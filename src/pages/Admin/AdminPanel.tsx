@@ -289,7 +289,7 @@ const AdminPanel = () => {
                   <button 
                     onClick={() => {
                       const id = prompt("Committee ID (e.g. kohhran, sunday-school):");
-                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "" });
+                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "", members: [], officeBearers: [], reports: "" });
                     }}
                     className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
                   >
@@ -336,6 +336,19 @@ const AdminPanel = () => {
                                 setCommittees(newList);
                               }}
                               className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers (Comma separated)</label>
+                            <textarea 
+                              value={committee.officeBearers?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, officeBearers: e.target.value.split(',').map(s => s.trim()) } : c);
+                                setCommittees(newList);
+                              }}
+                              rows={2}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              placeholder="e.g. Chairman: Rev. John, Secretary: Upa Liana"
                             />
                           </div>
                           <div className="md:col-span-3">
@@ -399,7 +412,7 @@ const AdminPanel = () => {
                   <button 
                     onClick={() => {
                       const id = prompt("Fellowship ID (e.g. ktp, kpp, kohhran-hmeichhia):");
-                      if (id) handleSaveFellowship(id, { name: "", description: "", purpose: "", imageUrl: "", meetingTime: "", activities: [] });
+                      if (id) handleSaveFellowship(id, { name: "", description: "", purpose: "", imageUrl: "", meetingTime: "", activities: [], members: [], officeBearers: [] });
                     }}
                     className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
                   >
@@ -481,6 +494,31 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, activities: e.target.value.split(',').map(s => s.trim()) } : f);
                                 setFellowships(newList);
                               }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers (Comma separated)</label>
+                            <textarea 
+                              value={fellowship.officeBearers?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: e.target.value.split(',').map(s => s.trim()) } : f);
+                                setFellowships(newList);
+                              }}
+                              rows={2}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              placeholder="e.g. Leader: John, Secretary: Jane"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
+                            <textarea 
+                              value={fellowship.members?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, members: e.target.value.split(',').map(s => s.trim()) } : f);
+                                setFellowships(newList);
+                              }}
+                              rows={2}
                               className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
                             />
                           </div>

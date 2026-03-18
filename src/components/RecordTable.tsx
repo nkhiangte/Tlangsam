@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2, Trash2, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../App';
 
 interface RecordTableProps {

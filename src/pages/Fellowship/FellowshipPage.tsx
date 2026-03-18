@@ -11,6 +11,8 @@ interface FellowshipData {
   imageUrl: string;
   meetingTime: string;
   activities: string[];
+  members?: string[];
+  officeBearers?: string[];
 }
 
 interface FellowshipPageProps {
@@ -114,10 +116,28 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                 <Users className="w-5 h-5 text-emerald-600 mt-1" />
                 <div>
                   <h3 className="font-medium text-stone-900">Member-te</h3>
-                  <p className="text-sm text-stone-500">Kohhran member zawng zawngte.</p>
+                  <p className="text-sm text-stone-500">
+                    {data.members && data.members.length > 0 
+                      ? data.members.join(', ') 
+                      : "Kohhran member zawng zawngte."}
+                  </p>
                 </div>
               </div>
             </div>
+
+            {data.officeBearers && data.officeBearers.length > 0 && (
+              <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-800 mb-4">Office Bearers</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                  {data.officeBearers.map((ob, i) => (
+                    <div key={i} className="text-stone-700 text-sm flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      {ob}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
 

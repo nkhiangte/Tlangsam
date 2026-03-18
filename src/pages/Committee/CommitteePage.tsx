@@ -59,6 +59,16 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               </div>
               <h3 className="text-xl font-serif mb-2">Member-te</h3>
               <p className="text-stone-600 text-sm">Committee member-te leh an mawhphurhna hrang hrangte.</p>
+              {data?.members && data.members.length > 0 && (
+                <ul className="mt-4 space-y-1">
+                  {data.members.map((m: string, i: number) => (
+                    <li key={i} className="text-stone-700 text-sm flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-church-gold" />
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100">
               <div className="w-12 h-12 bg-church-burgundy/10 rounded-2xl flex items-center justify-center text-church-burgundy mb-6">
@@ -66,6 +76,16 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               </div>
               <h3 className="text-xl font-serif mb-2">Inkhawm Hun</h3>
               <p className="text-stone-600 text-sm">{data?.meetingTime || "Committee thutkhawm hun leh hmun hrang hrangte."}</p>
+              {data?.officeBearers && data.officeBearers.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-stone-200">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-3">Office Bearers</h4>
+                  <ul className="space-y-2">
+                    {data.officeBearers.map((ob: string, i: number) => (
+                      <li key={i} className="text-stone-800 text-sm font-medium">{ob}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100">
               <div className="w-12 h-12 bg-church-burgundy/10 rounded-2xl flex items-center justify-center text-church-burgundy mb-6">
@@ -73,6 +93,11 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               </div>
               <h3 className="text-xl font-serif mb-2">Minutes & Report</h3>
               <p className="text-stone-600 text-sm">Committee thurel leh report pawimawh vawn thatnate.</p>
+              {data?.reports && (
+                <div className="mt-4 p-4 bg-white rounded-xl border border-stone-200 text-stone-700 text-sm italic line-clamp-6">
+                  {data.reports}
+                </div>
+              )}
             </div>
           </div>
 
