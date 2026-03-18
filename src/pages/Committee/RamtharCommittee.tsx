@@ -4,8 +4,9 @@ import CommitteePage from './CommitteePage';
 const RamtharCommittee = () => {
   return (
     <CommitteePage 
-      name="Ramthar Committee" 
-      description="Ramthar rawngbawlna leh chanchin tha puanchhuahna kawnga hma latu committee."
+      id="ramthar"
+      defaultName="Ramthar Committee" 
+      defaultDescription="Ramthar rawngbawlna leh chanchin tha puanchhuahna kawnga hma latu committee."
     />
   );
 };

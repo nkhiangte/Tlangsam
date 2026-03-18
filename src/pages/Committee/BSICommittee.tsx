@@ -4,8 +4,9 @@ import CommitteePage from './CommitteePage';
 const BSICommittee = () => {
   return (
     <CommitteePage 
-      name="BSI Committee" 
-      description="Bible Society of India (BSI) rawngbawlna leh Bible hmasawnna kawnga hma latu committee."
+      id="bsi"
+      defaultName="BSI Committee" 
+      defaultDescription="Bible Society of India (BSI) rawngbawlna leh Bible hmasawnna kawnga hma latu committee."
     />
   );
 };

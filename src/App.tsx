@@ -589,7 +589,7 @@ const DailyInspiration = () => {
           
           <div className="flex items-center gap-2 mb-6">
             <div className="h-px w-8 bg-church-gold"></div>
-            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Ni tina chakna</span>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Vawiin Changvawn</span>
           </div>
 
           {loading ? (

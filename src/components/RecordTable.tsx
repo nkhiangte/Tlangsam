@@ -18,6 +18,7 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isAdmin, user } = useAuth();
@@ -43,18 +44,37 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
     if (!isAdmin) return;
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, collectionName), {
-        ...formData,
-        createdAt: Timestamp.now(),
-        authorUid: user?.uid
-      });
+      if (editingId) {
+        await setDoc(doc(db, collectionName, editingId), {
+          ...formData,
+          updatedAt: Timestamp.now(),
+          updatedBy: user?.uid
+        }, { merge: true });
+      } else {
+        await addDoc(collection(db, collectionName), {
+          ...formData,
+          createdAt: Timestamp.now(),
+          authorUid: user?.uid
+        });
+      }
       setShowAddModal(false);
+      setEditingId(null);
       setFormData({});
     } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, collectionName);
+      handleFirestoreError(error, editingId ? OperationType.UPDATE : OperationType.CREATE, collectionName);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditRecord = (record: any) => {
+    setEditingId(record.id);
+    const initialFormData: any = {};
+    Object.keys(schema).forEach(key => {
+      initialFormData[key] = record[key] || '';
+    });
+    setFormData(initialFormData);
+    setShowAddModal(true);
   };
 
   const handleDeleteRecord = async (id: string) => {
@@ -149,13 +169,22 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                       ))}
                       {isAdmin && (
                         <td className="px-8 py-4 text-right">
-                          <button 
-                            onClick={() => handleDeleteRecord(row.id)}
-                            className="p-2 text-stone-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
-                            title="Paih rawh"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                            <button 
+                              onClick={() => handleEditRecord(row)}
+                              className="p-2 text-stone-300 hover:text-church-gold transition-all"
+                              title="Edit rawh"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteRecord(row.id)}
+                              className="p-2 text-stone-300 hover:text-red-500 transition-all"
+                              title="Paih rawh"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       )}
                     </tr>
@@ -194,8 +223,17 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
               className="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl overflow-hidden"
             >
               <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
-                <h2 className="text-2xl font-serif text-stone-900">Record thar dahna ({title.replace('Record-te', '').trim()})</h2>
-                <button onClick={() => setShowAddModal(false)} className="text-stone-400 hover:text-stone-600 transition-colors">
+                <h2 className="text-2xl font-serif text-stone-900">
+                  {editingId ? 'Record siamthatna' : 'Record thar dahna'} ({title.replace('Record-te', '').trim()})
+                </h2>
+                <button 
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingId(null);
+                    setFormData({});
+                  }} 
+                  className="text-stone-400 hover:text-stone-600 transition-colors"
+                >
                   <X className="h-6 w-6" />
                 </button>
               </div>
@@ -218,7 +256,11 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                 <div className="flex gap-4">
                   <button 
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setEditingId(null);
+                      setFormData({});
+                    }}
                     className="flex-1 px-8 py-4 border border-stone-200 rounded-xl font-medium text-stone-600 hover:bg-stone-50 transition-all"
                   >
                     Bansan
@@ -228,7 +270,7 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                     disabled={isSubmitting}
                     className="flex-1 px-8 py-4 bg-church-burgundy text-white rounded-xl font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Record Save rawh'}
+                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : (editingId ? 'Record Update rawh' : 'Record Save rawh')}
                   </button>
                 </div>
               </form>

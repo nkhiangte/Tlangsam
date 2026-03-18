@@ -12,7 +12,8 @@ import {
   Plus,
   Trash2,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  Sparkles
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -33,9 +34,12 @@ import { useAuth } from '../../App';
 const AdminPanel = () => {
   const { isAdmin, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'services' | 'records'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'services' | 'records' | 'committees' | 'fellowships' | 'inspiration'>('users');
   const [users, setUsers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
+  const [committees, setCommittees] = useState<any[]>([]);
+  const [fellowships, setFellowships] = useState<any[]>([]);
+  const [inspiration, setInspiration] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -79,6 +83,43 @@ const AdminPanel = () => {
     return unsubscribe;
   }, [isAdmin]);
 
+  // Fetch committees
+  useEffect(() => {
+    if (!isAdmin) return;
+    const unsubscribe = onSnapshot(collection(db, 'committees'), (snapshot) => {
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCommittees(list);
+    });
+    return unsubscribe;
+  }, [isAdmin]);
+
+  // Fetch fellowships
+  useEffect(() => {
+    if (!isAdmin) return;
+    const unsubscribe = onSnapshot(collection(db, 'fellowships'), (snapshot) => {
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setFellowships(list);
+    });
+    return unsubscribe;
+  }, [isAdmin]);
+
+  // Fetch inspiration
+  useEffect(() => {
+    if (!isAdmin) return;
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'inspiration'), (doc) => {
+      if (doc.exists()) {
+        setInspiration(doc.data());
+      }
+    });
+    return unsubscribe;
+  }, [isAdmin]);
+
   const toggleUserRole = async (userId: string, currentRole: string) => {
     if (userId === user?.uid) {
       alert("I mahni role i thlak thei lo.");
@@ -102,6 +143,69 @@ const AdminPanel = () => {
       alert("Inkhawm hun-te vawn that a ni ta.");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, 'settings/services');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveCommittee = async (id: string, data: any) => {
+    setIsSaving(true);
+    try {
+      await setDoc(doc(db, 'committees', id), {
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      alert("Committee data vawn that a ni ta.");
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `committees/${id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteCommittee = async (id: string) => {
+    if (!window.confirm("I delete duh tak tak em?")) return;
+    try {
+      await deleteDoc(doc(db, 'committees', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `committees/${id}`);
+    }
+  };
+
+  const handleSaveFellowship = async (id: string, data: any) => {
+    setIsSaving(true);
+    try {
+      await setDoc(doc(db, 'fellowships', id), {
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      alert("Fellowship data vawn that a ni ta.");
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `fellowships/${id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteFellowship = async (id: string) => {
+    if (!window.confirm("I delete duh tak tak em?")) return;
+    try {
+      await deleteDoc(doc(db, 'fellowships', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `fellowships/${id}`);
+    }
+  };
+
+  const handleSaveInspiration = async (data: any) => {
+    setIsSaving(true);
+    try {
+      await setDoc(doc(db, 'settings', 'inspiration'), {
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      alert("Vawiin Changvawn vawn that a ni ta.");
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, 'settings/inspiration');
     } finally {
       setIsSaving(false);
     }
@@ -150,10 +254,320 @@ const AdminPanel = () => {
           >
             <FileText className="h-4 w-4" /> Record Edit
           </button>
+          <button 
+            onClick={() => setActiveTab('committees')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === 'committees' ? 'bg-church-burgundy text-white shadow-lg' : 'bg-white text-stone-600 hover:bg-stone-50'}`}
+          >
+            <Shield className="h-4 w-4" /> Committees
+          </button>
+          <button 
+            onClick={() => setActiveTab('fellowships')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === 'fellowships' ? 'bg-church-burgundy text-white shadow-lg' : 'bg-white text-stone-600 hover:bg-stone-50'}`}
+          >
+            <Users className="h-4 w-4" /> Fellowships
+          </button>
+          <button 
+            onClick={() => setActiveTab('inspiration')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === 'inspiration' ? 'bg-church-burgundy text-white shadow-lg' : 'bg-white text-stone-600 hover:bg-stone-50'}`}
+          >
+            <Sparkles className="h-4 w-4" /> Vawiin Changvawn
+          </button>
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-xl border border-stone-100 overflow-hidden p-8">
           <AnimatePresence mode="wait">
+            {activeTab === 'committees' && (
+              <motion.div
+                key="committees"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-8"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-serif">Committee Management</h2>
+                  <button 
+                    onClick={() => {
+                      const id = prompt("Committee ID (e.g. kohhran, sunday-school):");
+                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "" });
+                    }}
+                    className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
+                  >
+                    <Plus className="h-4 w-4" /> Committee thar belhna
+                  </button>
+                </div>
+
+                <div className="grid gap-6">
+                  {committees.map((committee) => (
+                    <div key={committee.id} className="p-6 border border-stone-100 rounded-2xl bg-stone-50/50 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 grid md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hming</label>
+                            <input 
+                              type="text" 
+                              value={committee.name}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, name: e.target.value } : c);
+                                setCommittees(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hrilhfiahna</label>
+                            <input 
+                              type="text" 
+                              value={committee.description}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, description: e.target.value } : c);
+                                setCommittees(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Inkhawm Hun / Meeting Time</label>
+                            <input 
+                              type="text" 
+                              value={committee.meetingTime || ""}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, meetingTime: e.target.value } : c);
+                                setCommittees(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
+                            <textarea 
+                              value={committee.members?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, members: e.target.value.split(',').map(s => s.trim()) } : c);
+                                setCommittees(newList);
+                              }}
+                              rows={2}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Reports / Minutes Summary</label>
+                            <textarea 
+                              value={committee.reports || ""}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, reports: e.target.value } : c);
+                                setCommittees(newList);
+                              }}
+                              rows={3}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <button 
+                            onClick={() => handleSaveCommittee(committee.id, committee)}
+                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                            title="Save"
+                          >
+                            <Save className="h-5 w-5" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteCommittee(committee.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'fellowships' && (
+              <motion.div
+                key="fellowships"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-8"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-serif">Fellowship Management</h2>
+                  <button 
+                    onClick={() => {
+                      const id = prompt("Fellowship ID (e.g. ktp, kpp, kohhran-hmeichhia):");
+                      if (id) handleSaveFellowship(id, { name: "", description: "", purpose: "", imageUrl: "", meetingTime: "", activities: [] });
+                    }}
+                    className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
+                  >
+                    <Plus className="h-4 w-4" /> Fellowship thar belhna
+                  </button>
+                </div>
+
+                <div className="grid gap-6">
+                  {fellowships.map((fellowship) => (
+                    <div key={fellowship.id} className="p-6 border border-stone-100 rounded-2xl bg-stone-50/50 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hming</label>
+                            <input 
+                              type="text" 
+                              value={fellowship.name}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, name: e.target.value } : f);
+                                setFellowships(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Image URL</label>
+                            <input 
+                              type="text" 
+                              value={fellowship.imageUrl || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, imageUrl: e.target.value } : f);
+                                setFellowships(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hrilhfiahna</label>
+                            <input 
+                              type="text" 
+                              value={fellowship.description}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, description: e.target.value } : f);
+                                setFellowships(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Kan Thiltum / Purpose</label>
+                            <textarea 
+                              value={fellowship.purpose || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, purpose: e.target.value } : f);
+                                setFellowships(newList);
+                              }}
+                              rows={2}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Inkhawm Hun</label>
+                            <input 
+                              type="text" 
+                              value={fellowship.meetingTime || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, meetingTime: e.target.value } : f);
+                                setFellowships(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Activities (Comma separated)</label>
+                            <input 
+                              type="text" 
+                              value={fellowship.activities?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, activities: e.target.value.split(',').map(s => s.trim()) } : f);
+                                setFellowships(newList);
+                              }}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <button 
+                            onClick={() => handleSaveFellowship(fellowship.id, fellowship)}
+                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                            title="Save"
+                          >
+                            <Save className="h-5 w-5" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteFellowship(fellowship.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'inspiration' && (
+              <motion.div
+                key="inspiration"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-8"
+              >
+                <div className="mb-6">
+                  <h2 className="text-2xl font-serif">Vawiin Changvawn Management</h2>
+                  <p className="text-stone-500">Daily verse leh reflection edit-na hmun.</p>
+                </div>
+
+                <div className="p-8 border border-stone-100 rounded-3xl bg-stone-50/50 space-y-6">
+                  <div className="grid gap-6">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Changvawn (Verse)</label>
+                      <textarea 
+                        value={inspiration?.verse || ""}
+                        onChange={(e) => setInspiration({ ...inspiration, verse: e.target.value })}
+                        rows={2}
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                        placeholder="Bible chang dah rawh..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Reference</label>
+                      <input 
+                        type="text" 
+                        value={inspiration?.reference || ""}
+                        onChange={(e) => setInspiration({ ...inspiration, reference: e.target.value })}
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                        placeholder="e.g. John 3:16"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Reflection / Hrilhfiahna</label>
+                      <textarea 
+                        value={inspiration?.reflection || ""}
+                        onChange={(e) => setInspiration({ ...inspiration, reflection: e.target.value })}
+                        rows={4}
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                        placeholder="Changvawn hrilhfiahna tawite..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={() => handleSaveInspiration(inspiration)}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 bg-church-burgundy text-white px-8 py-4 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-bold disabled:opacity-50"
+                    >
+                      {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                      Vawng tha rawh
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             {activeTab === 'users' && (
               <motion.div
                 key="users"

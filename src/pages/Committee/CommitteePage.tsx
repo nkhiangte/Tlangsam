@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Users, Calendar, FileText, Shield } from 'lucide-react';
+import { Users, Calendar, FileText, Shield, Loader2 } from 'lucide-react';
+import { db } from '../../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 interface CommitteePageProps {
-  name: string;
-  description: string;
+  id: string;
+  defaultName: string;
+  defaultDescription: string;
 }
 
-const CommitteePage: React.FC<CommitteePageProps> = ({ name, description }) => {
+const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultDescription }) => {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'committees', id), (doc) => {
+      if (doc.exists()) {
+        setData(doc.data());
+      } else {
+        setData({
+          name: defaultName,
+          description: defaultDescription,
+          meetingTime: "Committee thutkhawm hun leh hmun hrang hrangte."
+        });
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, [id, defaultName, defaultDescription]);
+
+  if (loading) {
+    return (
+      <div className="pt-24 min-h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 text-church-burgundy animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="pt-24 min-h-screen">
       <section className="py-24 bg-white">
@@ -18,8 +48,8 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ name, description }) => {
             className="text-center mb-16"
           >
             <span className="text-church-gold font-medium uppercase tracking-widest text-sm mb-4 block">Committee</span>
-            <h2 className="text-4xl md:text-5xl font-serif mb-4">{name}</h2>
-            <p className="text-stone-500 max-w-2xl mx-auto">{description}</p>
+            <h2 className="text-4xl md:text-5xl font-serif mb-4">{data?.name || defaultName}</h2>
+            <p className="text-stone-500 max-w-2xl mx-auto">{data?.description || defaultDescription}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
@@ -35,7 +65,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ name, description }) => {
                 <Calendar className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-serif mb-2">Inkhawm Hun</h3>
-              <p className="text-stone-600 text-sm">Committee thutkhawm hun leh hmun hrang hrangte.</p>
+              <p className="text-stone-600 text-sm">{data?.meetingTime || "Committee thutkhawm hun leh hmun hrang hrangte."}</p>
             </div>
             <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100">
               <div className="w-12 h-12 bg-church-burgundy/10 rounded-2xl flex items-center justify-center text-church-burgundy mb-6">

@@ -4,8 +4,9 @@ import CommitteePage from './CommitteePage';
 const KohhranCommittee = () => {
   return (
     <CommitteePage 
-      name="Kohhran Committee" 
-      description="Kohhran thil pawimawh leh hmasawnna hrang hrang reltu leh enkawltu committee."
+      id="kohhran"
+      defaultName="Kohhran Committee" 
+      defaultDescription="Kohhran thil pawimawh leh hmasawnna hrang hrang reltu leh enkawltu committee."
     />
   );
 };

@@ -112,6 +112,32 @@
       },
       "required": ["name", "ordinationDate", "yearsOfService", "deathDate", "legacy"]
     },
+    "Committee": {
+      "title": "Committee",
+      "description": "Information about a church committee.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "members": { "type": "string", "description": "JSON string of members list" },
+        "meetingTime": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "description"]
+    },
+    "Fellowship": {
+      "title": "Fellowship",
+      "description": "Information about a church fellowship group.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "leaders": { "type": "string", "description": "JSON string of leaders list" },
+        "activities": { "type": "string", "description": "JSON string of activities list" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "description"]
+    },
     "Setting": {
       "title": "Setting",
       "description": "Application settings.",
@@ -134,6 +160,8 @@
     "/admission_records": { "schema": "AdmissionRecord", "description": "Collection of admission records" },
     "/minute_records": { "schema": "MinuteRecord", "description": "Collection of minute records" },
     "/elder_records": { "schema": "ElderRecord", "description": "Collection of elder records" },
+    "/committees": { "schema": "Committee", "description": "Collection of church committees" },
+    "/fellowships": { "schema": "Fellowship", "description": "Collection of church fellowships" },
     "/settings": { "schema": "Setting", "description": "Collection of application settings" }
   }
 }

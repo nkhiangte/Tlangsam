@@ -4,8 +4,9 @@ import CommitteePage from './CommitteePage';
 const SundaySchoolCommittee = () => {
   return (
     <CommitteePage 
-      name="Sunday School Committee" 
-      description="Sunday School hmasawnna leh zirna hrang hrang enkawltu committee."
+      id="sunday-school"
+      defaultName="Sunday School Committee" 
+      defaultDescription="Sunday School hmasawnna leh zirna hrang hrang enkawltu committee."
     />
   );
 };

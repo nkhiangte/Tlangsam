@@ -4,8 +4,9 @@ import CommitteePage from './CommitteePage';
 const LightAndSoundCommittee = () => {
   return (
     <CommitteePage 
-      name="Light & Sound Committee" 
-      description="Biak In leh thil hrang hranga eng leh ri (light & sound) enkawltu committee."
+      id="light-sound"
+      defaultName="Light & Sound Committee" 
+      defaultDescription="Biak In leh thil hrang hranga eng leh ri (light & sound) enkawltu committee."
     />
   );
 };
