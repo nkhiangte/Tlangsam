@@ -119,6 +119,7 @@
       "properties": {
         "value": { "type": "string", "description": "The value of the setting" },
         "logoUrl": { "type": "string", "description": "URL of the church logo" },
+        "logoSize": { "type": "integer", "description": "Size of the church logo in pixels" },
         "backgroundImage": { "type": "string", "description": "URL of the homepage background image" },
         "updatedAt": { "type": "string", "format": "date-time" }
       }

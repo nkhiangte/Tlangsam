@@ -31,7 +31,8 @@ import {
   Camera,
   Upload,
   Loader2,
-  Shield
+  Shield,
+  Settings
 } from 'lucide-react';
 import { getDailyInspiration } from './services/geminiService';
 import Baptism from './pages/Records/Baptism';
@@ -143,6 +144,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
+  const [logoSize, setLogoSize] = useState(48);
+  const [showSizeSlider, setShowSizeSlider] = useState(false);
   const [uploading, setUploading] = useState(false);
   const { user, login, logout, isAdmin } = useAuth();
 
@@ -151,8 +154,10 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     
     const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
-      if (doc.exists() && doc.data().logoUrl) {
-        setLogoUrl(doc.data().logoUrl);
+      if (doc.exists()) {
+        const data = doc.data();
+        if (data.logoUrl) setLogoUrl(data.logoUrl);
+        if (data.logoSize) setLogoSize(data.logoSize);
       }
     });
 
@@ -161,6 +166,18 @@ const Navbar = () => {
       unsubscribe();
     };
   }, []);
+
+  const handleLogoSizeChange = async (newSize: number) => {
+    setLogoSize(newSize);
+    try {
+      await setDoc(doc(db, 'settings', 'homepage'), {
+        logoSize: newSize,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error updating logo size:', error);
+    }
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -225,15 +242,42 @@ const Navbar = () => {
                 <img 
                   src={logoUrl} 
                   alt="Tlangsam Presbyterian Logo" 
-                  className="h-12 w-12 object-contain"
+                  style={{ height: `${logoSize}px`, width: `${logoSize}px` }}
+                  className="object-contain transition-all duration-300"
                   referrerPolicy="no-referrer"
                 />
               </Link>
               {isAdmin && (
-                <label className="absolute -bottom-1 -right-1 bg-church-burgundy text-white p-1 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10">
-                  {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
-                  <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
-                </label>
+                <div className="absolute -bottom-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <label className="bg-church-burgundy text-white p-1 rounded-full cursor-pointer shadow-lg">
+                    {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                    <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+                  </label>
+                  <button 
+                    onClick={() => setShowSizeSlider(!showSizeSlider)}
+                    className="bg-church-gold text-white p-1 rounded-full cursor-pointer shadow-lg"
+                  >
+                    <Settings className="h-3 w-3" />
+                  </button>
+                  
+                  {showSizeSlider && (
+                    <div className="absolute top-full mt-2 left-0 bg-white p-3 rounded-xl shadow-xl border border-stone-100 w-48 z-50">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-stone-400 mb-2">Logo Size: {logoSize}px</p>
+                      <input 
+                        type="range" 
+                        min="32" 
+                        max="120" 
+                        value={logoSize} 
+                        onChange={(e) => handleLogoSizeChange(parseInt(e.target.value))}
+                        className="w-full h-1 bg-stone-100 rounded-lg appearance-none cursor-pointer accent-church-gold"
+                      />
+                      <div className="flex justify-between text-[8px] text-stone-400 mt-1">
+                        <span>Small</span>
+                        <span>Large</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             <Link to="/" className="flex flex-col">
@@ -250,15 +294,15 @@ const Navbar = () => {
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className={`text-sm font-medium transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}>
-                    {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
+                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}>
+                    {link.name} <ChevronRight className="h-4 w-4 rotate-90" />
                   </button>
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
                     {link.dropdown.map((sub) => (
                       <Link 
                         key={sub.name} 
                         to={sub.href}
-                        className="block px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
+                        className="block px-4 py-2 text-base text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
                       >
                         {sub.name}
                       </Link>
@@ -273,7 +317,7 @@ const Navbar = () => {
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={`text-sm font-medium transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
                 >
                   {link.name}
                 </a>
@@ -281,7 +325,7 @@ const Navbar = () => {
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
                 >
                   {link.name}
                 </Link>
@@ -293,9 +337,9 @@ const Navbar = () => {
                 {isAdmin && (
                   <Link 
                     to="/admin" 
-                    className={`text-sm font-medium transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
                   >
-                    <Shield className="h-4 w-4" /> Admin Panel
+                    <Shield className="h-5 w-5" /> Admin Panel
                   </Link>
                 )}
                 <div className="flex items-center gap-2">
@@ -474,10 +518,10 @@ const Hero = () => {
         >
           <span className="text-church-gold font-medium tracking-[0.2em] uppercase text-sm mb-6 block">Kan kohhranah kan lo lawm a che</span>
           <div className="mb-12">
-            <p className="text-2xl md:text-3xl text-white/90 font-serif font-normal mb-3">
+            <p className="text-xl md:text-2xl text-white/90 font-serif font-normal mb-3">
               Mizoram Synod
             </p>
-            <h1 className="text-5xl md:text-8xl text-white font-serif font-bold leading-tight tracking-tight">
+            <h1 className="text-3xl md:text-5xl text-white font-serif font-bold leading-tight tracking-tight whitespace-nowrap">
               Tlangsam Presbyterian Kohhran
             </h1>
           </div>
@@ -943,11 +987,14 @@ const Contact = () => {
 
 const Footer = () => {
   const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
+  const [logoSize, setLogoSize] = useState(40);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
-      if (doc.exists() && doc.data().logoUrl) {
-        setLogoUrl(doc.data().logoUrl);
+      if (doc.exists()) {
+        const data = doc.data();
+        if (data.logoUrl) setLogoUrl(data.logoUrl);
+        if (data.logoSize) setLogoSize(Math.max(32, data.logoSize * 0.8)); // Footer logo slightly smaller
       }
     });
     return unsubscribe;
@@ -961,7 +1008,8 @@ const Footer = () => {
             <img 
               src={logoUrl} 
               alt="Tlangsam Presbyterian Logo" 
-              className="h-10 w-10 object-contain brightness-0 invert"
+              style={{ height: `${logoSize}px`, width: `${logoSize}px` }}
+              className="object-contain brightness-0 invert"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
