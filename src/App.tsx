@@ -2,7 +2,6 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Church, 
   Calendar, 
   Clock, 
   MapPin, 
@@ -184,11 +183,21 @@ const Navbar = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Church className={`h-8 w-8 ${scrolled ? 'text-church-burgundy' : 'text-white'}`} />
-            <span className={`text-xl font-serif font-bold tracking-tight ${scrolled ? 'text-stone-900' : 'text-white'}`}>
-              Tlangsam Presbyterian
-            </span>
+          <Link to="/" className="flex items-center gap-3">
+            <img 
+              src="https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png" 
+              alt="Tlangsam Presbyterian Logo" 
+              className="h-12 w-12 object-contain"
+              referrerPolicy="no-referrer"
+            />
+            <div className="flex flex-col">
+              <span className={`text-xl font-serif font-bold leading-tight tracking-tight ${scrolled ? 'text-stone-900' : 'text-white'}`}>
+                Tlangsam
+              </span>
+              <span className={`text-sm font-serif font-medium leading-tight opacity-90 ${scrolled ? 'text-church-burgundy' : 'text-church-gold'}`}>
+                Presbyterian Church
+              </span>
+            </div>
           </Link>
           
           <div className="hidden md:flex items-center gap-8">
@@ -889,11 +898,21 @@ const Footer = () => {
     <footer className="bg-stone-950 text-white py-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <Church className="h-6 w-6 text-church-gold" />
-            <span className="text-lg font-serif font-bold tracking-tight">
-              Tlangsam Presbyterian
-            </span>
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png" 
+              alt="Tlangsam Presbyterian Logo" 
+              className="h-10 w-10 object-contain brightness-0 invert"
+              referrerPolicy="no-referrer"
+            />
+            <div className="flex flex-col">
+              <span className="text-lg font-serif font-bold tracking-tight">
+                Tlangsam
+              </span>
+              <span className="text-xs font-serif font-medium text-church-gold opacity-80">
+                Presbyterian Church
+              </span>
+            </div>
           </div>
           
           <div className="flex gap-8 text-sm text-white/40">
