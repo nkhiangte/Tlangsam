@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "BaptismRecord": {
+      "title": "Baptism Record",
+      "description": "Record of a holy baptism.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the person baptized" },
+        "date": { "type": "string", "format": "date", "description": "Date of baptism" },
+        "parents": { "type": "string", "description": "Parents' names" },
+        "officiant": { "type": "string", "description": "Minister who performed the baptism" },
+        "location": { "type": "string", "description": "Location of the baptism" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "date", "parents", "officiant", "location"]
+    },
+    "WeddingRecord": {
+      "title": "Wedding Record",
+      "description": "Record of a marriage ceremony.",
+      "type": "object",
+      "properties": {
+        "groom": { "type": "string", "description": "Groom's name" },
+        "bride": { "type": "string", "description": "Bride's name" },
+        "date": { "type": "string", "format": "date", "description": "Date of marriage" },
+        "officiant": { "type": "string", "description": "Minister who performed the ceremony" },
+        "witnesses": { "type": "string", "description": "Names of witnesses" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groom", "bride", "date", "officiant", "witnesses"]
+    },
+    "FuneralRecord": {
+      "title": "Funeral Record",
+      "description": "Record of a funeral service.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the deceased" },
+        "deathDate": { "type": "string", "format": "date", "description": "Date of death" },
+        "funeralDate": { "type": "string", "format": "date", "description": "Date of funeral" },
+        "age": { "type": "integer", "description": "Age at death" },
+        "officiant": { "type": "string", "description": "Minister who performed the service" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "deathDate", "funeralDate", "age", "officiant"]
+    },
+    "ConferenceRecord": {
+      "title": "Conference Record",
+      "description": "Record of a church conference or meeting.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the conference" },
+        "date": { "type": "string", "format": "date", "description": "Date of the conference" },
+        "location": { "type": "string", "description": "Location of the conference" },
+        "delegates": { "type": "integer", "description": "Number of delegates" },
+        "reportUrl": { "type": "string", "description": "Link to the report" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "date", "location", "delegates"]
+    },
+    "TransferRecord": {
+      "title": "Transfer Record (Pem Dawnsawn)",
+      "description": "Record of a member transfer.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the member" },
+        "date": { "type": "string", "format": "date", "description": "Date of transfer" },
+        "fromChurch": { "type": "string", "description": "Church transferring from" },
+        "toChurch": { "type": "string", "description": "Church transferring to" },
+        "reason": { "type": "string", "description": "Reason for transfer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "date", "fromChurch", "toChurch", "reason"]
+    },
+    "AdmissionRecord": {
+      "title": "Admission Record (Pawl Dang)",
+      "description": "Record of a member joining from another denomination.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the member" },
+        "date": { "type": "string", "format": "date", "description": "Date joined" },
+        "formerDenomination": { "type": "string", "description": "Former denomination" },
+        "admissionType": { "type": "string", "description": "Type of admission" },
+        "officiant": { "type": "string", "description": "Minister who performed the admission" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "date", "formerDenomination", "admissionType", "officiant"]
+    },
+    "MinuteRecord": {
+      "title": "Minute Record",
+      "description": "Record of meeting minutes.",
+      "type": "object",
+      "properties": {
+        "meetingType": { "type": "string", "description": "Type of meeting" },
+        "date": { "type": "string", "format": "date", "description": "Date of meeting" },
+        "secretary": { "type": "string", "description": "Secretary of the meeting" },
+        "decisions": { "type": "string", "description": "Key decisions made" },
+        "downloadUrl": { "type": "string", "description": "Link to the full minutes" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["meetingType", "date", "secretary", "decisions"]
+    },
+    "ElderRecord": {
+      "title": "Elder Record (Upa kal ta te)",
+      "description": "Record of a deceased elder.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the elder" },
+        "ordinationDate": { "type": "string", "format": "date", "description": "Date of ordination" },
+        "yearsOfService": { "type": "string", "description": "Years of service" },
+        "deathDate": { "type": "string", "format": "date", "description": "Date of decease" },
+        "legacy": { "type": "string", "description": "Legacy and contributions" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "ordinationDate", "yearsOfService", "deathDate", "legacy"]
+    }
+  },
+  "firestore": {
+    "/baptism_records": { "schema": "BaptismRecord", "description": "Collection of baptism records" },
+    "/wedding_records": { "schema": "WeddingRecord", "description": "Collection of wedding records" },
+    "/funeral_records": { "schema": "FuneralRecord", "description": "Collection of funeral records" },
+    "/conference_records": { "schema": "ConferenceRecord", "description": "Collection of conference records" },
+    "/transfer_records": { "schema": "TransferRecord", "description": "Collection of transfer records" },
+    "/admission_records": { "schema": "AdmissionRecord", "description": "Collection of admission records" },
+    "/minute_records": { "schema": "MinuteRecord", "description": "Collection of minute records" },
+    "/elder_records": { "schema": "ElderRecord", "description": "Collection of elder records" }
+  }
+}

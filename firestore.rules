@@ -1,0 +1,185 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: baptism_records
+    // Fields: name, date, parents, officiant, location, createdAt
+    //
+    // Collection: wedding_records
+    // Fields: groom, bride, date, officiant, witnesses, createdAt
+    //
+    // Collection: funeral_records
+    // Fields: name, deathDate, funeralDate, age, officiant, createdAt
+    //
+    // Collection: conference_records
+    // Fields: name, date, location, delegates, reportUrl, createdAt
+    //
+    // Collection: transfer_records
+    // Fields: name, date, fromChurch, toChurch, reason, createdAt
+    //
+    // Collection: admission_records
+    // Fields: name, date, formerDenomination, admissionType, officiant, createdAt
+    //
+    // Collection: minute_records
+    // Fields: meetingType, date, secretary, decisions, downloadUrl, createdAt
+    //
+    // Collection: elder_records
+    // Fields: name, ordinationDate, yearsOfService, deathDate, legacy, createdAt
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "nkhiangte@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidBaptism(data) {
+      return hasRequiredFields(['name', 'date', 'parents', 'officiant', 'location']) &&
+             data.name is string && data.name.size() < 100 &&
+             data.date is string &&
+             data.parents is string &&
+             data.officiant is string &&
+             data.location is string;
+    }
+
+    function isValidWedding(data) {
+      return hasRequiredFields(['groom', 'bride', 'date', 'officiant', 'witnesses']) &&
+             data.groom is string && data.bride is string &&
+             data.date is string &&
+             data.officiant is string &&
+             data.witnesses is string;
+    }
+
+    function isValidFuneral(data) {
+      return hasRequiredFields(['name', 'deathDate', 'funeralDate', 'age', 'officiant']) &&
+             data.name is string && data.age is int &&
+             data.deathDate is string && data.funeralDate is string &&
+             data.officiant is string;
+    }
+
+    function isValidConference(data) {
+      return hasRequiredFields(['name', 'date', 'location', 'delegates']) &&
+             data.name is string && data.date is string &&
+             data.location is string && data.delegates is int;
+    }
+
+    function isValidTransfer(data) {
+      return hasRequiredFields(['name', 'date', 'fromChurch', 'toChurch', 'reason']) &&
+             data.name is string && data.date is string &&
+             data.fromChurch is string && data.toChurch is string &&
+             data.reason is string;
+    }
+
+    function isValidAdmission(data) {
+      return hasRequiredFields(['name', 'date', 'formerDenomination', 'admissionType', 'officiant']) &&
+             data.name is string && data.date is string &&
+             data.formerDenomination is string && data.admissionType is string &&
+             data.officiant is string;
+    }
+
+    function isValidMinute(data) {
+      return hasRequiredFields(['meetingType', 'date', 'secretary', 'decisions']) &&
+             data.meetingType is string && data.date is string &&
+             data.secretary is string && data.decisions is string;
+    }
+
+    function isValidElder(data) {
+      return hasRequiredFields(['name', 'ordinationDate', 'yearsOfService', 'deathDate', 'legacy']) &&
+             data.name is string && data.ordinationDate is string &&
+             data.yearsOfService is string && data.deathDate is string &&
+             data.legacy is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Publicly readable for authenticated users, but writable only by admins
+    match /baptism_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidBaptism(request.resource.data);
+      allow update: if isAdmin() && isValidBaptism(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /wedding_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidWedding(request.resource.data);
+      allow update: if isAdmin() && isValidWedding(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /funeral_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidFuneral(request.resource.data);
+      allow update: if isAdmin() && isValidFuneral(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /conference_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidConference(request.resource.data);
+      allow update: if isAdmin() && isValidConference(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /transfer_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidTransfer(request.resource.data);
+      allow update: if isAdmin() && isValidTransfer(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /admission_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidAdmission(request.resource.data);
+      allow update: if isAdmin() && isValidAdmission(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /minute_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidMinute(request.resource.data);
+      allow update: if isAdmin() && isValidMinute(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /elder_records/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidElder(request.resource.data);
+      allow update: if isAdmin() && isValidElder(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'user';
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
+    }
+  }
+}
