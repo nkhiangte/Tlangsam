@@ -426,13 +426,15 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-church-gold font-medium tracking-[0.2em] uppercase text-sm mb-4 block">Kan kohhranah kan lo lawm a che</span>
-          <h1 className="text-5xl md:text-7xl text-white font-serif mb-6 leading-tight">
-            Rinna, Beiseina, leh Hmangaihna Tlangsam laili-ah
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 mb-10 font-light max-w-2xl mx-auto">
-            Pathian chibai buk tura kan inkhawmnaah lo tel ve rawh, rinnaah thangin kan khawtlang tana rawngbawl turin i inbuatsaih ang u.
-          </p>
+          <span className="text-church-gold font-medium tracking-[0.2em] uppercase text-sm mb-6 block">Kan kohhranah kan lo lawm a che</span>
+          <div className="mb-12">
+            <p className="text-2xl md:text-3xl text-white/90 font-serif font-normal mb-3">
+              Mizoram Synod
+            </p>
+            <h1 className="text-5xl md:text-8xl text-white font-serif font-bold leading-tight tracking-tight">
+              Tlangsam Presbyterian Kohhran
+            </h1>
+          </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button className="w-full sm:w-auto bg-white text-stone-900 px-8 py-4 rounded-full font-medium hover:bg-stone-100 transition-all flex items-center justify-center gap-2">
               Pathian Ni Inkhawm <ChevronRight className="h-4 w-4" />
