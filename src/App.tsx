@@ -219,30 +219,32 @@ const Navbar = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3 group relative">
+          <div className="flex items-center gap-3 group relative">
             <div className="relative">
-              <img 
-                src={logoUrl} 
-                alt="Tlangsam Presbyterian Logo" 
-                className="h-12 w-12 object-contain"
-                referrerPolicy="no-referrer"
-              />
+              <Link to="/" className="block">
+                <img 
+                  src={logoUrl} 
+                  alt="Tlangsam Presbyterian Logo" 
+                  className="h-12 w-12 object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </Link>
               {isAdmin && (
-                <label className="absolute -bottom-1 -right-1 bg-church-burgundy text-white p-1 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                <label className="absolute -bottom-1 -right-1 bg-church-burgundy text-white p-1 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10">
                   {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
                   <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
                 </label>
               )}
             </div>
-            <div className="flex flex-col">
+            <Link to="/" className="flex flex-col">
               <span className={`text-xl font-serif font-bold leading-tight tracking-tight ${scrolled ? 'text-stone-900' : 'text-white'}`}>
                 Tlangsam
               </span>
               <span className={`text-sm font-serif font-medium leading-tight opacity-90 ${scrolled ? 'text-church-burgundy' : 'text-church-gold'}`}>
                 Presbyterian Church
               </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
           
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
