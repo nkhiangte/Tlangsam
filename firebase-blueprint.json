@@ -111,6 +111,16 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "ordinationDate", "yearsOfService", "deathDate", "legacy"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Application settings.",
+      "type": "object",
+      "properties": {
+        "value": { "type": "string", "description": "The value of the setting" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["value"]
     }
   },
   "firestore": {
@@ -121,6 +131,7 @@
     "/transfer_records": { "schema": "TransferRecord", "description": "Collection of transfer records" },
     "/admission_records": { "schema": "AdmissionRecord", "description": "Collection of admission records" },
     "/minute_records": { "schema": "MinuteRecord", "description": "Collection of minute records" },
-    "/elder_records": { "schema": "ElderRecord", "description": "Collection of elder records" }
+    "/elder_records": { "schema": "ElderRecord", "description": "Collection of elder records" },
+    "/settings": { "schema": "Setting", "description": "Collection of application settings" }
   }
 }

@@ -175,6 +175,11 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /settings/{id} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
     // User profiles
     match /users/{userId} {
       allow read: if isAuthenticated();

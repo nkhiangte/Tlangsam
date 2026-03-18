@@ -28,7 +28,10 @@ import {
   ScrollText,
   LogIn,
   LogOut,
-  User
+  User,
+  Camera,
+  Upload,
+  Loader2
 } from 'lucide-react';
 import { getDailyInspiration } from './services/geminiService';
 import Baptism from './pages/Records/Baptism';
@@ -43,9 +46,10 @@ import Gallery from './pages/Archive/Gallery';
 import KohhranHmeichhia from './pages/Fellowship/KohhranHmeichhia';
 import KTP from './pages/Fellowship/KTP';
 import KPP from './pages/Fellowship/KPP';
-import { auth, db } from './firebase';
+import { auth, db, storage } from './firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Firebase Context
 interface AuthContextType {
@@ -76,7 +80,13 @@ const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ children })
         // Check if user is admin
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
-          setIsAdmin(userDoc.data().role === 'admin');
+          const data = userDoc.data();
+          if (user.email === 'nkhiangte@gmail.com' && data.role !== 'admin') {
+            await setDoc(doc(db, 'users', user.uid), { role: 'admin' }, { merge: true });
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(data.role === 'admin');
+          }
         } else {
           // Create user doc if it doesn't exist
           const isDefaultAdmin = user.email === 'nkhiangte@gmail.com';
@@ -315,16 +325,73 @@ const Navbar = () => {
 };
 
 const Hero = () => {
+  const { isAdmin } = useAuth();
+  const [bgImage, setBgImage] = useState('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073&auto=format&fit=crop');
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
+      if (doc.exists() && doc.data().backgroundImage) {
+        setBgImage(doc.data().backgroundImage);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `homepage/background_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      await setDoc(doc(db, 'settings', 'homepage'), {
+        backgroundImage: downloadURL,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
+      alert('Background thlak a ni ta!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Background thlaknaah hian harsatna a awm: ' + (error instanceof Error ? error.message : String(error)));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073&auto=format&fit=crop" 
+          src={bgImage} 
           alt="Church Interior" 
           className="w-full h-full object-cover brightness-50"
           referrerPolicy="no-referrer"
         />
       </div>
+      
+      {isAdmin && (
+        <div className="absolute top-24 right-4 z-20">
+          <label className="cursor-pointer bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-all flex items-center gap-2 text-sm">
+            {uploading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Camera className="h-5 w-5" />
+            )}
+            <span className="hidden md:inline">Background thlakna</span>
+            <input 
+              type="file" 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleImageUpload}
+              disabled={uploading}
+            />
+          </label>
+        </div>
+      )}
       
       <div className="relative z-10 text-center px-4 max-w-4xl">
         <motion.div
