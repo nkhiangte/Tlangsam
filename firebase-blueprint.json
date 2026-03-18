@@ -118,9 +118,10 @@
       "type": "object",
       "properties": {
         "value": { "type": "string", "description": "The value of the setting" },
+        "logoUrl": { "type": "string", "description": "URL of the church logo" },
+        "backgroundImage": { "type": "string", "description": "URL of the homepage background image" },
         "updatedAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["value"]
+      }
     }
   },
   "firestore": {

@@ -142,13 +142,49 @@ const ScrollToTop = () => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
+  const [uploading, setUploading] = useState(false);
   const { user, login, logout, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
+      if (doc.exists() && doc.data().logoUrl) {
+        setLogoUrl(doc.data().logoUrl);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      unsubscribe();
+    };
   }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `branding/logo_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      await setDoc(doc(db, 'settings', 'homepage'), {
+        logoUrl: downloadURL,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
+      alert('Logo thlak a ni ta!');
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      alert('Logo thlaknaah hian harsatna a awm: ' + (error instanceof Error ? error.message : String(error)));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const navLinks = [
     { name: 'Inlam', href: '/' },
@@ -183,13 +219,21 @@ const Navbar = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3">
-            <img 
-              src="https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png" 
-              alt="Tlangsam Presbyterian Logo" 
-              className="h-12 w-12 object-contain"
-              referrerPolicy="no-referrer"
-            />
+          <Link to="/" className="flex items-center gap-3 group relative">
+            <div className="relative">
+              <img 
+                src={logoUrl} 
+                alt="Tlangsam Presbyterian Logo" 
+                className="h-12 w-12 object-contain"
+                referrerPolicy="no-referrer"
+              />
+              {isAdmin && (
+                <label className="absolute -bottom-1 -right-1 bg-church-burgundy text-white p-1 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                  <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+                </label>
+              )}
+            </div>
             <div className="flex flex-col">
               <span className={`text-xl font-serif font-bold leading-tight tracking-tight ${scrolled ? 'text-stone-900' : 'text-white'}`}>
                 Tlangsam
@@ -896,13 +940,24 @@ const Contact = () => {
 };
 
 const Footer = () => {
+  const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
+      if (doc.exists() && doc.data().logoUrl) {
+        setLogoUrl(doc.data().logoUrl);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <footer className="bg-stone-950 text-white py-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
             <img 
-              src="https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png" 
+              src={logoUrl} 
               alt="Tlangsam Presbyterian Logo" 
               className="h-10 w-10 object-contain brightness-0 invert"
               referrerPolicy="no-referrer"
