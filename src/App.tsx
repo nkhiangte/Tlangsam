@@ -31,7 +31,8 @@ import {
   User,
   Camera,
   Upload,
-  Loader2
+  Loader2,
+  Shield
 } from 'lucide-react';
 import { getDailyInspiration } from './services/geminiService';
 import Baptism from './pages/Records/Baptism';
@@ -46,6 +47,7 @@ import Gallery from './pages/Archive/Gallery';
 import KohhranHmeichhia from './pages/Fellowship/KohhranHmeichhia';
 import KTP from './pages/Fellowship/KTP';
 import KPP from './pages/Fellowship/KPP';
+import AdminPanel from './pages/Admin/AdminPanel';
 import { auth, db, storage } from './firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
@@ -233,6 +235,14 @@ const Navbar = () => {
             
             {user ? (
               <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <Link 
+                    to="/admin" 
+                    className={`text-sm font-medium transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                  >
+                    <Shield className="h-4 w-4" /> Admin Panel
+                  </Link>
+                )}
                 <div className="flex items-center gap-2">
                   <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
                   <span className={`text-sm font-medium ${scrolled ? 'text-stone-900' : 'text-white'}`}>
@@ -487,26 +497,42 @@ const DailyInspiration = () => {
 };
 
 const Services = () => {
-  const services = [
-    {
-      title: "Pathian Ni Inkhawm",
-      time: "10:30 AM",
-      description: "Hlabu leh Pathian thu hmanga chibai bukna inkhawm.",
-      icon: <Clock className="h-6 w-6" />
-    },
-    {
-      title: "Nilai Zan Thupui Zirna",
-      time: "Nilaini 7:00 PM",
-      description: "Pathian thu zirhona leh sawihona hun hlu.",
-      icon: <BookOpen className="h-6 w-6" />
-    },
-    {
-      title: "Thalai Inkhawm",
-      time: "Zirtawpni 6:30 PM",
-      description: "Thalaite tana rinna lama thanna leh inpawlhona hun.",
-      icon: <Users className="h-6 w-6" />
-    }
-  ];
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'services'), (doc) => {
+      if (doc.exists()) {
+        setServices(doc.data().list || []);
+      } else {
+        // Default services if not set in DB
+        setServices([
+          {
+            title: "Pathian Ni Inkhawm",
+            time: "10:30 AM",
+            description: "Hlabu leh Pathian thu hmanga chibai bukna inkhawm.",
+            icon: <Clock className="h-6 w-6" />
+          },
+          {
+            title: "Nilai Zan Thupui Zirna",
+            time: "Nilaini 7:00 PM",
+            description: "Pathian thu zirhona leh sawihona hun hlu.",
+            icon: <BookOpen className="h-6 w-6" />
+          },
+          {
+            title: "Thalai Inkhawm",
+            time: "Zirtawpni 6:30 PM",
+            description: "Thalaite tana rinna lama thanna leh inpawlhona hun.",
+            icon: <Users className="h-6 w-6" />
+          }
+        ]);
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (loading) return null;
 
   return (
     <section id="services" className="py-24 bg-white">
@@ -524,7 +550,7 @@ const Services = () => {
               className="p-8 rounded-3xl border border-stone-100 bg-stone-50 hover:bg-white hover:shadow-xl transition-all duration-300"
             >
               <div className="w-12 h-12 bg-church-burgundy/10 rounded-2xl flex items-center justify-center text-church-burgundy mb-6">
-                {service.icon}
+                {idx === 0 ? <Clock className="h-6 w-6" /> : idx === 1 ? <BookOpen className="h-6 w-6" /> : <Users className="h-6 w-6" />}
               </div>
               <h3 className="text-2xl font-serif mb-2">{service.title}</h3>
               <p className="text-church-gold font-medium mb-4">{service.time}</p>
@@ -908,6 +934,7 @@ export default function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/records/baptism" element={<Baptism />} />
             <Route path="/records/wedding" element={<Wedding />} />
             <Route path="/records/funeral" element={<Funeral />} />

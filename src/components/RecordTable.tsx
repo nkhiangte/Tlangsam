@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { collection, onSnapshot, addDoc, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '../App';
 
 interface RecordTableProps {
@@ -54,6 +54,17 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
       handleFirestoreError(error, OperationType.CREATE, collectionName);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteRecord = async (id: string) => {
+    if (!isAdmin) return;
+    if (!window.confirm('He record hi i paih duh tak tak em?')) return;
+    
+    try {
+      await deleteDoc(doc(db, collectionName, id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `${collectionName}/${id}`);
     }
   };
 
@@ -125,16 +136,28 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                         {col}
                       </th>
                     ))}
+                    {isAdmin && <th className="px-8 py-5 text-sm font-serif font-bold text-stone-900 uppercase tracking-wider text-right">Action</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {data.map((row, i) => (
-                    <tr key={i} className="border-b border-stone-50 hover:bg-stone-50/50 transition-colors">
+                    <tr key={i} className="border-b border-stone-50 hover:bg-stone-50/50 transition-colors group">
                       {Object.keys(schema).map((key, j) => (
                         <td key={j} className="px-8 py-4 text-stone-600 text-sm">
                           {row[key]?.toString() || '-'}
                         </td>
                       ))}
+                      {isAdmin && (
+                        <td className="px-8 py-4 text-right">
+                          <button 
+                            onClick={() => handleDeleteRecord(row.id)}
+                            className="p-2 text-stone-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                            title="Paih rawh"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

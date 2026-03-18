@@ -41,8 +41,9 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "nkhiangte@gmail.com" && request.auth.token.email_verified == true));
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          request.auth.token.email == "nkhiangte@gmail.com");
     }
 
     function hasRequiredFields(fields) {
@@ -182,8 +183,11 @@ service cloud.firestore {
 
     // User profiles
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'user';
+      allow get: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId && 
+        (request.resource.data.role == 'user' || 
+         (request.resource.data.role == 'admin' && request.auth.token.email == "nkhiangte@gmail.com"));
       allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
     }
   }
