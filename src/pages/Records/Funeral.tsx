@@ -2,19 +2,19 @@ import React from 'react';
 import { RecordTable } from '../../components/RecordTable';
 
 const Funeral = () => {
-  const columns = ['Name', 'Date of Death', 'Date of Funeral', 'Age', 'Officiant'];
+  const columns = ['Hming', 'Thih Ni', 'Phum Ni', 'Kum', 'Phumtu'];
   const schema = {
-    name: 'Name',
-    deathDate: 'Date of Death',
-    funeralDate: 'Date of Funeral',
-    age: 'Age',
-    officiant: 'Officiant'
+    name: 'Hming',
+    deathDate: 'Thih Ni',
+    funeralDate: 'Phum Ni',
+    age: 'Kum',
+    officiant: 'Phumtu'
   };
 
   return (
     <RecordTable 
-      title="Funeral Records" 
-      description="Honoring the lives of our members who have gone to be with the Lord, preserving their memory in our community."
+      title="Mitthi Record-te" 
+      description="Lalpa hnena chawl tawh kan kohhran member-te hriatrengna leh record vawn thatna."
       columns={columns}
       collectionName="funeral_records"
       schema={schema}

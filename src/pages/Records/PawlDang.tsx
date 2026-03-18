@@ -2,19 +2,19 @@ import React from 'react';
 import { RecordTable } from '../../components/RecordTable';
 
 const PawlDang = () => {
-  const columns = ['Name', 'Date Joined', 'Former Denomination', 'Admission Type', 'Officiant'];
+  const columns = ['Hming', 'Luh Ni', 'Pawl hman', 'Luh dan', 'Latu'];
   const schema = {
-    name: 'Name',
-    date: 'Date Joined',
-    formerDenomination: 'Former Denomination',
-    admissionType: 'Admission Type',
-    officiant: 'Officiant'
+    name: 'Hming',
+    date: 'Luh Ni',
+    formerDenomination: 'Pawl hman',
+    admissionType: 'Luh dan',
+    officiant: 'Latu'
   };
 
   return (
     <RecordTable 
       title="Pawl Dang atanga lo lut" 
-      description="Members joining us from other denominations, growing our family through diverse spiritual backgrounds."
+      description="Pawl dang atanga kan kohhran-a lo lut tharte record vawn thatna."
       columns={columns}
       collectionName="admission_records"
       schema={schema}

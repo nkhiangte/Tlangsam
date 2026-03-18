@@ -13,7 +13,7 @@ const KTP = () => {
         >
           <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Kristian Thalai Pawl (KTP)</h1>
           <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-            The Youth Fellowship of Tlangsam Presbyterian Kohhran, dedicated to spiritual growth and service.
+            Tlangsam Presbyterian Kohhran thalaite inpawlhona leh thlarau lama hmasawnna tura din.
           </p>
         </motion.div>
 
@@ -36,23 +36,23 @@ const KTP = () => {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h2 className="text-3xl font-serif text-stone-900">Our Vision</h2>
+            <h2 className="text-3xl font-serif text-stone-900">Kan Thiltum</h2>
             <p className="text-stone-600 leading-relaxed">
-              KTP is the heartbeat of our church's youth. We aim to nurture young believers in their faith, equip them for service, and provide a vibrant community for fellowship and growth.
+              KTP hi kan kohhran thalaite tana thlarau lama hmasawnna leh rawngbawlna hmun pawimawh tak a ni. Thalaite rinna kawnga chawm len leh, rawngbawlna hrang hrangah an theihna hman thiamtir kan tum a ni.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
                 <Music className="w-5 h-5 text-emerald-600 mt-1" />
                 <div>
-                  <h3 className="font-medium text-stone-900">Worship & Music</h3>
-                  <p className="text-sm text-stone-500">Leading praise and worship sessions.</p>
+                  <h3 className="font-medium text-stone-900">Inkhawm leh Zai</h3>
+                  <p className="text-sm text-stone-500">Praise & Worship leh zai hruaina.</p>
                 </div>
               </div>
               <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
                 <Zap className="w-5 h-5 text-emerald-600 mt-1" />
                 <div>
-                  <h3 className="font-medium text-stone-900">Evangelism</h3>
-                  <p className="text-sm text-stone-500">Sharing the Gospel with the youth.</p>
+                  <h3 className="font-medium text-stone-900">Chanchin Tha Puanchhuah</h3>
+                  <p className="text-sm text-stone-500">Thalaite hnena Chanchin Tha hril.</p>
                 </div>
               </div>
             </div>
@@ -62,18 +62,18 @@ const KTP = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <Calendar className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Weekly Meeting</h3>
-            <p className="text-stone-600">Every Monday at 7:00 PM in the Church Hall.</p>
+            <h3 className="text-xl font-serif mb-2">Thawhtanni Inkhawm</h3>
+            <p className="text-stone-600">Thawhtanni zan dar 7:00-ah Biak In Hall-ah.</p>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <Users className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Fellowship Groups</h3>
-            <p className="text-stone-600">Monthly small group gatherings for deeper connection.</p>
+            <h3 className="text-xl font-serif mb-2">Group Inpawlhona</h3>
+            <p className="text-stone-600">Thla tin group hrang hrangah inpawlhona neih thin a ni.</p>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <Music className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Choir Practice</h3>
-            <p className="text-stone-600">Weekly practice for special services and events.</p>
+            <h3 className="text-xl font-serif mb-2">Zaipawl Practice</h3>
+            <p className="text-stone-600">Inkhawm pawimawh leh thil thleng hrang hrang atana inbuatsaihna.</p>
           </div>
         </div>
       </div>

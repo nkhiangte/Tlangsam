@@ -2,19 +2,19 @@ import React from 'react';
 import { RecordTable } from '../../components/RecordTable';
 
 const Minutes = () => {
-  const columns = ['Meeting Type', 'Date', 'Secretary', 'Key Decisions', 'Download'];
+  const columns = ['Inkhawm/Meeting', 'Ni', 'Secretary', 'Thutlukna pawimawh', 'Download'];
   const schema = {
-    meetingType: 'Meeting Type',
-    date: 'Date',
+    meetingType: 'Inkhawm/Meeting',
+    date: 'Ni',
     secretary: 'Secretary',
-    decisions: 'Key Decisions',
+    decisions: 'Thutlukna pawimawh',
     downloadUrl: 'Download'
   };
 
   return (
     <RecordTable 
-      title="Meeting Minutes" 
-      description="Official records and minutes from various church committee meetings and general assemblies."
+      title="Meeting Minutes-te" 
+      description="Kohhran committee leh inkhawmpui hrang hrang minutes vawn thatna."
       columns={columns}
       collectionName="minute_records"
       schema={schema}

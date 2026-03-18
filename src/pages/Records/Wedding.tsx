@@ -2,19 +2,19 @@ import React from 'react';
 import { RecordTable } from '../../components/RecordTable';
 
 const Wedding = () => {
-  const columns = ['Groom Name', 'Bride Name', 'Date of Marriage', 'Officiant', 'Witnesses'];
+  const columns = ['Mipa Hming', 'Hmeichhe Hming', 'Inneih Ni', 'Inneitirtu', 'Hrechiangtute'];
   const schema = {
-    groom: 'Groom Name',
-    bride: 'Bride Name',
-    date: 'Date of Marriage',
-    officiant: 'Officiant',
-    witnesses: 'Witnesses'
+    groom: 'Mipa Hming',
+    bride: 'Hmeichhe Hming',
+    date: 'Inneih Ni',
+    officiant: 'Inneitirtu',
+    witnesses: 'Hrechiangtute'
   };
 
   return (
     <RecordTable 
-      title="Wedding Records" 
-      description="Sacred unions blessed and recorded in our church registry, celebrating the covenant of marriage."
+      title="Inneihna Record-te" 
+      description="Kan kohhran-a innei tawh zawng zawngte record vawn thatna."
       columns={columns}
       collectionName="wedding_records"
       schema={schema}

@@ -132,11 +132,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/#about' },
-    { name: 'Services', href: '/#services' },
+    { name: 'Inlam', href: '/' },
+    { name: 'Chanchin', href: '/#about' },
+    { name: 'Inkhawm', href: '/#services' },
     { 
-      name: 'Fellowship', 
+      name: 'Pawl Hrang Hrang', 
       href: '#',
       dropdown: [
         { name: 'Kohhran Hmeichhia', href: '/fellowship/hmeichhia' },
@@ -144,10 +144,9 @@ const Navbar = () => {
         { name: 'KPP', href: '/fellowship/kpp' },
       ]
     },
-    { name: 'Records', href: '/#records' },
+    { name: 'Record-te', href: '/#records' },
     { name: 'Archive', href: '/#archive' },
-    { name: 'Events', href: '/#events' },
-    { name: 'Contact', href: '/#contact' },
+    { name: 'Biak Pawhna', href: '/#contact' },
   ];
 
   const handleNavClick = (href: string) => {
@@ -219,14 +218,14 @@ const Navbar = () => {
                 <div className="flex items-center gap-2">
                   <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
                   <span className={`text-sm font-medium ${scrolled ? 'text-stone-900' : 'text-white'}`}>
-                    {isAdmin ? 'Admin' : 'Member'}
+                    {isAdmin ? 'Admin' : 'Kohhran Member'}
                   </span>
                 </div>
                 <button 
                   onClick={logout}
                   className="bg-stone-100 text-stone-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-stone-200 transition-all flex items-center gap-2"
                 >
-                  <LogOut className="h-4 w-4" /> Logout
+                  <LogOut className="h-4 w-4" /> Chhuak rawh
                 </button>
               </div>
             ) : (
@@ -234,7 +233,7 @@ const Navbar = () => {
                 onClick={login}
                 className="bg-church-burgundy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center gap-2"
               >
-                <LogIn className="h-4 w-4" /> Login
+                <LogIn className="h-4 w-4" /> Lut rawh
               </button>
             )}
           </div>
@@ -298,14 +297,14 @@ const Navbar = () => {
                 onClick={() => { logout(); setIsOpen(false); }}
                 className="bg-stone-100 text-stone-900 px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2"
               >
-                <LogOut className="h-4 w-4" /> Logout
+                <LogOut className="h-4 w-4" /> Chhuak rawh
               </button>
             ) : (
               <button 
                 onClick={() => { login(); setIsOpen(false); }}
                 className="bg-church-burgundy text-white px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2"
               >
-                <LogIn className="h-4 w-4" /> Login
+                <LogIn className="h-4 w-4" /> Lut rawh
               </button>
             )}
           </motion.div>
@@ -333,19 +332,19 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-church-gold font-medium tracking-[0.2em] uppercase text-sm mb-4 block">Welcome to our community</span>
+          <span className="text-church-gold font-medium tracking-[0.2em] uppercase text-sm mb-4 block">Kan kohhranah kan lo lawm a che</span>
           <h1 className="text-5xl md:text-7xl text-white font-serif mb-6 leading-tight">
-            Faith, Hope, and Love in the Heart of Tlangsam
+            Rinna, Beiseina, leh Hmangaihna Tlangsam laili-ah
           </h1>
           <p className="text-lg md:text-xl text-white/80 mb-10 font-light max-w-2xl mx-auto">
-            Join us as we worship together, grow in faith, and serve our community with the grace of God.
+            Pathian chibai buk tura kan inkhawmnaah lo tel ve rawh, rinnaah thangin kan khawtlang tana rawngbawl turin i inbuatsaih ang u.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button className="w-full sm:w-auto bg-white text-stone-900 px-8 py-4 rounded-full font-medium hover:bg-stone-100 transition-all flex items-center justify-center gap-2">
-              Join Us This Sunday <ChevronRight className="h-4 w-4" />
+              Pathian Ni Inkhawm <ChevronRight className="h-4 w-4" />
             </button>
             <button className="w-full sm:w-auto border border-white/30 text-white backdrop-blur-sm px-8 py-4 rounded-full font-medium hover:bg-white/10 transition-all">
-              Learn Our Story
+              Kan Chanchin
             </button>
           </div>
         </motion.div>
@@ -383,7 +382,7 @@ const DailyInspiration = () => {
           
           <div className="flex items-center gap-2 mb-6">
             <div className="h-px w-8 bg-church-gold"></div>
-            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Daily Inspiration</span>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Ni tina chakna</span>
           </div>
 
           {loading ? (
@@ -415,21 +414,21 @@ const DailyInspiration = () => {
 const Services = () => {
   const services = [
     {
-      title: "Sunday Worship",
+      title: "Pathian Ni Inkhawm",
       time: "10:30 AM",
-      description: "A traditional service with hymns, scripture, and a message of hope.",
+      description: "Hlabu leh Pathian thu hmanga chibai bukna inkhawm.",
       icon: <Clock className="h-6 w-6" />
     },
     {
-      title: "Bible Study",
-      time: "Wednesday 7:00 PM",
-      description: "Deepen your understanding of the Word in an interactive group setting.",
+      title: "Nilai Zan Thupui Zirna",
+      time: "Nilaini 7:00 PM",
+      description: "Pathian thu zirhona leh sawihona hun hlu.",
       icon: <BookOpen className="h-6 w-6" />
     },
     {
-      title: "Youth Fellowship",
-      time: "Friday 6:30 PM",
-      description: "A vibrant space for young people to connect and grow in faith.",
+      title: "Thalai Inkhawm",
+      time: "Zirtawpni 6:30 PM",
+      description: "Thalaite tana rinna lama thanna leh inpawlhona hun.",
       icon: <Users className="h-6 w-6" />
     }
   ];
@@ -438,8 +437,8 @@ const Services = () => {
     <section id="services" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif mb-4">Join Us in Worship</h2>
-          <p className="text-stone-500 max-w-2xl mx-auto">We offer various opportunities to gather, learn, and grow together throughout the week.</p>
+          <h2 className="text-4xl md:text-5xl font-serif mb-4">Inkhawm Hun-te</h2>
+          <p className="text-stone-500 max-w-2xl mx-auto">Pathian chibai buk tura kan inkhawmna hun hrang hrangte.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -464,57 +463,57 @@ const Services = () => {
 };
 
 const Records = () => {
-  const [activeTab, setActiveTab] = useState('Baptism');
+  const [activeTab, setActiveTab] = useState('Baptisma');
 
   const tabs = [
-    { name: 'Baptism', icon: <Droplets className="h-5 w-5" /> },
-    { name: 'Wedding', icon: <Heart className="h-5 w-5" /> },
-    { name: 'Funeral', icon: <FileText className="h-5 w-5" /> },
-    { name: 'Conference', icon: <Mic className="h-5 w-5" /> },
+    { name: 'Baptisma', icon: <Droplets className="h-5 w-5" /> },
+    { name: 'Inneihna', icon: <Heart className="h-5 w-5" /> },
+    { name: 'Mitthi', icon: <FileText className="h-5 w-5" /> },
+    { name: 'Inkhawmpui', icon: <Mic className="h-5 w-5" /> },
     { name: 'Pem Dawnsawn', icon: <ArrowRightLeft className="h-5 w-5" /> },
-    { name: 'Pawl Dang atanga lo lut', icon: <UserPlus className="h-5 w-5" /> },
+    { name: 'Pawl Dang', icon: <UserPlus className="h-5 w-5" /> },
   ];
 
   const recordContent: Record<string, any> = {
-    'Baptism': {
-      title: 'Baptism Records',
-      description: 'Records of holy baptism administered at Tlangsam Presbyterian Kohhran.',
-      stats: 'Over 1,200 baptisms recorded since inception.',
+    'Baptisma': {
+      title: 'Baptisma Record-te',
+      description: 'Tlangsam Presbyterian Kohhran-a baptisma chang tawh zawng zawngte record.',
+      stats: 'Baptisma chang tawh 1,200 chuang an awm tawh a ni.',
       recent: ['Lalthlamuana (2024)', 'Zosangzuali (2024)', 'Lalrinawma (2023)'],
       link: '/records/baptism'
     },
-    'Wedding': {
-      title: 'Wedding Records',
-      description: 'Sacred unions blessed and recorded in our church registry.',
-      stats: '450+ marriages solemnized.',
+    'Inneihna': {
+      title: 'Inneihna Record-te',
+      description: 'Kan kohhran-a innei tawh zawng zawngte record.',
+      stats: 'Inneihna 450 chuang buatsaih a ni tawh a ni.',
       recent: ['Rohlua & Pari (2024)', 'Sanga & Mawii (2023)', 'Tluanga & Tei (2023)'],
       link: '/records/wedding'
     },
-    'Funeral': {
-      title: 'Funeral Records',
-      description: 'Honoring the lives of our members who have gone to be with the Lord.',
-      stats: 'Respectful records of our departed brothers and sisters.',
+    'Mitthi': {
+      title: 'Mitthi Record-te',
+      description: 'Lalpa hnena chawl tawh kan kohhran member-te record.',
+      stats: 'Lalpa hnena chawl tawh kan unaute hriatrengna.',
       recent: ['Pi Liani (2024)', 'Pu Thanga (2024)', 'Pi Pari (2023)'],
       link: '/records/funeral'
     },
-    'Conference': {
-      title: 'Conference Records',
-      description: 'Minutes and reports from various church conferences and meetings.',
-      stats: 'Annual and biennial conference proceedings.',
+    'Inkhawmpui': {
+      title: 'Inkhawmpui Record-te',
+      description: 'Kohhran inkhawmpui hrang hrang minutes leh report-te.',
+      stats: 'Kum tina inkhawmpui thurelte.',
       recent: ['KTP General Conference (2024)', 'Presbytery Meeting (2023)', 'Kohhran Inkhawmpui (2023)'],
       link: '/records/conference'
     },
     'Pem Dawnsawn': {
-      title: 'Pem Dawnsawn (Transfer In)',
-      description: 'Records of members who have transferred their membership to Tlangsam.',
-      stats: 'Welcoming new members into our local fold.',
+      title: 'Pem Dawnsawn',
+      description: 'Hmun dang atanga kan kohhran-a pem lut tharte record.',
+      stats: 'Member thar kan lo lawmte.',
       recent: ['Lalduhawmi from Aizawl', 'Zothana from Lunglei', 'Rina from Champhai'],
       link: '/records/pem-dawnsawn'
     },
-    'Pawl Dang atanga lo lut': {
+    'Pawl Dang': {
       title: 'Pawl Dang atanga lo lut',
-      description: 'Members joining us from other denominations.',
-      stats: 'Growing our family through diverse spiritual backgrounds.',
+      description: 'Pawl dang atanga kan kohhran-a lo lut tharte record.',
+      stats: 'Rinna kawng danga kan unau lo zawm ve tute.',
       recent: ['Lalremruata (2024)', 'Zuali (2024)', 'Mawia (2023)'],
       link: '/records/pawl-dang'
     }
@@ -526,8 +525,8 @@ const Records = () => {
     <section id="records" className="py-24 bg-stone-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif mb-4">Church Records</h2>
-          <p className="text-stone-500 max-w-2xl mx-auto">Maintaining the history and milestones of our congregation with diligence and care.</p>
+          <h2 className="text-4xl md:text-5xl font-serif mb-4">Kohhran Record-te</h2>
+          <p className="text-stone-500 max-w-2xl mx-auto">Kan kohhran chanchin leh thil thleng pawimawhte vawn thatna.</p>
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-stone-100">
@@ -578,14 +577,14 @@ const Records = () => {
                       to={current.link}
                       className="mt-8 inline-flex items-center gap-2 bg-church-burgundy text-white px-8 py-3 rounded-xl font-medium hover:bg-opacity-90 transition-all shadow-lg"
                     >
-                      Open Full Records <ExternalLink className="h-4 w-4" />
+                      Record-te En rawh <ExternalLink className="h-4 w-4" />
                     </Link>
                   </div>
                   
                   <div className="bg-stone-50 p-8 rounded-3xl border border-stone-100">
                     <h4 className="font-serif text-xl mb-6 text-stone-800 flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-church-gold" />
-                      Recent Entries
+                      Thil thleng thar-te
                     </h4>
                     <ul className="space-y-4">
                       {current.recent.map((entry: string, i: number) => (
@@ -596,7 +595,7 @@ const Records = () => {
                       ))}
                     </ul>
                     <Link to={current.link} className="mt-8 text-church-burgundy font-medium flex items-center gap-2 hover:gap-3 transition-all">
-                      View Full Registry <ChevronRight className="h-4 w-4" />
+                      Registry En vek rawh <ChevronRight className="h-4 w-4" />
                     </Link>
                   </div>
                 </div>
@@ -613,19 +612,19 @@ const Archive = () => {
   const archives = [
     {
       title: "Minutes",
-      description: "Official records of church committee meetings and decisions.",
+      description: "Kohhran committee thureltute vawn thatna.",
       icon: <ScrollText className="h-6 w-6" />,
       link: "/archive/minutes"
     },
     {
       title: "Upa kal ta te",
-      description: "Honoring the memory and service of our deceased elders.",
+      description: "Kan kohhran upa hmasa, Lalpa hnena chawl tawhte hriatrengna.",
       icon: <History className="h-6 w-6" />,
       link: "/archive/upa-kal-ta-te"
     },
     {
-      title: "Gallery",
-      description: "Visual journey of our church life, events, and community.",
+      title: "Thlalak",
+      description: "Kohhran thil thleng hrang hrang thlalakte.",
       icon: <ImageIcon className="h-6 w-6" />,
       link: "/archive/gallery"
     }
@@ -635,8 +634,8 @@ const Archive = () => {
     <section id="archive" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif mb-4">Church Archive</h2>
-          <p className="text-stone-500 max-w-2xl mx-auto">Preserving our heritage and documenting our journey of faith for future generations.</p>
+          <h2 className="text-4xl md:text-5xl font-serif mb-4">Kohhran Archive</h2>
+          <p className="text-stone-500 max-w-2xl mx-auto">Kan kohhran kal tawh hnu leh thil thlengte vawn thatna.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -655,7 +654,7 @@ const Archive = () => {
                 to={item.link}
                 className="mt-auto inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all"
               >
-                Explore Archive <ChevronRight className="h-4 w-4" />
+                Archive En rawh <ChevronRight className="h-4 w-4" />
               </Link>
             </motion.div>
           ))}
@@ -680,29 +679,29 @@ const About = () => {
               />
             </div>
             <div className="absolute -bottom-8 -right-8 bg-church-burgundy p-8 rounded-3xl text-white hidden md:block max-w-xs shadow-xl">
-              <p className="font-serif text-2xl italic mb-2">"For where two or three gather in my name, there am I with them."</p>
-              <p className="text-sm opacity-80">— Matthew 18:20</p>
+              <p className="font-serif text-2xl italic mb-2">"Khawiah pawh mi pahnih emaw pathum emaw ka hminga an inkhawmna apiangah chuan an zingah ka awm thin a ni."</p>
+              <p className="text-sm opacity-80">— Matthaia 18:20</p>
             </div>
           </div>
 
           <div>
-            <span className="text-church-gold font-medium uppercase tracking-widest text-sm mb-4 block">Our Story</span>
-            <h2 className="text-4xl md:text-5xl font-serif mb-8 leading-tight">A Legacy of Faith in Tlangsam</h2>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-sm mb-4 block">Kan Chanchin</span>
+            <h2 className="text-4xl md:text-5xl font-serif mb-8 leading-tight">Tlangsam-a Rinna Hlu</h2>
             <div className="space-y-6 text-stone-600 leading-relaxed text-lg">
               <p>
-                Tlangsam Presbyterian Kohhran has been a cornerstone of spiritual life in our community for generations. Founded on the principles of reformed theology, we strive to be a light on the hill, sharing the transformative power of the Gospel.
+                Tlangsam Presbyterian Kohhran hi kan khawtlang tana rinna lungphum pawimawh tak a ni a. Pathian thu dik tak vawng nungin, khawvelah Isua Krista chanchin tha puang chhuaktu nih kan tum tlat a ni.
               </p>
               <p>
-                Our mission is to glorify God by making disciples of Jesus Christ through gospel-centered worship, community, and mission. We believe in the power of prayer, the authority of Scripture, and the necessity of grace.
+                Kan thupui ber chu Isua Krista zirtir siam leh Pathian chawimawi a ni a. Tawngtai te, Pathian thu zir te, leh rawngbawlna hrang hrang hmangin kan thawk chhuak thin a ni.
               </p>
               <div className="grid grid-cols-2 gap-8 pt-6">
                 <div>
-                  <h4 className="text-stone-900 font-serif text-xl mb-2">Our Vision</h4>
-                  <p className="text-sm">To see Tlangsam renewed by the grace of God through a vibrant, gospel-centered community.</p>
+                  <h4 className="text-stone-900 font-serif text-xl mb-2">Kan Vision</h4>
+                  <p className="text-sm">Tlangsam khua hi Pathian khawngaihna hmanga tih thar a nih nan.</p>
                 </div>
                 <div>
-                  <h4 className="text-stone-900 font-serif text-xl mb-2">Our Values</h4>
-                  <p className="text-sm">Scripture, Prayer, Community, Service, and Extravagant Grace.</p>
+                  <h4 className="text-stone-900 font-serif text-xl mb-2">Kan Hlutna</h4>
+                  <p className="text-sm">Pathian Thu, Tawngtai, Inpawlhona, Rawngbawlna, leh Khawngaihna.</p>
                 </div>
               </div>
             </div>
@@ -719,8 +718,8 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
-            <h2 className="text-4xl md:text-5xl font-serif mb-8">Get in Touch</h2>
-            <p className="text-white/60 mb-12 text-lg">Whether you have a prayer request, a question about our services, or just want to say hello, we'd love to hear from you.</p>
+            <h2 className="text-4xl md:text-5xl font-serif mb-8">Biak Pawhna</h2>
+            <p className="text-white/60 mb-12 text-lg">Tawngtaipui i ngaihna emaw, zawhna i neih chuan min lo be pawh rawh.</p>
             
             <div className="space-y-8">
               <div className="flex items-start gap-4">
@@ -728,7 +727,7 @@ const Contact = () => {
                   <MapPin className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl mb-1">Our Location</h4>
+                  <h4 className="font-serif text-xl mb-1">Kan awmna</h4>
                   <p className="text-white/60">Tlangsam Village, Mizoram, India</p>
                 </div>
               </div>
@@ -757,24 +756,24 @@ const Contact = () => {
             <form className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">First Name</label>
+                  <label className="block text-sm font-medium text-white/60 mb-2">Hming Hmasa</label>
                   <input type="text" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">Last Name</label>
+                  <label className="block text-sm font-medium text-white/60 mb-2">Hming Hnuhnung</label>
                   <input type="text" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/60 mb-2">Email Address</label>
+                <label className="block text-sm font-medium text-white/60 mb-2">Email</label>
                 <input type="email" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/60 mb-2">Message</label>
+                <label className="block text-sm font-medium text-white/60 mb-2">Thuchah</label>
                 <textarea rows={4} className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"></textarea>
               </div>
               <button className="w-full bg-church-gold text-stone-900 font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all">
-                Send Message
+                Thawn rawh
               </button>
             </form>
           </div>
@@ -797,13 +796,13 @@ const Footer = () => {
           </div>
           
           <div className="flex gap-8 text-sm text-white/40">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white transition-colors">Vawn Himna</a>
+            <a href="#" className="hover:text-white transition-colors">Inkaihhruaina</a>
             <a href="#" className="hover:text-white transition-colors">Sitemap</a>
           </div>
 
           <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. All rights reserved.
+            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. Dikna zawng zawng vawn a ni.
           </p>
         </div>
       </div>

@@ -5,14 +5,14 @@ import { Link } from 'react-router-dom';
 
 const Gallery = () => {
   const images = [
-    { url: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=800', title: 'Sunday Service', category: 'Worship' },
-    { url: 'https://images.unsplash.com/photo-1548625361-195fe57724e1?q=80&w=800', title: 'Youth Gathering', category: 'Youth' },
-    { url: 'https://images.unsplash.com/photo-1519491050282-cf00c82424b4?q=80&w=800', title: 'Church Choir', category: 'Music' },
-    { url: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=800', title: 'Community Outreach', category: 'Mission' },
-    { url: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=800', title: 'Bible Study', category: 'Education' },
-    { url: 'https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=800', title: 'Christmas Celebration', category: 'Events' },
-    { url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800', title: 'Wedding Ceremony', category: 'Sacraments' },
-    { url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800', title: 'Leadership Meeting', category: 'Admin' },
+    { url: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=800', title: 'Chawlhni Inkhawm', category: 'Biak In' },
+    { url: 'https://images.unsplash.com/photo-1548625361-195fe57724e1?q=80&w=800', title: 'Thalai Inkhawm', category: 'Thalai' },
+    { url: 'https://images.unsplash.com/photo-1519491050282-cf00c82424b4?q=80&w=800', title: 'Kohhran Zaipawl', category: 'Music' },
+    { url: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=800', title: 'Ramhlun Rawngbawlna', category: 'Mission' },
+    { url: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=800', title: 'Bible Zirna', category: 'Zirna' },
+    { url: 'https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=800', title: 'Krismas Lawmna', category: 'Events' },
+    { url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800', title: 'Inneihna', category: 'Sacraments' },
+    { url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800', title: 'Hruaitute Meeting', category: 'Admin' },
   ];
 
   return (
@@ -20,12 +20,12 @@ const Gallery = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all mb-6">
-            <ArrowLeft className="h-4 w-4" /> Back to Home
+            <ArrowLeft className="h-4 w-4" /> Hawna
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Church Gallery</h1>
-              <p className="text-stone-600 max-w-2xl">Capturing the moments of faith, community, and worship at Tlangsam Presbyterian Kohhran.</p>
+              <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Thlalak-te</h1>
+              <p className="text-stone-600 max-w-2xl">Tlangsam Presbyterian Kohhran-a thil thleng hrang hrang thlalak-te.</p>
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@ const Gallery = () => {
                 <span className="text-church-gold text-xs font-bold uppercase tracking-widest mb-1">{img.category}</span>
                 <h3 className="text-white font-serif text-xl mb-3">{img.title}</h3>
                 <button className="flex items-center gap-2 text-white/80 text-sm hover:text-white transition-colors">
-                  <Maximize2 className="h-4 w-4" /> View Full Image
+                  <Maximize2 className="h-4 w-4" /> En fiahna
                 </button>
               </div>
             </motion.div>

@@ -13,7 +13,7 @@ const KPP = () => {
         >
           <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Kohhran Pa Pawl (KPP)</h1>
           <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-            The Men's Fellowship of Tlangsam Presbyterian Kohhran, strengthening men in faith and leadership.
+            Tlangsam Presbyterian Kohhran pa-te rinna leh hruaitu nihna kawnga thuam chakna.
           </p>
         </motion.div>
 
@@ -36,23 +36,23 @@ const KPP = () => {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h2 className="text-3xl font-serif text-stone-900">Our Purpose</h2>
+            <h2 className="text-3xl font-serif text-stone-900">Kan Thiltum</h2>
             <p className="text-stone-600 leading-relaxed">
-              KPP is dedicated to the spiritual growth and fellowship of the men in our church. We focus on building strong Christian leaders, supporting the church's mission, and providing a community of brotherhood.
+              KPP hi kan kohhran pa-te tana thlarau lama hmasawnna leh inpawlhona hmun pawimawh tak a ni. Kristian hruaitu tha tak nih leh, kohhran hna hrang hrang thlawp leh inunauna tha zawk siam kan tum a ni.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
                 <Shield className="w-5 h-5 text-emerald-600 mt-1" />
                 <div>
-                  <h3 className="font-medium text-stone-900">Leadership</h3>
-                  <p className="text-sm text-stone-500">Equipping men for church leadership.</p>
+                  <h3 className="font-medium text-stone-900">Hruaitu Nihna</h3>
+                  <p className="text-sm text-stone-500">Kohhran hruaitu tha ni tura inbuatsaihna.</p>
                 </div>
               </div>
               <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
                 <Users className="w-5 h-5 text-emerald-600 mt-1" />
                 <div>
-                  <h3 className="font-medium text-stone-900">Brotherhood</h3>
-                  <p className="text-sm text-stone-500">Strengthening bonds of faith.</p>
+                  <h3 className="font-medium text-stone-900">Inunauna</h3>
+                  <p className="text-sm text-stone-500">Rinna kawnga inunauna tha zawk.</p>
                 </div>
               </div>
             </div>
@@ -62,18 +62,18 @@ const KPP = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <Calendar className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Monthly Meeting</h3>
-            <p className="text-stone-600">First Saturday of every month at 6:00 PM.</p>
+            <h3 className="text-xl font-serif mb-2">Thla tin Inkhawm</h3>
+            <p className="text-stone-600">Thla tin Inrinni hmasa ber zan dar 6:00-ah.</p>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <BookOpen className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Bible Study</h3>
-            <p className="text-stone-600">Focused studies on Christian manhood and leadership.</p>
+            <h3 className="text-xl font-serif mb-2">Bible Zirna</h3>
+            <p className="text-stone-600">Kristian pa-te mawhphurhna leh hruaitu nihna zirhona.</p>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
             <Users className="w-8 h-8 text-emerald-600 mb-4" />
-            <h3 className="text-xl font-serif mb-2">Service Projects</h3>
-            <p className="text-stone-600">Supporting church maintenance and community outreach.</p>
+            <h3 className="text-xl font-serif mb-2">Rawngbawlna</h3>
+            <p className="text-stone-600">Biak In enkawl leh hmun hrang hranga rawngbawlna.</p>
           </div>
         </div>
       </div>

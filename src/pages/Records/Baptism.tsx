@@ -2,19 +2,19 @@ import React from 'react';
 import { RecordTable } from '../../components/RecordTable';
 
 const Baptism = () => {
-  const columns = ['Name', 'Date of Baptism', 'Parents', 'Officiant', 'Location'];
+  const columns = ['Hming', 'Baptisma Ni', 'Nu leh Pa', 'Baptisma petu', 'Hmun'];
   const schema = {
-    name: 'Name',
-    date: 'Date of Baptism',
-    parents: 'Parents',
-    officiant: 'Officiant',
-    location: 'Location'
+    name: 'Hming',
+    date: 'Baptisma Ni',
+    parents: 'Nu leh Pa',
+    officiant: 'Baptisma petu',
+    location: 'Hmun'
   };
 
   return (
     <RecordTable 
-      title="Baptism Records" 
-      description="Official registry of holy baptism administered at Tlangsam Presbyterian Kohhran, documenting the spiritual journey of our members."
+      title="Baptisma Record-te" 
+      description="Tlangsam Presbyterian Kohhran-a baptisma chang tawh zawng zawngte record vawn thatna."
       columns={columns}
       collectionName="baptism_records"
       schema={schema}
