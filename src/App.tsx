@@ -53,6 +53,12 @@ import ServicesPage from './pages/Services';
 import RecordsPage from './pages/Records';
 import ArchivePage from './pages/Archive';
 import ContactPage from './pages/Contact';
+import KohhranCommittee from './pages/Committee/KohhranCommittee';
+import SundaySchoolCommittee from './pages/Committee/SundaySchoolCommittee';
+import RamtharCommittee from './pages/Committee/RamtharCommittee';
+import BSICommittee from './pages/Committee/BSICommittee';
+import RefreshmentCommittee from './pages/Committee/RefreshmentCommittee';
+import LightAndSoundCommittee from './pages/Committee/LightAndSoundCommittee';
 import { auth, db, storage } from './firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
@@ -213,12 +219,24 @@ const Navbar = () => {
     { name: 'Chanchin', href: '/about' },
     { name: 'Inkhawm', href: '/services' },
     { 
-      name: 'Pawl Hrang Hrang', 
+      name: 'Fellowships', 
       href: '#',
       dropdown: [
         { name: 'Kohhran Hmeichhia', href: '/fellowship/hmeichhia' },
         { name: 'KTP', href: '/fellowship/ktp' },
         { name: 'KPP', href: '/fellowship/kpp' },
+      ]
+    },
+    { 
+      name: 'Committee', 
+      href: '#',
+      dropdown: [
+        { name: 'Kohhran Committee', href: '/committee/kohhran' },
+        { name: 'Sunday School Committee', href: '/committee/sunday-school' },
+        { name: 'Ramthar Committee', href: '/committee/ramthar' },
+        { name: 'BSI Committee', href: '/committee/bsi' },
+        { name: 'Refreshment Committee', href: '/committee/refreshment' },
+        { name: 'Light & Sound Committee', href: '/committee/light-sound' },
       ]
     },
     { name: 'Record-te', href: '/records' },
@@ -246,7 +264,7 @@ const Navbar = () => {
                     maxHeight: scrolled ? '80px' : '120px',
                     imageRendering: 'auto'
                   }}
-                  className="object-contain transition-all duration-300 drop-shadow-sm"
+                  className="object-contain transition-all duration-300 drop-shadow-sm rounded-full"
                   referrerPolicy="no-referrer"
                 />
               </Link>
@@ -624,7 +642,7 @@ const Footer = () => {
               src={logoUrl} 
               alt="Tlangsam Presbyterian Logo" 
               style={{ height: `${logoSize}px`, width: `${logoSize}px` }}
-              className="object-contain brightness-0 invert"
+              className="object-contain brightness-0 invert rounded-full"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
@@ -688,6 +706,12 @@ export default function App() {
             <Route path="/fellowship/hmeichhia" element={<KohhranHmeichhia />} />
             <Route path="/fellowship/ktp" element={<KTP />} />
             <Route path="/fellowship/kpp" element={<KPP />} />
+            <Route path="/committee/kohhran" element={<KohhranCommittee />} />
+            <Route path="/committee/sunday-school" element={<SundaySchoolCommittee />} />
+            <Route path="/committee/ramthar" element={<RamtharCommittee />} />
+            <Route path="/committee/bsi" element={<BSICommittee />} />
+            <Route path="/committee/refreshment" element={<RefreshmentCommittee />} />
+            <Route path="/committee/light-sound" element={<LightAndSoundCommittee />} />
           </Routes>
           <Footer />
         </div>
