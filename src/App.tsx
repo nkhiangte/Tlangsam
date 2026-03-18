@@ -40,6 +40,9 @@ import PawlDang from './pages/Records/PawlDang';
 import Minutes from './pages/Archive/Minutes';
 import UpaKalTaTe from './pages/Archive/UpaKalTaTe';
 import Gallery from './pages/Archive/Gallery';
+import KohhranHmeichhia from './pages/Fellowship/KohhranHmeichhia';
+import KTP from './pages/Fellowship/KTP';
+import KPP from './pages/Fellowship/KPP';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -132,6 +135,15 @@ const Navbar = () => {
     { name: 'Home', href: '/' },
     { name: 'About', href: '/#about' },
     { name: 'Services', href: '/#services' },
+    { 
+      name: 'Fellowship', 
+      href: '#',
+      dropdown: [
+        { name: 'Kohhran Hmeichhia', href: '/fellowship/hmeichhia' },
+        { name: 'KTP', href: '/fellowship/ktp' },
+        { name: 'KPP', href: '/fellowship/kpp' },
+      ]
+    },
     { name: 'Records', href: '/#records' },
     { name: 'Archive', href: '/#archive' },
     { name: 'Events', href: '/#events' },
@@ -162,7 +174,24 @@ const Navbar = () => {
           
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              link.href.startsWith('/#') ? (
+              link.dropdown ? (
+                <div key={link.name} className="relative group">
+                  <button className={`text-sm font-medium transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}>
+                    {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
+                  </button>
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
+                    {link.dropdown.map((sub) => (
+                      <Link 
+                        key={sub.name} 
+                        to={sub.href}
+                        className="block px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : link.href.startsWith('/#') ? (
                 <a 
                   key={link.name} 
                   href={link.href}
@@ -227,7 +256,21 @@ const Navbar = () => {
             className="md:hidden bg-white absolute top-full left-0 w-full shadow-xl py-4 px-4 flex flex-col gap-4"
           >
             {navLinks.map((link) => (
-              link.href.startsWith('/#') ? (
+              link.dropdown ? (
+                <div key={link.name} className="flex flex-col gap-2">
+                  <span className="text-stone-400 text-xs font-bold uppercase tracking-widest px-2">{link.name}</span>
+                  {link.dropdown.map((sub) => (
+                    <Link 
+                      key={sub.name} 
+                      to={sub.href}
+                      onClick={() => setIsOpen(false)}
+                      className="text-stone-600 font-medium py-2 px-4 border-l-2 border-stone-100 hover:border-church-burgundy hover:bg-stone-50 transition-all"
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : link.href.startsWith('/#') ? (
                 <a 
                   key={link.name} 
                   href={link.href}
@@ -800,6 +843,9 @@ export default function App() {
             <Route path="/archive/minutes" element={<Minutes />} />
             <Route path="/archive/upa-kal-ta-te" element={<UpaKalTaTe />} />
             <Route path="/archive/gallery" element={<Gallery />} />
+            <Route path="/fellowship/hmeichhia" element={<KohhranHmeichhia />} />
+            <Route path="/fellowship/ktp" element={<KTP />} />
+            <Route path="/fellowship/kpp" element={<KPP />} />
           </Routes>
           <Footer />
         </div>
