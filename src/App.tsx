@@ -77,25 +77,33 @@ const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ children })
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        // Check if user is admin
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          if (user.email === 'nkhiangte@gmail.com' && data.role !== 'admin') {
-            await setDoc(doc(db, 'users', user.uid), { role: 'admin' }, { merge: true });
-            setIsAdmin(true);
+        const isDefaultAdmin = user.email === 'nkhiangte@gmail.com';
+        
+        try {
+          // Check if user is admin in DB
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            if (isDefaultAdmin && data.role !== 'admin') {
+              // Try to upgrade to admin in DB if it's the default admin
+              await setDoc(doc(db, 'users', user.uid), { role: 'admin' }, { merge: true });
+              setIsAdmin(true);
+            } else {
+              setIsAdmin(data.role === 'admin' || isDefaultAdmin);
+            }
           } else {
-            setIsAdmin(data.role === 'admin');
+            // Create user doc if it doesn't exist
+            await setDoc(doc(db, 'users', user.uid), {
+              email: user.email,
+              role: isDefaultAdmin ? 'admin' : 'user',
+              displayName: user.displayName,
+              photoURL: user.photoURL
+            });
+            setIsAdmin(isDefaultAdmin);
           }
-        } else {
-          // Create user doc if it doesn't exist
-          const isDefaultAdmin = user.email === 'nkhiangte@gmail.com';
-          await setDoc(doc(db, 'users', user.uid), {
-            email: user.email,
-            role: isDefaultAdmin ? 'admin' : 'user',
-            displayName: user.displayName,
-            photoURL: user.photoURL
-          });
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          // Fallback to email check if DB fails
           setIsAdmin(isDefaultAdmin);
         }
       } else {
