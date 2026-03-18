@@ -25,7 +25,7 @@ const Gallery = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Church Gallery</h1>
-              <p className="text-stone-600 max-w-2xl">Capturing the moments of faith, community, and worship at Tlangsam Presbyterian Church.</p>
+              <p className="text-stone-600 max-w-2xl">Capturing the moments of faith, community, and worship at Tlangsam Presbyterian Kohhran.</p>
             </div>
           </div>
         </div>

@@ -14,7 +14,7 @@ const Baptism = () => {
   return (
     <RecordTable 
       title="Baptism Records" 
-      description="Official registry of holy baptism administered at Tlangsam Presbyterian Church, documenting the spiritual journey of our members."
+      description="Official registry of holy baptism administered at Tlangsam Presbyterian Kohhran, documenting the spiritual journey of our members."
       columns={columns}
       collectionName="baptism_records"
       schema={schema}

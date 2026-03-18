@@ -435,7 +435,7 @@ const Records = () => {
   const recordContent: Record<string, any> = {
     'Baptism': {
       title: 'Baptism Records',
-      description: 'Records of holy baptism administered at Tlangsam Presbyterian Church.',
+      description: 'Records of holy baptism administered at Tlangsam Presbyterian Kohhran.',
       stats: 'Over 1,200 baptisms recorded since inception.',
       recent: ['Lalthlamuana (2024)', 'Zosangzuali (2024)', 'Lalrinawma (2023)'],
       link: '/records/baptism'
@@ -647,7 +647,7 @@ const About = () => {
             <h2 className="text-4xl md:text-5xl font-serif mb-8 leading-tight">A Legacy of Faith in Tlangsam</h2>
             <div className="space-y-6 text-stone-600 leading-relaxed text-lg">
               <p>
-                Tlangsam Presbyterian Church has been a cornerstone of spiritual life in our community for generations. Founded on the principles of reformed theology, we strive to be a light on the hill, sharing the transformative power of the Gospel.
+                Tlangsam Presbyterian Kohhran has been a cornerstone of spiritual life in our community for generations. Founded on the principles of reformed theology, we strive to be a light on the hill, sharing the transformative power of the Gospel.
               </p>
               <p>
                 Our mission is to glorify God by making disciples of Jesus Christ through gospel-centered worship, community, and mission. We believe in the power of prayer, the authority of Scripture, and the necessity of grace.
@@ -760,7 +760,7 @@ const Footer = () => {
           </div>
 
           <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Church. All rights reserved.
+            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. All rights reserved.
           </p>
         </div>
       </div>

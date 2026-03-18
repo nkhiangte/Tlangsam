@@ -14,7 +14,7 @@ const UpaKalTaTe = () => {
   return (
     <RecordTable 
       title="Upa kal ta te (Deceased Elders)" 
-      description="Honoring the memory and service of the elders who have served Tlangsam Presbyterian Church faithfully."
+      description="Honoring the memory and service of the elders who have served Tlangsam Presbyterian Kohhran faithfully."
       columns={columns}
       collectionName="elder_records"
       schema={schema}
