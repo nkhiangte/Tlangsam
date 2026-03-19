@@ -4,7 +4,7 @@ import { Users, Calendar, FileText, Shield, Loader2, Edit, Plus, Trash2, Save, X
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 
 interface NewsItem {
   title: string;
@@ -61,6 +61,8 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
         });
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, `committees/${id}`);
     });
     return unsubscribe;
   }, [id, defaultName, defaultDescription]);
@@ -147,22 +149,29 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
   }
 
   return (
-    <div className="pt-24 min-h-screen">
-      <section className="py-24 bg-white">
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="text-left"
           >
-            <span className="text-church-gold font-medium uppercase tracking-widest text-sm mb-4 block">Committee</span>
-            <h2 className="text-4xl md:text-5xl font-serif mb-4">{data?.name || defaultName}</h2>
-            <p className="text-stone-500 max-w-2xl mx-auto">{data?.description || defaultDescription}</p>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-px w-8 bg-church-gold"></div>
+              <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Committee</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data?.name || defaultName}</h1>
+            <p className="text-stone-400 max-w-2xl">{data?.description || defaultDescription}</p>
           </motion.div>
+        </div>
+      </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {/* Members Section */}
-            <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 relative group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 pb-24">
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {/* Members Section */}
+          <div className="p-8 rounded-3xl bg-white shadow-xl border border-stone-100 relative group">
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('members')}
@@ -239,7 +248,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
             </div>
 
             {/* Activities Section */}
-            <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 relative group">
+            <div className="p-8 rounded-3xl bg-white shadow-xl border border-stone-100 relative group">
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('activities')}
@@ -371,7 +380,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
             </div>
 
             {/* Minutes Section */}
-            <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 relative group">
+            <div className="p-8 rounded-3xl bg-white shadow-xl border border-stone-100 relative group">
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('minutes')}
@@ -505,7 +514,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
 
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {/* Meeting Time & OB */}
-            <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 relative group">
+            <div className="p-8 rounded-3xl bg-white shadow-xl border border-stone-100 relative group">
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('ob')}
@@ -643,8 +652,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
   );
 };
 

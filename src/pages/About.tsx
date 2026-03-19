@@ -4,9 +4,9 @@ import { LogoPlaceholder } from '../components/LogoPlaceholder';
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-church-cream">
+    <div className="min-h-screen bg-stone-50">
       {/* Page Header */}
-      <div className="bg-church-burgundy pt-40 pb-20">
+      <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px w-8 bg-church-gold"></div>
@@ -16,7 +16,7 @@ const About = () => {
         </div>
       </div>
 
-      <section className="py-24 bg-church-cream overflow-hidden">
+      <div className="py-24 bg-stone-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
@@ -53,7 +53,7 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

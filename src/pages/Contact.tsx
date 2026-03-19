@@ -16,7 +16,7 @@ const Contact = () => {
     return (
       <div className="min-h-screen bg-stone-50">
         {/* Page Header */}
-        <div className="bg-church-burgundy pt-40 pb-20">
+        <div className="bg-stone-900 pt-40 pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-px w-8 bg-church-gold"></div>
@@ -49,7 +49,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Page Header */}
-      <div className="bg-church-burgundy pt-40 pb-20">
+      <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px w-8 bg-church-gold"></div>
@@ -59,7 +59,7 @@ const Contact = () => {
         </div>
       </div>
 
-      <section className="py-24 bg-stone-50">
+      <div className="bg-stone-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 mb-24">
             <div className="bg-white p-12 rounded-[2.5rem] shadow-xl border border-stone-100">
@@ -143,7 +143,7 @@ const Contact = () => {
             </APIProvider>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

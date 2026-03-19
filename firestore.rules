@@ -43,7 +43,7 @@ service cloud.firestore {
       return isAuthenticated() &&
         ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-          request.auth.token.email == "nkhiangte@gmail.com");
+          (request.auth.token.email == "nkhiangte@gmail.com" && request.auth.token.email_verified == true));
     }
 
     function hasRequiredFields(fields) {
@@ -57,6 +57,14 @@ service cloud.firestore {
     // ===============================================================
     // Domain Validators
     // ===============================================================
+
+    function isValidNews(data) {
+      return hasRequiredFields(['title', 'content', 'date', 'author']) &&
+             data.title is string && data.title.size() < 200 &&
+             data.content is string && data.content.size() < 10000 &&
+             data.date is string &&
+             data.author is string;
+    }
 
     function isValidBaptism(data) {
       return hasRequiredFields(['name', 'date', 'parents', 'officiant', 'location']) &&
@@ -173,6 +181,13 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAdmin() && isValidElder(request.resource.data);
       allow update: if isAdmin() && isValidElder(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /news/{id} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidNews(request.resource.data);
+      allow update: if isAdmin() && isValidNews(request.resource.data);
       allow delete: if isAdmin();
     }
 

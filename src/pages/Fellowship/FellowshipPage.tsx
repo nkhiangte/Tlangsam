@@ -5,7 +5,7 @@ import { doc, onSnapshot, updateDoc, collection } from 'firebase/firestore';
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { LogoPlaceholder } from '../../components/LogoPlaceholder';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 
 interface NewsItem {
   title: string;
@@ -87,6 +87,8 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
         });
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, `fellowships/${id}`);
     });
 
     return () => unsub();
@@ -175,20 +177,27 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
   if (!data) return null;
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-stone-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">{data.name}</h1>
-          <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-            {data.description}
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-900 pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-left"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-px w-8 bg-church-gold"></div>
+              <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
+            <p className="text-stone-400 max-w-2xl">{data.description}</p>
+          </motion.div>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20 bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -358,7 +367,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Activities Section */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 relative group">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-stone-100 relative group">
             {isAdmin && !editingSection && (
               <button 
                 onClick={() => startEditing('activities')}
@@ -498,7 +507,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
           </div>
 
           {/* Minutes Section */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 relative group">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-stone-100 relative group">
             {isAdmin && !editingSection && (
               <button 
                 onClick={() => startEditing('minutes')}

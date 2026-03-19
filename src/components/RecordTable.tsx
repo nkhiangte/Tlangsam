@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc, setDoc, writeBatch } from 'firebase/firestore';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import * as XLSX from 'xlsx';
 
 interface RecordTableProps {
@@ -155,16 +155,21 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-24 bg-church-cream">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all mb-6">
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-900 pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link to="/" className="inline-flex items-center gap-2 text-church-gold font-medium hover:gap-3 transition-all mb-8">
             <ArrowLeft className="h-4 w-4" /> In-ah let leh rawh
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">{title}</h1>
-              <p className="text-stone-600 max-w-2xl">{description}</p>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-px w-8 bg-church-gold"></div>
+                <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Records</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{title}</h1>
+              <p className="text-stone-400 max-w-2xl">{description}</p>
             </div>
             <div className="flex flex-wrap gap-4">
               {isAdmin && (
@@ -204,8 +209,10 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="bg-white rounded-[2rem] shadow-xl border border-stone-100 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 pb-24">
+        <div className="bg-white rounded-[2rem] shadow-2xl border border-stone-100 overflow-hidden">
           <div className="p-6 border-b border-stone-100 bg-stone-50/50 flex flex-col md:flex-row gap-4 justify-between items-center">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />

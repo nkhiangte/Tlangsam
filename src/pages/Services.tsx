@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Clock, BookOpen, Users } from 'lucide-react';
 import { onSnapshot, doc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, handleFirestoreError, OperationType } from '../firebase';
 
 const Services = () => {
   const [schedule, setSchedule] = useState<any[]>([]);
@@ -49,6 +49,8 @@ const Services = () => {
         ]);
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/services');
     });
     return unsubscribe;
   }, []);
@@ -62,17 +64,17 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Page Header */}
-      <div className="bg-church-gold pt-40 pb-20">
+      <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
-            <div className="h-px w-8 bg-church-burgundy"></div>
-            <span className="text-church-burgundy font-medium uppercase tracking-widest text-xs">Inkhawm Hun-te</span>
+            <div className="h-px w-8 bg-church-gold"></div>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Inkhawm Hun-te</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">Service Times</h1>
         </div>
       </div>
 
-      <section className="py-24 bg-stone-50">
+      <div className="bg-stone-50 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-serif mb-4">Inkhawm Hun-te</h2>
@@ -119,7 +121,7 @@ const Services = () => {
             ))}
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

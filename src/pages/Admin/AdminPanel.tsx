@@ -29,7 +29,7 @@ import {
   where,
   deleteDoc
 } from 'firebase/firestore';
-import { useAuth } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 
 const AdminPanel = () => {
   const { isAdmin, user, loading: authLoading } = useAuth();
@@ -60,6 +60,8 @@ const AdminPanel = () => {
       }));
       setUsers(userList);
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'users');
     });
     return unsubscribe;
   }, [isAdmin]);
@@ -108,6 +110,8 @@ const AdminPanel = () => {
         ];
         setServices(defaultServices);
       }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/services');
     });
     return unsubscribe;
   }, [isAdmin]);
@@ -121,6 +125,8 @@ const AdminPanel = () => {
         ...doc.data()
       }));
       setCommittees(list);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'committees');
     });
     return unsubscribe;
   }, [isAdmin]);
@@ -134,6 +140,8 @@ const AdminPanel = () => {
         ...doc.data()
       }));
       setFellowships(list);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'fellowships');
     });
     return unsubscribe;
   }, [isAdmin]);
@@ -145,6 +153,8 @@ const AdminPanel = () => {
       if (doc.exists()) {
         setInspiration(doc.data());
       }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/inspiration');
     });
     return unsubscribe;
   }, [isAdmin]);

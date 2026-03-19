@@ -15,7 +15,7 @@ import {
   FileDown,
   Loader2
 } from 'lucide-react';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import * as XLSX from 'xlsx';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { collection, addDoc, Timestamp, writeBatch, doc } from 'firebase/firestore';
@@ -155,7 +155,7 @@ const Records = () => {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Page Header */}
-      <div className="bg-stone-800 pt-40 pb-20">
+      <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px w-8 bg-church-gold"></div>
@@ -165,7 +165,7 @@ const Records = () => {
         </div>
       </div>
 
-      <section className="py-24 bg-stone-50">
+      <div className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-serif mb-4">Kohhran Record-te</h2>
@@ -275,7 +275,7 @@ const Records = () => {
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

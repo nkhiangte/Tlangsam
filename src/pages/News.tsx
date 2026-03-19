@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Newspaper, Calendar, Clock, ChevronRight, Loader2, Plus, Trash2, Edit, Save, X } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query, orderBy, getDocs } from 'firebase/firestore';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 
 interface NewsItem {
   id: string;
@@ -98,16 +98,22 @@ const News = () => {
         ...doc.data()
       })) as NewsItem[];
       aggregateAllNews(currentManualNews, currentCommittees, currentFellowships);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'news');
     });
 
     committeesUnsubscribe = onSnapshot(collection(db, 'committees'), (snapshot) => {
       currentCommittees = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       aggregateAllNews(currentManualNews, currentCommittees, currentFellowships);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'committees');
     });
 
     fellowshipsUnsubscribe = onSnapshot(collection(db, 'fellowships'), (snapshot) => {
       currentFellowships = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       aggregateAllNews(currentManualNews, currentCommittees, currentFellowships);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'fellowships');
     });
 
     return () => {
