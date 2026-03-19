@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Users, Music, Calendar, Zap, Loader2 } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { LogoPlaceholder } from '../../components/LogoPlaceholder';
 
 interface FellowshipData {
   name: string;
@@ -96,7 +97,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <Users className="w-20 h-20 text-stone-400" />
+                <LogoPlaceholder className="w-40 h-40" iconClassName="w-20 h-20 text-stone-400" />
               )}
             </div>
           </motion.div>

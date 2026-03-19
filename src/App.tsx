@@ -264,19 +264,20 @@ const Navbar = () => {
             <div className="relative flex items-center min-w-[48px] min-h-[48px] justify-center">
               <Link to="/" className="block transition-transform hover:scale-105">
                 {!logoError ? (
-                  <img 
-                    src={logoUrl} 
-                    alt="Tlangsam Presbyterian Logo" 
-                    onError={() => setLogoError(true)}
-                    style={{ 
-                      height: `${logoSize}px`, 
-                      width: 'auto',
-                      maxHeight: isDarkNav ? '80px' : '120px',
-                      imageRendering: 'auto'
-                    }}
-                    className="object-contain transition-all duration-300 drop-shadow-sm"
-                    referrerPolicy="no-referrer"
-                  />
+                    <img 
+                      src={logoUrl} 
+                      alt="Tlangsam Presbyterian Logo" 
+                      onError={() => setLogoError(true)}
+                      style={{ 
+                        height: `${logoSize}px`, 
+                        width: 'auto',
+                        minHeight: '32px',
+                        maxHeight: isDarkNav ? '100px' : '150px',
+                        imageRendering: 'auto'
+                      }}
+                      className="object-contain transition-all duration-300 drop-shadow-md"
+                      referrerPolicy="no-referrer"
+                    />
                 ) : (
                   <div 
                     className={`flex items-center justify-center rounded-full border-2 ${isDarkNav ? 'border-church-burgundy bg-stone-50' : 'border-church-gold bg-white/10'}`}
@@ -333,7 +334,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}>
+                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}>
                     {link.name} <ChevronRight className="h-4 w-4 rotate-90" />
                   </button>
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
@@ -356,7 +357,7 @@ const Navbar = () => {
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
                 >
                   {link.name}
                 </a>
@@ -364,7 +365,7 @@ const Navbar = () => {
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
                 >
                   {link.name}
                 </Link>
@@ -376,7 +377,7 @@ const Navbar = () => {
                 {isAdmin && (
                   <Link 
                     to="/admin" 
-                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
+                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
                   >
                     <Shield className="h-5 w-5" /> Admin Panel
                   </Link>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Image as ImageIcon } from 'lucide-react';
+import { LogoPlaceholder } from '../components/LogoPlaceholder';
 
 const About = () => {
   return (
@@ -10,7 +10,7 @@ const About = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-stone-200 flex items-center justify-center">
-                <ImageIcon className="w-20 h-20 text-stone-400" />
+                <LogoPlaceholder className="w-40 h-40" iconClassName="w-20 h-20 text-stone-400" />
               </div>
               <div className="absolute -bottom-8 -right-8 bg-church-burgundy p-8 rounded-3xl text-white hidden md:block max-w-xs shadow-xl">
                 <p className="font-serif text-2xl italic mb-2">"Khawiah pawh mi pahnih emaw pathum emaw ka hminga an inkhawmna apiangah chuan an zingah ka awm thin a ni."</p>

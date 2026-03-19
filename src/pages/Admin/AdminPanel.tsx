@@ -289,7 +289,7 @@ const AdminPanel = () => {
                   <button 
                     onClick={() => {
                       const id = prompt("Committee ID (e.g. kohhran, sunday-school):");
-                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "", members: [], officeBearers: [], reports: "" });
+                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "", members: [], officeBearers: [], activities: [], reports: "" });
                     }}
                     className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
                   >
@@ -357,6 +357,18 @@ const AdminPanel = () => {
                               value={committee.members?.join(', ') || ""}
                               onChange={(e) => {
                                 const newList = committees.map(c => c.id === committee.id ? { ...c, members: e.target.value.split(',').map(s => s.trim()) } : c);
+                                setCommittees(newList);
+                              }}
+                              rows={2}
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                            />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Activities (Comma separated)</label>
+                            <textarea 
+                              value={committee.activities?.join(', ') || ""}
+                              onChange={(e) => {
+                                const newList = committees.map(c => c.id === committee.id ? { ...c, activities: e.target.value.split(',').map(s => s.trim()) } : c);
                                 setCommittees(newList);
                               }}
                               rows={2}

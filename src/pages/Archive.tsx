@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ScrollText, History, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import { ScrollText, History, ChevronRight } from 'lucide-react';
+import { LogoPlaceholder } from '../components/LogoPlaceholder';
 
 const Archive = () => {
   const archives = [
@@ -20,7 +21,7 @@ const Archive = () => {
     {
       title: "Thlalak",
       description: "Kohhran thil thleng hrang hrang thlalakte.",
-      icon: <ImageIcon className="h-6 w-6" />,
+      icon: <LogoPlaceholder className="w-10 h-10" iconClassName="h-6 w-6 text-church-burgundy" />,
       link: "/archive/gallery"
     }
   ];
