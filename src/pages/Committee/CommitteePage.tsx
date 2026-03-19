@@ -166,9 +166,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('members')}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-church-burgundy transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-church-burgundy text-white rounded-full shadow-lg hover:bg-church-burgundy/90 transition-all z-10"
                 >
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Edit</span>
                 </button>
               )}
               
@@ -242,9 +243,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('activities')}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-church-burgundy transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-church-burgundy text-white rounded-full shadow-lg hover:bg-church-burgundy/90 transition-all z-10"
                 >
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Edit</span>
                 </button>
               )}
               
@@ -373,9 +375,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('minutes')}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-church-burgundy transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-church-burgundy text-white rounded-full shadow-lg hover:bg-church-burgundy/90 transition-all z-10"
                 >
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Edit</span>
                 </button>
               )}
               
@@ -506,9 +509,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               {isAdmin && !editingSection && (
                 <button 
                   onClick={() => startEditing('ob')}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-church-burgundy transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-church-burgundy text-white rounded-full shadow-lg hover:bg-church-burgundy/90 transition-all z-10"
                 >
-                  <Edit className="h-4 w-4" />
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Edit</span>
                 </button>
               )}
               <div className="flex items-center gap-3 mb-6">
