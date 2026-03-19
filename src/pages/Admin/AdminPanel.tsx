@@ -13,11 +13,13 @@ import {
   Trash2,
   Loader2,
   ArrowLeft,
-  Sparkles
+  Sparkles,
+  Camera
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { db, handleFirestoreError, OperationType } from '../../firebase';
+import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { 
   collection, 
   onSnapshot, 
@@ -208,6 +210,31 @@ const AdminPanel = () => {
       await deleteDoc(doc(db, 'committees', id));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `committees/${id}`);
+    }
+  };
+
+  const handleFellowshipLogoUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const storageRef = ref(storage, `fellowships/${id}/logo_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      const newFellowships = fellowships.map(f => f.id === id ? { ...f, logoUrl: downloadURL } : f);
+      setFellowships(newFellowships);
+      
+      // Auto-save if it's an existing fellowship
+      await updateDoc(doc(db, 'fellowships', id), {
+        logoUrl: downloadURL,
+        updatedAt: new Date().toISOString()
+      });
+      
+      alert('Logo thlak a ni ta!');
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      alert('Logo thlaknaah hian harsatna a awm: ' + (error instanceof Error ? error.message : String(error)));
     }
   };
 
@@ -558,6 +585,28 @@ const AdminPanel = () => {
                               }}
                               className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Logo</label>
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 rounded-xl bg-stone-100 flex items-center justify-center overflow-hidden border border-stone-200">
+                                {fellowship.logoUrl ? (
+                                  <img src={fellowship.logoUrl} alt="" className="w-full h-full object-contain" />
+                                ) : (
+                                  <Users className="w-8 h-8 text-stone-300" />
+                                )}
+                              </div>
+                              <label className="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-600 px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-2">
+                                <Camera className="h-4 w-4" />
+                                <span>Logo thlakna</span>
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  accept="image/*" 
+                                  onChange={(e) => handleFellowshipLogoUpload(fellowship.id, e)}
+                                />
+                              </label>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Image URL</label>

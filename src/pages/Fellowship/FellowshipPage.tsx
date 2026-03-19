@@ -68,7 +68,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
   const { isAdmin } = useAuth();
 
   // Editing states
-  const [editingSection, setEditingSection] = useState<'ob' | 'activities' | 'minutes' | null>(null);
+  const [editingSection, setEditingSection] = useState<'ob' | 'activities' | 'minutes' | 'header' | 'purpose' | null>(null);
   const [editValue, setEditValue] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
@@ -113,9 +113,22 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
     }
   };
 
-  const startEditing = (section: 'ob' | 'activities' | 'minutes') => {
+  const startEditing = (section: 'ob' | 'activities' | 'minutes' | 'header' | 'purpose') => {
     setEditingSection(section);
-    if (section === 'ob') {
+    if (section === 'header') {
+      setEditValue({
+        ...data,
+        name: data.name || '',
+        description: data.description || ''
+      });
+    } else if (section === 'purpose') {
+      setEditValue({
+        ...data,
+        purpose: data.purpose || '',
+        meetingTime: data.meetingTime || '',
+        members: data.members || []
+      });
+    } else if (section === 'ob') {
       const currentOB = data?.officeBearers || [];
       // Migration check
       if (currentOB.length > 0 && typeof currentOB[0] === 'string') {
@@ -250,11 +263,11 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
             <div className="flex flex-col md:flex-row md:items-center gap-6 mb-4">
               {data.logoUrl ? (
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-2xl bg-white p-2 shadow-xl overflow-hidden flex items-center justify-center">
+                  <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
                     <img 
                       src={data.logoUrl} 
                       alt={`${data.name} Logo`} 
-                      className="max-w-full max-h-full object-contain"
+                      className="max-w-full max-h-full object-contain drop-shadow-lg"
                       referrerPolicy="no-referrer"
                     />
                   </div>
@@ -288,13 +301,47 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                   </label>
                 )
               )}
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-px w-8 bg-church-gold"></div>
-                  <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
-                <p className="text-stone-400 max-w-2xl">{data.description}</p>
+              <div className="flex-grow relative group">
+                {isAdmin && !editingSection && (
+                  <button 
+                    onClick={() => startEditing('header')}
+                    className="absolute -top-2 -right-2 p-2 bg-emerald-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                )}
+                
+                {editingSection === 'header' ? (
+                  <div className="space-y-4 bg-stone-900/50 p-6 rounded-2xl border border-white/10">
+                    <input 
+                      type="text"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-2xl font-serif text-white focus:outline-none focus:border-church-gold"
+                      value={editValue.name}
+                      onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
+                      placeholder="Fellowship Name"
+                    />
+                    <textarea 
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white/80 focus:outline-none focus:border-church-gold"
+                      value={editValue.description}
+                      onChange={(e) => setEditValue({ ...editValue, description: e.target.value })}
+                      placeholder="Description"
+                      rows={2}
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={handleSave} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
+                      <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-stone-700 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-600">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="h-px w-8 bg-church-gold"></div>
+                      <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
+                    <p className="text-stone-400 max-w-2xl">{data.description}</p>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -345,32 +392,80 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-6"
+            className="space-y-6 relative group"
           >
+            {isAdmin && !editingSection && (
+              <button 
+                onClick={() => startEditing('purpose')}
+                className="absolute -top-2 -right-2 p-2 bg-emerald-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            )}
+
             <h2 className="text-3xl font-serif text-stone-900">Kan Thiltum</h2>
-            <p className="text-stone-600 leading-relaxed">
-              {data.purpose}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-emerald-600 mt-1" />
+            
+            {editingSection === 'purpose' ? (
+              <div className="space-y-4 bg-stone-50 p-6 rounded-2xl border border-stone-200">
                 <div>
-                  <h3 className="font-medium text-stone-900">Inkhawm Hun</h3>
-                  <p className="text-sm text-stone-500">{data.meetingTime}</p>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Purpose</label>
+                  <textarea 
+                    className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2 text-stone-900 focus:outline-none focus:border-church-gold"
+                    value={editValue.purpose}
+                    onChange={(e) => setEditValue({ ...editValue, purpose: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Inkhawm Hun</label>
+                  <input 
+                    type="text"
+                    className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2 text-stone-900 focus:outline-none focus:border-church-gold"
+                    value={editValue.meetingTime}
+                    onChange={(e) => setEditValue({ ...editValue, meetingTime: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
+                  <textarea 
+                    className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2 text-stone-900 focus:outline-none focus:border-church-gold"
+                    value={editValue.members.join(', ')}
+                    onChange={(e) => setEditValue({ ...editValue, members: e.target.value.split(',').map(s => s.trim()) })}
+                    rows={2}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={handleSave} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
+                  <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-stone-200 text-stone-600 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-300">Cancel</button>
                 </div>
               </div>
-              <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
-                <Users className="w-5 h-5 text-emerald-600 mt-1" />
-                <div>
-                  <h3 className="font-medium text-stone-900">Member-te</h3>
-                  <p className="text-sm text-stone-500">
-                    {data.members && data.members.length > 0 
-                      ? data.members.join(', ') 
-                      : "Kohhran member zawng zawngte."}
-                  </p>
+            ) : (
+              <>
+                <p className="text-stone-600 leading-relaxed">
+                  {data.purpose}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
+                    <Calendar className="w-5 h-5 text-emerald-600 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-stone-900">Inkhawm Hun</h3>
+                      <p className="text-sm text-stone-500">{data.meetingTime}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-white rounded-xl shadow-sm border border-stone-100 flex items-start gap-3">
+                    <Users className="w-5 h-5 text-emerald-600 mt-1" />
+                    <div>
+                      <h3 className="font-medium text-stone-900">Member-te</h3>
+                      <p className="text-sm text-stone-500">
+                        {data.members && data.members.length > 0 
+                          ? data.members.join(', ') 
+                          : "Kohhran member zawng zawngte."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
 
             {((data.officeBearers && data.officeBearers.length > 0) || isAdmin) && (
               <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 relative group">

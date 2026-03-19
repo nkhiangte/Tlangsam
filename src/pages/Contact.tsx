@@ -12,7 +12,7 @@ const API_KEY =
   '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
 
-const CHURCH_LOCATION = { lat: 23.414004, lng: 93.315003 };
+const CHURCH_LOCATION = { lat: 23.4616, lng: 93.3609 };
 
 const Contact = () => {
   if (!hasValidKey) {
@@ -132,7 +132,7 @@ const Contact = () => {
             <APIProvider apiKey={API_KEY} version="weekly">
               <Map
                 defaultCenter={CHURCH_LOCATION}
-                defaultZoom={15}
+                defaultZoom={17}
                 mapId="DEMO_MAP_ID"
                 internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
                 style={{ width: '100%', height: '100%', borderRadius: '1.5rem' }}
