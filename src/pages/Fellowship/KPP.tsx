@@ -8,7 +8,7 @@ const KPP = () => {
       defaultName="Kohhran Pa Pawl (KPP)"
       defaultDescription="Tlangsam Presbyterian Kohhran pa-te rinna leh hruaitu nihna kawnga thuam chakna."
       defaultPurpose="KPP hi kan kohhran pa-te tana thlarau lama hmasawnna leh inpawlhona hmun pawimawh tak a ni. Kristian hruaitu tha tak nih leh, kohhran hna hrang hrang thlawp leh inunauna tha zawk siam kan tum a ni."
-      defaultImageUrl="https://picsum.photos/seed/men-fellowship/800/600"
+      defaultImageUrl=""
       defaultMeetingTime="Thla tin Inrinni hmasa ber zan dar 6:00-ah."
       defaultActivities={[
         "Kohhran hruaitu tha ni tura inbuatsaihna.",

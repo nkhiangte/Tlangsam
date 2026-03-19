@@ -154,11 +154,16 @@ const ScrollToTop = () => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { pathname } = useLocation();
   const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
   const [logoSize, setLogoSize] = useState(48);
+  const [logoError, setLogoError] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
   const [uploading, setUploading] = useState(false);
   const { user, login, logout, isAdmin } = useAuth();
+
+  const isHomePage = pathname === '/';
+  const isDarkNav = scrolled || !isHomePage;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -167,7 +172,10 @@ const Navbar = () => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        if (data.logoUrl) setLogoUrl(data.logoUrl);
+        if (data.logoUrl) {
+          setLogoUrl(data.logoUrl);
+          setLogoError(false);
+        }
         if (data.logoSize) setLogoSize(data.logoSize);
       }
     });
@@ -249,24 +257,34 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${isDarkNav ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-4 group relative">
-            <div className="relative flex items-center">
+            <div className="relative flex items-center min-w-[48px] min-h-[48px] justify-center">
               <Link to="/" className="block transition-transform hover:scale-105">
-                <img 
-                  src={logoUrl} 
-                  alt="Tlangsam Presbyterian Logo" 
-                  style={{ 
-                    height: `${logoSize}px`, 
-                    width: 'auto',
-                    maxHeight: scrolled ? '80px' : '120px',
-                    imageRendering: 'auto'
-                  }}
-                  className="object-contain transition-all duration-300 drop-shadow-sm rounded-full"
-                  referrerPolicy="no-referrer"
-                />
+                {!logoError ? (
+                  <img 
+                    src={logoUrl} 
+                    alt="Tlangsam Presbyterian Logo" 
+                    onError={() => setLogoError(true)}
+                    style={{ 
+                      height: `${logoSize}px`, 
+                      width: 'auto',
+                      maxHeight: isDarkNav ? '80px' : '120px',
+                      imageRendering: 'auto'
+                    }}
+                    className="object-contain transition-all duration-300 drop-shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div 
+                    className={`flex items-center justify-center rounded-full border-2 ${isDarkNav ? 'border-church-burgundy bg-stone-50' : 'border-church-gold bg-white/10'}`}
+                    style={{ height: `${logoSize}px`, width: `${logoSize}px` }}
+                  >
+                    <ImageIcon className={`h-1/2 w-1/2 ${isDarkNav ? 'text-church-burgundy' : 'text-church-gold'}`} />
+                  </div>
+                )}
               </Link>
               {isAdmin && (
                 <div className="absolute -bottom-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
@@ -302,10 +320,10 @@ const Navbar = () => {
               )}
             </div>
             <Link to="/" className="flex flex-col justify-center">
-              <span className={`text-xl font-serif font-bold leading-none tracking-tight ${scrolled ? 'text-stone-900' : 'text-white'}`}>
+              <span className={`text-xl font-serif font-bold leading-none tracking-tight ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
                 Tlangsam
               </span>
-              <span className={`text-sm font-serif font-medium leading-none mt-1 opacity-90 ${scrolled ? 'text-church-burgundy' : 'text-church-gold'}`}>
+              <span className={`text-sm font-serif font-medium leading-none mt-1 opacity-90 ${isDarkNav ? 'text-church-burgundy' : 'text-church-gold'}`}>
                 Presbyterian Church
               </span>
             </Link>
@@ -315,7 +333,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}>
+                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}>
                     {link.name} <ChevronRight className="h-4 w-4 rotate-90" />
                   </button>
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
@@ -338,7 +356,7 @@ const Navbar = () => {
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
                 >
                   {link.name}
                 </a>
@@ -346,7 +364,7 @@ const Navbar = () => {
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
                 >
                   {link.name}
                 </Link>
@@ -358,14 +376,14 @@ const Navbar = () => {
                 {isAdmin && (
                   <Link 
                     to="/admin" 
-                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${scrolled ? 'text-stone-600' : 'text-white/90'}`}
+                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-600' : 'text-white/90'}`}
                   >
                     <Shield className="h-5 w-5" /> Admin Panel
                   </Link>
                 )}
                 <div className="flex items-center gap-2">
                   <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
-                  <span className={`text-sm font-medium ${scrolled ? 'text-stone-900' : 'text-white'}`}>
+                  <span className={`text-sm font-medium ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
                     {isAdmin ? 'Admin' : 'Kohhran Member'}
                   </span>
                 </div>
@@ -387,7 +405,7 @@ const Navbar = () => {
           </div>
 
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className={scrolled ? 'text-stone-900' : 'text-white'}>
+            <button onClick={() => setIsOpen(!isOpen)} className={isDarkNav ? 'text-stone-900' : 'text-white'}>
               {isOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -464,14 +482,16 @@ const Navbar = () => {
 
 const Hero = () => {
   const { isAdmin } = useAuth();
-  const [bgImage, setBgImage] = useState('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073&auto=format&fit=crop');
+  const [bgImage, setBgImage] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
       if (doc.exists() && doc.data().backgroundImage) {
         setBgImage(doc.data().backgroundImage);
       }
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -501,14 +521,18 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
       <div className="absolute inset-0 z-0">
-        <img 
-          src={bgImage} 
-          alt="Church Interior" 
-          className="w-full h-full object-cover brightness-50"
-          referrerPolicy="no-referrer"
-        />
+        {bgImage ? (
+          <img 
+            src={bgImage} 
+            alt="Church Interior" 
+            className="w-full h-full object-cover brightness-50"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-full h-full bg-stone-900" />
+        )}
       </div>
       
       {isAdmin && (
@@ -641,8 +665,8 @@ const Footer = () => {
             <img 
               src={logoUrl} 
               alt="Tlangsam Presbyterian Logo" 
-              style={{ height: `${logoSize}px`, width: `${logoSize}px` }}
-              className="object-contain brightness-0 invert rounded-full"
+              style={{ height: `${logoSize}px`, width: 'auto', maxWidth: '120px' }}
+              className="object-contain brightness-0 invert"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">

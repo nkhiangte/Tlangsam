@@ -8,7 +8,7 @@ const KohhranHmeichhia = () => {
       defaultName="Kohhran Hmeichhia"
       defaultDescription="Tlangsam Presbyterian Kohhran-a hmeichhiate rinna, rawngbawlna leh inpawlhona kawnga thuam chakna."
       defaultPurpose="Kohhran Hmeichhia hi kan kohhran-a pawl pawimawh tak a ni. Thlarau lama hmasawnna, kohhran hna hrang hrang thlawpna leh mamawhtute tana rawngbawlna kawngah kan thawk thin a ni."
-      defaultImageUrl="https://picsum.photos/seed/women-fellowship/800/600"
+      defaultImageUrl=""
       defaultMeetingTime="Thawhlehni zan dar 6:30-ah Biak In Hall-ah."
       defaultActivities={[
         "Mamawhtute tana thilpek leh rawngbawlna.",

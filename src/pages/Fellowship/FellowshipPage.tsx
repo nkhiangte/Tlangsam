@@ -87,12 +87,18 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <img 
-              src={data.imageUrl || "https://picsum.photos/seed/fellowship/800/600"} 
-              alt={data.name} 
-              className="rounded-2xl shadow-xl w-full h-auto object-cover aspect-[4/3]"
-              referrerPolicy="no-referrer"
-            />
+            <div className="relative rounded-2xl shadow-xl overflow-hidden aspect-[4/3] bg-stone-200 flex items-center justify-center">
+              {data.imageUrl ? (
+                <img 
+                  src={data.imageUrl} 
+                  alt={data.name} 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <Users className="w-20 h-20 text-stone-400" />
+              )}
+            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}

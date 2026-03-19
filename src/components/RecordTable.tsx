@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2, Trash2, Edit } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Download, Search, Filter, Plus, X, Loader2, Trash2, Edit, FileUp, FileDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, orderBy, Timestamp, deleteDoc, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { useAuth } from '../App';
+import * as XLSX from 'xlsx';
 
 interface RecordTableProps {
   title: string;
@@ -21,7 +22,9 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const { isAdmin, user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const q = query(collection(db, collectionName), orderBy('createdAt', 'desc'));
@@ -88,6 +91,69 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
     }
   };
 
+  const downloadTemplate = () => {
+    const headers = Object.values(schema);
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, `${title.replace(/\s+/g, '_')}_Template.xlsx`);
+  };
+
+  const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !isAdmin) return;
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const jsonData = XLSX.utils.sheet_to_json(ws);
+
+        if (jsonData.length === 0) {
+          alert('Excel file-ah hian data a awm lo.');
+          return;
+        }
+
+        const batch = writeBatch(db);
+        const reverseSchema: { [key: string]: string } = {};
+        Object.entries(schema).forEach(([key, label]) => {
+          reverseSchema[String(label)] = key;
+        });
+
+        (jsonData as any[]).forEach((row: any) => {
+          const record: any = {
+            createdAt: Timestamp.now(),
+            authorUid: user?.uid
+          };
+
+          Object.entries(row).forEach(([header, value]) => {
+            const fieldKey = reverseSchema[String(header)];
+            if (fieldKey) {
+              record[fieldKey] = value;
+            }
+          });
+
+          const newDocRef = doc(collection(db, collectionName));
+          batch.set(newDocRef, record);
+        });
+
+        await batch.commit();
+        alert(`${jsonData.length} records hlawhtling takin import a ni ta!`);
+      } catch (error) {
+        console.error('Excel import error:', error);
+        alert('Excel import-naah hian harsatna a awm: ' + (error instanceof Error ? error.message : String(error)));
+      } finally {
+        setIsImporting(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <div className="min-h-screen pt-32 pb-24 bg-church-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,17 +166,40 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
               <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">{title}</h1>
               <p className="text-stone-600 max-w-2xl">{description}</p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               {isAdmin && (
-                <button 
-                  onClick={() => setShowAddModal(true)}
-                  className="flex items-center gap-2 bg-church-gold text-stone-900 px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-medium"
-                >
-                  <Plus className="h-4 w-4" /> Record thar dahna
-                </button>
+                <>
+                  <button 
+                    onClick={() => setShowAddModal(true)}
+                    className="flex items-center gap-2 bg-church-gold text-stone-900 px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-medium"
+                  >
+                    <Plus className="h-4 w-4" /> Record thar
+                  </button>
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImporting}
+                    className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-medium disabled:opacity-50"
+                  >
+                    {isImporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />}
+                    Excel Import
+                  </button>
+                  <button 
+                    onClick={downloadTemplate}
+                    className="flex items-center gap-2 bg-stone-800 text-white px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-medium"
+                  >
+                    <FileDown className="h-4 w-4" /> Template
+                  </button>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleExcelImport} 
+                    accept=".xlsx, .xls" 
+                    className="hidden" 
+                  />
+                </>
               )}
-              <button className="flex items-center gap-2 bg-church-burgundy text-white px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg">
-                <Download className="h-4 w-4" /> Record-te lakchhuahna
+              <button className="flex items-center gap-2 bg-church-burgundy text-white px-6 py-3 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-medium">
+                <Download className="h-4 w-4" /> Export
               </button>
             </div>
           </div>
