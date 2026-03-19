@@ -26,6 +26,7 @@ interface FellowshipData {
   purpose: string;
   imageUrl: string;
   meetingTime: string;
+  logoUrl?: string;
   activities: NewsItem[];
   reports?: NewsItem[];
   members?: string[];
@@ -48,6 +49,7 @@ interface FellowshipPageProps {
   defaultPurpose: string;
   defaultImageUrl: string;
   defaultMeetingTime: string;
+  defaultLogoUrl?: string;
   defaultActivities: string[];
 }
 
@@ -57,6 +59,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
   defaultDescription,
   defaultPurpose,
   defaultImageUrl,
+  defaultLogoUrl,
   defaultMeetingTime,
   defaultActivities
 }) => {
@@ -80,6 +83,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
           description: defaultDescription,
           purpose: defaultPurpose,
           imageUrl: defaultImageUrl,
+          logoUrl: defaultLogoUrl || "",
           meetingTime: defaultMeetingTime,
           activities: defaultActivities.map(a => ({ title: "Activity", content: a, date: new Date().toISOString().split('T')[0] })),
           reports: [],
@@ -166,6 +170,41 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
     }
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage('logo');
+    try {
+      const storageRef = ref(storage, `fellowships/${id}/logo_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      await updateDoc(doc(db, 'fellowships', id), {
+        logoUrl: downloadURL,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      alert('Logo upload failed');
+    } finally {
+      setUploadingImage(null);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!window.confirm('Are you sure you want to remove the logo?')) return;
+    
+    try {
+      await updateDoc(doc(db, 'fellowships', id), {
+        logoUrl: "",
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `fellowships/${id}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
@@ -186,12 +225,56 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
             animate={{ opacity: 1, y: 0 }}
             className="text-left"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-px w-8 bg-church-gold"></div>
-              <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
+            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-4">
+              {data.logoUrl ? (
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-2xl bg-white p-2 shadow-xl overflow-hidden flex items-center justify-center">
+                    <img 
+                      src={data.logoUrl} 
+                      alt={`${data.name} Logo`} 
+                      className="max-w-full max-h-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  {isAdmin && (
+                    <div className="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <label className="p-1.5 bg-emerald-600 text-white rounded-full shadow-lg cursor-pointer hover:bg-emerald-700 transition-all">
+                        <Camera className="h-3 w-3" />
+                        <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                      </label>
+                      <button 
+                        onClick={handleRemoveLogo}
+                        className="p-1.5 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                isAdmin && (
+                  <label className="w-24 h-24 rounded-2xl border-2 border-dashed border-stone-700 flex flex-col items-center justify-center gap-2 text-stone-500 hover:text-emerald-500 hover:border-emerald-500 transition-all cursor-pointer bg-stone-800/50">
+                    {uploadingImage === 'logo' ? (
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    ) : (
+                      <>
+                        <Plus className="h-6 w-6" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Add Logo</span>
+                      </>
+                    )}
+                    <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                  </label>
+                )
+              )}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-px w-8 bg-church-gold"></div>
+                  <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
+                <p className="text-stone-400 max-w-2xl">{data.description}</p>
+              </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
-            <p className="text-stone-400 max-w-2xl">{data.description}</p>
           </motion.div>
         </div>
       </div>

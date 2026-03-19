@@ -134,6 +134,7 @@
         "description": { "type": "string" },
         "leaders": { "type": "string", "description": "JSON string of leaders list" },
         "activities": { "type": "string", "description": "JSON string of activities list" },
+        "logoUrl": { "type": "string", "description": "URL of the fellowship logo" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "description"]
