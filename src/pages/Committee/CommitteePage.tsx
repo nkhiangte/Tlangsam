@@ -1,15 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Calendar, FileText, Shield, Loader2, Edit, Plus, Trash2, Save, X, Check, ClipboardList } from 'lucide-react';
-import { db, handleFirestoreError, OperationType } from '../../firebase';
+import { Users, Calendar, FileText, Shield, Loader2, Edit, Plus, Trash2, Save, X, Check, ClipboardList, Zap, Phone, Camera, Image as ImageIcon } from 'lucide-react';
+import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../App';
+
+interface NewsItem {
+  title: string;
+  content: string;
+  imageUrl?: string;
+  date: string;
+}
+
+interface OfficeBearer {
+  role: string;
+  name: string;
+  phone: string;
+}
 
 interface CommitteePageProps {
   id: string;
   defaultName: string;
   defaultDescription: string;
 }
+
+const DEFAULT_OB_ROLES = [
+  "Chairman",
+  "Vice Chairman",
+  "Secretary",
+  "Asst. Secretary",
+  "Treasurer",
+  "Finance Secretary"
+];
 
 const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultDescription }) => {
   const [data, setData] = useState<any>(null);
@@ -20,6 +43,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
   const [editingSection, setEditingSection] = useState<'members' | 'minutes' | 'activities' | 'ob' | null>(null);
   const [editValue, setEditValue] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'committees', id), (doc) => {
@@ -59,9 +83,59 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
   const startEditing = (section: 'members' | 'minutes' | 'activities' | 'ob') => {
     setEditingSection(section);
     if (section === 'members') setEditValue([...(data?.members || [])]);
-    if (section === 'ob') setEditValue([...(data?.officeBearers || [])]);
-    if (section === 'activities') setEditValue([...(data?.activities || [])]);
-    if (section === 'minutes') setEditValue(data?.reports || "");
+    if (section === 'ob') {
+      const currentOB = data?.officeBearers || [];
+      // If it's the old string array format, try to convert or start fresh with placeholders
+      if (currentOB.length > 0 && typeof currentOB[0] === 'string') {
+        const migrated = DEFAULT_OB_ROLES.map(role => ({
+          role,
+          name: currentOB.find((s: string) => s.toLowerCase().includes(role.toLowerCase()))?.split(':')[1]?.trim() || "",
+          phone: ""
+        }));
+        setEditValue(migrated);
+      } else if (currentOB.length === 0) {
+        setEditValue(DEFAULT_OB_ROLES.map(role => ({ role, name: "", phone: "" })));
+      } else {
+        setEditValue([...currentOB]);
+      }
+    }
+    if (section === 'activities') {
+      const current = data?.activities || [];
+      if (current.length > 0 && typeof current[0] === 'string') {
+        setEditValue(current.map((s: string) => ({ title: "Activity", content: s, date: new Date().toISOString().split('T')[0] })));
+      } else {
+        setEditValue([...current]);
+      }
+    }
+    if (section === 'minutes') {
+      const current = data?.reports || [];
+      if (typeof current === 'string') {
+        setEditValue([{ title: "Minute", content: current, date: new Date().toISOString().split('T')[0] }]);
+      } else {
+        setEditValue([...current]);
+      }
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number, section: 'activities' | 'minutes') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(`${section}-${index}`);
+    try {
+      const storageRef = ref(storage, `committees/${id}/${section}_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      const newList = [...editValue];
+      newList[index] = { ...newList[index], imageUrl: downloadURL };
+      setEditValue(newList);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Image upload failed');
+    } finally {
+      setUploadingImage(null);
+    }
   };
 
   if (loading) {
@@ -181,29 +255,75 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               <p className="text-stone-600 text-sm mb-4">Committee hnathawh hrang hrang leh hmachhawp-te.</p>
               
               {editingSection === 'activities' ? (
-                <div className="space-y-3">
-                  {editValue.map((a: string, i: number) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <input 
-                        type="text" 
-                        value={a}
+                <div className="space-y-4">
+                  {editValue.map((a: NewsItem, i: number) => (
+                    <div key={i} className="p-4 bg-white border border-stone-200 rounded-xl space-y-3">
+                      <div className="flex justify-between items-center">
+                        <input 
+                          type="text" 
+                          placeholder="Title"
+                          value={a.title}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, title: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-church-gold"
+                        />
+                        <button 
+                          onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <textarea 
+                        placeholder="Content"
+                        value={a.content}
                         onChange={(e) => {
                           const newList = [...editValue];
-                          newList[i] = e.target.value;
+                          newList[i] = { ...a, content: e.target.value };
                           setEditValue(newList);
                         }}
-                        className="flex-1 bg-white border border-stone-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-church-gold"
+                        rows={3}
+                        className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-church-gold"
                       />
-                      <button 
-                        onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
-                        className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center gap-4">
+                        <input 
+                          type="date" 
+                          value={a.date}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, date: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="text-[10px] bg-stone-50 border border-stone-100 rounded px-2 py-1"
+                        />
+                        <label className="cursor-pointer flex items-center gap-1 text-[10px] text-church-burgundy font-bold uppercase">
+                          {uploadingImage === `activities-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                          {a.imageUrl ? 'Change Image' : 'Add Image'}
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'activities')} />
+                        </label>
+                      </div>
+                      {a.imageUrl && (
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-stone-100">
+                          <img src={a.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            onClick={() => {
+                              const newList = [...editValue];
+                              newList[i] = { ...a, imageUrl: undefined };
+                              setEditValue(newList);
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   <button 
-                    onClick={() => setEditValue([...editValue, ""])}
+                    onClick={() => setEditValue([...editValue, { title: "", content: "", date: new Date().toISOString().split('T')[0] }])}
                     className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-xs flex items-center justify-center gap-1 hover:bg-stone-100 transition-all"
                   >
                     <Plus className="h-3 w-3" /> Activity belhna
@@ -225,17 +345,26 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                   </div>
                 </div>
               ) : (
-                <ul className="space-y-2">
-                  {(data?.activities || []).map((a: string, i: number) => (
-                    <li key={i} className="text-stone-700 text-sm flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-church-burgundy mt-1.5" />
-                      {a}
-                    </li>
+                <div className="space-y-6">
+                  {(data?.activities || []).map((a: NewsItem, i: number) => (
+                    <div key={i} className="border-b border-stone-100 last:border-0 pb-4 last:pb-0">
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-church-gold uppercase tracking-widest mb-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                      <h4 className="font-bold text-stone-800 mb-2">{a.title}</h4>
+                      {a.imageUrl && (
+                        <div className="mb-3 rounded-xl overflow-hidden aspect-video bg-stone-100">
+                          <img src={a.imageUrl} alt={a.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        </div>
+                      )}
+                      <p className="text-stone-600 text-sm leading-relaxed">{a.content}</p>
+                    </div>
                   ))}
                   {(!data?.activities || data.activities.length === 0) && (
-                    <li className="text-stone-400 text-xs italic">Activity list a awm rih lo.</li>
+                    <p className="text-stone-400 text-xs italic">Activity list a awm rih lo.</p>
                   )}
-                </ul>
+                </div>
               )}
             </div>
 
@@ -257,15 +386,80 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               <p className="text-stone-600 text-sm mb-4">Committee thurel leh report pawimawh vawn thatnate.</p>
               
               {editingSection === 'minutes' ? (
-                <div className="space-y-3">
-                  <textarea 
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    rows={6}
-                    className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-church-gold transition-all"
-                    placeholder="Committee thurel tlangpui dah rawh..."
-                  />
-                  <div className="flex gap-2">
+                <div className="space-y-4">
+                  {editValue.map((a: NewsItem, i: number) => (
+                    <div key={i} className="p-4 bg-white border border-stone-200 rounded-xl space-y-3">
+                      <div className="flex justify-between items-center">
+                        <input 
+                          type="text" 
+                          placeholder="Title"
+                          value={a.title}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, title: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-church-gold"
+                        />
+                        <button 
+                          onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <textarea 
+                        placeholder="Content"
+                        value={a.content}
+                        onChange={(e) => {
+                          const newList = [...editValue];
+                          newList[i] = { ...a, content: e.target.value };
+                          setEditValue(newList);
+                        }}
+                        rows={3}
+                        className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-church-gold"
+                      />
+                      <div className="flex items-center gap-4">
+                        <input 
+                          type="date" 
+                          value={a.date}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, date: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="text-[10px] bg-stone-50 border border-stone-100 rounded px-2 py-1"
+                        />
+                        <label className="cursor-pointer flex items-center gap-1 text-[10px] text-church-burgundy font-bold uppercase">
+                          {uploadingImage === `minutes-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                          {a.imageUrl ? 'Change Image' : 'Add Image'}
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'minutes')} />
+                        </label>
+                      </div>
+                      {a.imageUrl && (
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-stone-100">
+                          <img src={a.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            onClick={() => {
+                              const newList = [...editValue];
+                              newList[i] = { ...a, imageUrl: undefined };
+                              setEditValue(newList);
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => setEditValue([...editValue, { title: "", content: "", date: new Date().toISOString().split('T')[0] }])}
+                    className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-xs flex items-center justify-center gap-1 hover:bg-stone-100 transition-all"
+                  >
+                    <Plus className="h-3 w-3" /> Minute belhna
+                  </button>
+                  <div className="flex gap-2 pt-2">
                     <button 
                       onClick={() => handleSave('reports', editValue)}
                       disabled={isSaving}
@@ -282,8 +476,25 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 p-4 bg-white rounded-xl border border-stone-200 text-stone-700 text-sm italic line-clamp-6">
-                  {data?.reports || "Report vawn that a awm rih lo."}
+                <div className="space-y-6">
+                  {(data?.reports || []).map((a: NewsItem, i: number) => (
+                    <div key={i} className="border-b border-stone-100 last:border-0 pb-4 last:pb-0">
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-church-gold uppercase tracking-widest mb-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                      <h4 className="font-bold text-stone-800 mb-2">{a.title}</h4>
+                      {a.imageUrl && (
+                        <div className="mb-3 rounded-xl overflow-hidden aspect-video bg-stone-100">
+                          <img src={a.imageUrl} alt={a.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        </div>
+                      )}
+                      <p className="text-stone-600 text-sm leading-relaxed">{a.content}</p>
+                    </div>
+                  ))}
+                  {(!data?.reports || data.reports.length === 0) && (
+                    <p className="text-stone-400 text-xs italic">Minute vawn that a awm rih lo.</p>
+                  )}
                 </div>
               )}
             </div>
@@ -308,33 +519,49 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
               <p className="text-stone-600 text-sm mb-6">{data?.meetingTime || "Committee thutkhawm hun leh hmun hrang hrangte."}</p>
               
               {editingSection === 'ob' ? (
-                <div className="space-y-3">
-                  {editValue.map((ob: string, i: number) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <input 
-                        type="text" 
-                        value={ob}
-                        onChange={(e) => {
-                          const newList = [...editValue];
-                          newList[i] = e.target.value;
-                          setEditValue(newList);
-                        }}
-                        className="flex-1 bg-white border border-stone-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-church-gold"
-                        placeholder="e.g. Chairman: Rev. John"
-                      />
-                      <button 
-                        onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
-                        className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                <div className="space-y-4">
+                  {editValue.map((ob: OfficeBearer, i: number) => (
+                    <div key={i} className="p-4 bg-white border border-stone-200 rounded-xl space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-church-burgundy uppercase tracking-wider">{ob.role}</span>
+                        <button 
+                          onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input 
+                          type="text" 
+                          placeholder="Hming"
+                          value={ob.name}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...ob, name: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-church-gold"
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Phone"
+                          value={ob.phone}
+                          onChange={(e) => {
+                            const newList = [...editValue];
+                            newList[i] = { ...ob, phone: e.target.value };
+                            setEditValue(newList);
+                          }}
+                          className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-church-gold"
+                        />
+                      </div>
                     </div>
                   ))}
                   <button 
-                    onClick={() => setEditValue([...editValue, ""])}
+                    onClick={() => setEditValue([...editValue, { role: "Other", name: "", phone: "" }])}
                     className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-xs flex items-center justify-center gap-1 hover:bg-stone-100 transition-all"
                   >
-                    <Plus className="h-3 w-3" /> OB belhna
+                    <Plus className="h-3 w-3" /> OB dang belhna
                   </button>
                   <div className="flex gap-2 pt-2">
                     <button 
@@ -354,15 +581,47 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                 </div>
               ) : (
                 <div className="pt-6 border-t border-stone-200">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-3">Office Bearers</h4>
-                  <ul className="space-y-2">
-                    {(data?.officeBearers || []).map((ob: string, i: number) => (
-                      <li key={i} className="text-stone-800 text-sm font-medium">{ob}</li>
-                    ))}
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-4">Office Bearers</h4>
+                  <div className="space-y-4">
+                    {(data?.officeBearers || []).map((ob: any, i: number) => {
+                      const isStructured = typeof ob === 'object' && ob !== null;
+                      const role = isStructured ? ob.role : ob.split(':')[0];
+                      const name = isStructured ? ob.name : ob.split(':')[1];
+                      const phone = isStructured ? ob.phone : "";
+
+                      return (
+                        <div key={i} className="flex flex-col">
+                          <span className="text-[10px] font-bold text-church-gold uppercase tracking-widest mb-0.5">{role}</span>
+                          <div className="flex items-center justify-between">
+                            <span className="text-stone-800 text-sm font-medium">{name || "—"}</span>
+                            {phone && (
+                              <div className="flex items-center gap-2">
+                                <a 
+                                  href={`tel:${phone}`}
+                                  className="p-1.5 bg-church-burgundy/5 text-church-burgundy rounded-lg hover:bg-church-burgundy hover:text-white transition-all"
+                                  title="Call"
+                                >
+                                  <Phone className="h-3 w-3" />
+                                </a>
+                                <a 
+                                  href={`https://wa.me/${phone.replace(/\D/g, '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"
+                                  title="WhatsApp"
+                                >
+                                  <Zap className="h-3 w-3" />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                     {(!data?.officeBearers || data.officeBearers.length === 0) && (
-                      <li className="text-stone-400 text-xs italic">OB list a awm rih lo.</li>
+                      <div className="text-stone-400 text-xs italic">OB list a awm rih lo.</div>
                     )}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>

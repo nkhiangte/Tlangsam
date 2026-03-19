@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Users, Music, Calendar, Zap, Loader2 } from 'lucide-react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { Users, Music, Calendar, Zap, Loader2, Edit, Trash2, Plus, Check, Save, X, Phone, Camera, Image as ImageIcon, FileText } from 'lucide-react';
+import { doc, onSnapshot, updateDoc, collection } from 'firebase/firestore';
+import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { LogoPlaceholder } from '../../components/LogoPlaceholder';
+import { useAuth } from '../../App';
+
+interface NewsItem {
+  title: string;
+  content: string;
+  imageUrl?: string;
+  date: string;
+}
+
+interface OfficeBearer {
+  role: string;
+  name: string;
+  phone: string;
+}
 
 interface FellowshipData {
   name: string;
@@ -11,10 +26,20 @@ interface FellowshipData {
   purpose: string;
   imageUrl: string;
   meetingTime: string;
-  activities: string[];
+  activities: NewsItem[];
+  reports?: NewsItem[];
   members?: string[];
-  officeBearers?: string[];
+  officeBearers?: OfficeBearer[];
 }
+
+const DEFAULT_OB_ROLES = [
+  "Chairman",
+  "Vice Chairman",
+  "Secretary",
+  "Asst. Secretary",
+  "Treasurer",
+  "Finance Secretary"
+];
 
 interface FellowshipPageProps {
   id: string;
@@ -37,6 +62,13 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
 }) => {
   const [data, setData] = useState<FellowshipData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAuth();
+
+  // Editing states
+  const [editingSection, setEditingSection] = useState<'ob' | 'activities' | 'minutes' | null>(null);
+  const [editValue, setEditValue] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'fellowships', id), (doc) => {
@@ -49,7 +81,9 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
           purpose: defaultPurpose,
           imageUrl: defaultImageUrl,
           meetingTime: defaultMeetingTime,
-          activities: defaultActivities
+          activities: defaultActivities.map(a => ({ title: "Activity", content: a, date: new Date().toISOString().split('T')[0] })),
+          reports: [],
+          officeBearers: []
         });
       }
       setLoading(false);
@@ -57,6 +91,78 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
 
     return () => unsub();
   }, [id, defaultName, defaultDescription, defaultPurpose, defaultImageUrl, defaultMeetingTime, defaultActivities]);
+
+  const handleSave = async (field: string, value: any) => {
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'fellowships', id), {
+        [field]: value,
+        updatedAt: new Date().toISOString()
+      });
+      setEditingSection(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `fellowships/${id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const startEditing = (section: 'ob' | 'activities' | 'minutes') => {
+    setEditingSection(section);
+    if (section === 'ob') {
+      const currentOB = data?.officeBearers || [];
+      // Migration check
+      if (currentOB.length > 0 && typeof currentOB[0] === 'string') {
+        const migrated = DEFAULT_OB_ROLES.map(role => ({
+          role,
+          name: (currentOB as any).find((s: string) => s.toLowerCase().includes(role.toLowerCase()))?.split(':')[1]?.trim() || "",
+          phone: ""
+        }));
+        setEditValue(migrated);
+      } else if (currentOB.length === 0) {
+        setEditValue(DEFAULT_OB_ROLES.map(role => ({ role, name: "", phone: "" })));
+      } else {
+        setEditValue([...currentOB]);
+      }
+    }
+    if (section === 'activities') {
+      const current = data?.activities || [];
+      if (current.length > 0 && typeof current[0] === 'string') {
+        setEditValue(current.map((s: string) => ({ title: "Activity", content: s, date: new Date().toISOString().split('T')[0] })));
+      } else {
+        setEditValue([...current]);
+      }
+    }
+    if (section === 'minutes') {
+      const current = data?.reports || [];
+      if (typeof current === 'string') {
+        setEditValue([{ title: "Minute", content: current, date: new Date().toISOString().split('T')[0] }]);
+      } else {
+        setEditValue([...current]);
+      }
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number, section: 'activities' | 'minutes') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(`${section}-${index}`);
+    try {
+      const storageRef = ref(storage, `fellowships/${id}/${section}_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      const newList = [...editValue];
+      newList[index] = { ...newList[index], imageUrl: downloadURL };
+      setEditValue(newList);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Image upload failed');
+    } finally {
+      setUploadingImage(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -132,37 +238,391 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
               </div>
             </div>
 
-            {data.officeBearers && data.officeBearers.length > 0 && (
-              <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+            {((data.officeBearers && data.officeBearers.length > 0) || isAdmin) && (
+              <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 relative group">
+                {isAdmin && !editingSection && (
+                  <button 
+                    onClick={() => startEditing('ob')}
+                    className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                )}
                 <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-800 mb-4">Office Bearers</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-                  {data.officeBearers.map((ob, i) => (
-                    <div key={i} className="text-stone-700 text-sm flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
-                      {ob}
+                
+                {editingSection === 'ob' ? (
+                  <div className="space-y-4">
+                    {editValue.map((ob: OfficeBearer, i: number) => (
+                      <div key={i} className="p-4 bg-white border border-emerald-100 rounded-xl space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{ob.role}</span>
+                          <button 
+                            onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                            className="text-red-400 hover:text-red-600"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input 
+                            type="text" 
+                            placeholder="Hming"
+                            value={ob.name}
+                            onChange={(e) => {
+                              const newList = [...editValue];
+                              newList[i] = { ...ob, name: e.target.value };
+                              setEditValue(newList);
+                            }}
+                            className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                          <input 
+                            type="text" 
+                            placeholder="Phone"
+                            value={ob.phone}
+                            onChange={(e) => {
+                              const newList = [...editValue];
+                              newList[i] = { ...ob, phone: e.target.value };
+                              setEditValue(newList);
+                            }}
+                            className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button 
+                      onClick={() => setEditValue([...editValue, { role: "Other", name: "", phone: "" }])}
+                      className="w-full py-2 border border-dashed border-emerald-200 rounded-lg text-emerald-400 text-[10px] flex items-center justify-center gap-1 hover:bg-emerald-100/50 transition-all"
+                    >
+                      <Plus className="h-3 w-3" /> OB belhna
+                    </button>
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        onClick={() => handleSave('officeBearers', editValue)}
+                        disabled={isSaving}
+                        className="flex-1 bg-emerald-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1"
+                      >
+                        {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Save
+                      </button>
+                      <button 
+                        onClick={() => setEditingSection(null)}
+                        className="flex-1 bg-stone-200 text-stone-600 py-2 rounded-lg text-xs font-bold"
+                      >
+                        Cancel
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                    {(data.officeBearers || []).map((ob: any, i) => {
+                      const isStructured = typeof ob === 'object' && ob !== null;
+                      const role = isStructured ? ob.role : ob.split(':')[0];
+                      const name = isStructured ? ob.name : ob.split(':')[1];
+                      const phone = isStructured ? ob.phone : "";
+
+                      return (
+                        <div key={i} className="flex flex-col">
+                          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-0.5">{role}</span>
+                          <div className="flex items-center justify-between">
+                            <span className="text-stone-700 text-sm font-medium">{name || "—"}</span>
+                            {phone && (
+                              <div className="flex items-center gap-2">
+                                <a 
+                                  href={`tel:${phone}`}
+                                  className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"
+                                  title="Call"
+                                >
+                                  <Phone className="h-3 w-3" />
+                                </a>
+                                <a 
+                                  href={`https://wa.me/${phone.replace(/\D/g, '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"
+                                  title="WhatsApp"
+                                >
+                                  <Zap className="h-3 w-3" />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {data.activities && data.activities.map((activity, index) => (
-            <motion.div 
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100"
-            >
-              <Zap className="w-8 h-8 text-emerald-600 mb-4" />
-              <h3 className="text-xl font-serif mb-2">Hmalakna {index + 1}</h3>
-              <p className="text-stone-600">{activity}</p>
-            </motion.div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {/* Activities Section */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 relative group">
+            {isAdmin && !editingSection && (
+              <button 
+                onClick={() => startEditing('activities')}
+                className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            )}
+            <div className="flex items-center gap-3 mb-6">
+              <Zap className="w-8 h-8 text-emerald-600" />
+              <h3 className="text-2xl font-serif text-stone-900">Hmalakna & Activities</h3>
+            </div>
+            
+            {editingSection === 'activities' ? (
+              <div className="space-y-4">
+                {editValue.map((a: NewsItem, i: number) => (
+                  <div key={i} className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-3">
+                    <div className="flex justify-between items-center">
+                      <input 
+                        type="text" 
+                        placeholder="Title"
+                        value={a.title}
+                        onChange={(e) => {
+                          const newList = [...editValue];
+                          newList[i] = { ...a, title: e.target.value };
+                          setEditValue(newList);
+                        }}
+                        className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-emerald-500"
+                      />
+                      <button 
+                        onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <textarea 
+                      placeholder="Content"
+                      value={a.content}
+                      onChange={(e) => {
+                        const newList = [...editValue];
+                        newList[i] = { ...a, content: e.target.value };
+                        setEditValue(newList);
+                      }}
+                      rows={3}
+                      className="w-full bg-white border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                    <div className="flex items-center gap-4">
+                      <input 
+                        type="date" 
+                        value={a.date}
+                        onChange={(e) => {
+                          const newList = [...editValue];
+                          newList[i] = { ...a, date: e.target.value };
+                          setEditValue(newList);
+                        }}
+                        className="text-[10px] bg-white border border-stone-100 rounded px-2 py-1"
+                      />
+                      <label className="cursor-pointer flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase">
+                        {uploadingImage === `activities-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                        {a.imageUrl ? 'Change Image' : 'Add Image'}
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'activities')} />
+                      </label>
+                    </div>
+                    {a.imageUrl && (
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-stone-100">
+                        <img src={a.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          onClick={() => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, imageUrl: undefined };
+                            setEditValue(newList);
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <button 
+                  onClick={() => setEditValue([...editValue, { title: "", content: "", date: new Date().toISOString().split('T')[0] }])}
+                  className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-xs flex items-center justify-center gap-1 hover:bg-stone-100 transition-all"
+                >
+                  <Plus className="h-3 w-3" /> Activity belhna
+                </button>
+                <div className="flex gap-2 pt-2">
+                  <button 
+                    onClick={() => handleSave('activities', editValue)}
+                    disabled={isSaving}
+                    className="flex-1 bg-emerald-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1"
+                  >
+                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Save
+                  </button>
+                  <button 
+                    onClick={() => setEditingSection(null)}
+                    className="flex-1 bg-stone-200 text-stone-600 py-2 rounded-lg text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {(data.activities || []).map((activity: any, index) => {
+                  const isStructured = typeof activity === 'object' && activity !== null;
+                  const title = isStructured ? activity.title : `Hmalakna ${index + 1}`;
+                  const content = isStructured ? activity.content : activity;
+                  const date = isStructured ? activity.date : null;
+                  const imageUrl = isStructured ? activity.imageUrl : null;
+
+                  return (
+                    <div key={index} className="border-b border-stone-100 last:border-0 pb-4 last:pb-0">
+                      {date && (
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
+                      )}
+                      <h4 className="font-bold text-stone-800 mb-2">{title}</h4>
+                      {imageUrl && (
+                        <div className="mb-3 rounded-xl overflow-hidden aspect-video bg-stone-100">
+                          <img src={imageUrl} alt={title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        </div>
+                      )}
+                      <p className="text-stone-600 text-sm leading-relaxed">{content}</p>
+                    </div>
+                  );
+                })}
+                {(!data.activities || data.activities.length === 0) && (
+                  <p className="text-stone-400 text-xs italic">Activity list a awm rih lo.</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Minutes Section */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 relative group">
+            {isAdmin && !editingSection && (
+              <button 
+                onClick={() => startEditing('minutes')}
+                className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-stone-400 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <Edit className="h-4 w-4" />
+              </button>
+            )}
+            <div className="flex items-center gap-3 mb-6">
+              <FileText className="w-8 h-8 text-emerald-600" />
+              <h3 className="text-2xl font-serif text-stone-900">Minutes & Report</h3>
+            </div>
+            
+            {editingSection === 'minutes' ? (
+              <div className="space-y-4">
+                {editValue.map((a: NewsItem, i: number) => (
+                  <div key={i} className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-3">
+                    <div className="flex justify-between items-center">
+                      <input 
+                        type="text" 
+                        placeholder="Title"
+                        value={a.title}
+                        onChange={(e) => {
+                          const newList = [...editValue];
+                          newList[i] = { ...a, title: e.target.value };
+                          setEditValue(newList);
+                        }}
+                        className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-emerald-500"
+                      />
+                      <button 
+                        onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <textarea 
+                      placeholder="Content"
+                      value={a.content}
+                      onChange={(e) => {
+                        const newList = [...editValue];
+                        newList[i] = { ...a, content: e.target.value };
+                        setEditValue(newList);
+                      }}
+                      rows={3}
+                      className="w-full bg-white border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                    <div className="flex items-center gap-4">
+                      <input 
+                        type="date" 
+                        value={a.date}
+                        onChange={(e) => {
+                          const newList = [...editValue];
+                          newList[i] = { ...a, date: e.target.value };
+                          setEditValue(newList);
+                        }}
+                        className="text-[10px] bg-white border border-stone-100 rounded px-2 py-1"
+                      />
+                      <label className="cursor-pointer flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase">
+                        {uploadingImage === `minutes-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                        {a.imageUrl ? 'Change Image' : 'Add Image'}
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'minutes')} />
+                      </label>
+                    </div>
+                    {a.imageUrl && (
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-stone-100">
+                        <img src={a.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          onClick={() => {
+                            const newList = [...editValue];
+                            newList[i] = { ...a, imageUrl: undefined };
+                            setEditValue(newList);
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <button 
+                  onClick={() => setEditValue([...editValue, { title: "", content: "", date: new Date().toISOString().split('T')[0] }])}
+                  className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-xs flex items-center justify-center gap-1 hover:bg-stone-100 transition-all"
+                >
+                  <Plus className="h-3 w-3" /> Minute belhna
+                </button>
+                <div className="flex gap-2 pt-2">
+                  <button 
+                    onClick={() => handleSave('reports', editValue)}
+                    disabled={isSaving}
+                    className="flex-1 bg-emerald-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1"
+                  >
+                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Save
+                  </button>
+                  <button 
+                    onClick={() => setEditingSection(null)}
+                    className="flex-1 bg-stone-200 text-stone-600 py-2 rounded-lg text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {(data.reports || []).map((a: NewsItem, i: number) => (
+                  <div key={i} className="border-b border-stone-100 last:border-0 pb-4 last:pb-0">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </div>
+                    <h4 className="font-bold text-stone-800 mb-2">{a.title}</h4>
+                    {a.imageUrl && (
+                      <div className="mb-3 rounded-xl overflow-hidden aspect-video bg-stone-100">
+                        <img src={a.imageUrl} alt={a.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      </div>
+                    )}
+                    <p className="text-stone-600 text-sm leading-relaxed">{a.content}</p>
+                  </div>
+                ))}
+                {(!data.reports || data.reports.length === 0) && (
+                  <p className="text-stone-400 text-xs italic">Minute vawn that a awm rih lo.</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

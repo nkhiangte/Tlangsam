@@ -49,6 +49,7 @@ import KTP from './pages/Fellowship/KTP';
 import KPP from './pages/Fellowship/KPP';
 import AdminPanel from './pages/Admin/AdminPanel';
 import About from './pages/About';
+import News from './pages/News';
 import ServicesPage from './pages/Services';
 import RecordsPage from './pages/Records';
 import ArchivePage from './pages/Archive';
@@ -223,7 +224,8 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: 'Inlam', href: '/' },
+    { name: 'Home', href: '/' },
+    { name: 'Latest News', href: '/news' },
     { name: 'Chanchin', href: '/about' },
     { name: 'Inkhawm', href: '/services' },
     { 
@@ -713,6 +715,7 @@ export default function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/news" element={<News />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/records" element={<RecordsPage />} />

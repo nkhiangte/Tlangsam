@@ -339,17 +339,78 @@ const AdminPanel = () => {
                             />
                           </div>
                           <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers (Comma separated)</label>
-                            <textarea 
-                              value={committee.officeBearers?.join(', ') || ""}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, officeBearers: e.target.value.split(',').map(s => s.trim()) } : c);
-                                setCommittees(newList);
-                              }}
-                              rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
-                              placeholder="e.g. Chairman: Rev. John, Secretary: Upa Liana"
-                            />
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers</label>
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {(committee.officeBearers || []).map((ob: any, obIdx: number) => {
+                                const isStructured = typeof ob === 'object' && ob !== null;
+                                const role = isStructured ? ob.role : ob.split(':')[0];
+                                const name = isStructured ? ob.name : ob.split(':')[1];
+                                const phone = isStructured ? ob.phone : "";
+                                
+                                return (
+                                  <div key={obIdx} className="p-3 bg-white border border-stone-200 rounded-xl space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <input 
+                                        type="text" 
+                                        value={role}
+                                        onChange={(e) => {
+                                          const newList = [...committee.officeBearers];
+                                          newList[obIdx] = { role: e.target.value, name, phone };
+                                          const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                          setCommittees(newCommittees);
+                                        }}
+                                        className="text-[10px] font-bold text-church-burgundy uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full"
+                                        placeholder="Role"
+                                      />
+                                      <button 
+                                        onClick={() => {
+                                          const newList = committee.officeBearers.filter((_: any, i: number) => i !== obIdx);
+                                          const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                          setCommittees(newCommittees);
+                                        }}
+                                        className="text-red-400 hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    </div>
+                                    <input 
+                                      type="text" 
+                                      value={name}
+                                      onChange={(e) => {
+                                        const newList = [...committee.officeBearers];
+                                        newList[obIdx] = { role, name: e.target.value, phone };
+                                        const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                        setCommittees(newCommittees);
+                                      }}
+                                      placeholder="Hming"
+                                      className="w-full text-xs border-none p-0 focus:ring-0 text-stone-800 font-medium"
+                                    />
+                                    <input 
+                                      type="text" 
+                                      value={phone}
+                                      onChange={(e) => {
+                                        const newList = [...committee.officeBearers];
+                                        newList[obIdx] = { role, name, phone: e.target.value };
+                                        const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                        setCommittees(newCommittees);
+                                      }}
+                                      placeholder="Phone"
+                                      className="w-full text-[10px] border-none p-0 focus:ring-0 text-stone-500"
+                                    />
+                                  </div>
+                                );
+                              })}
+                              <button 
+                                onClick={() => {
+                                  const newList = [...(committee.officeBearers || []), { role: "New Role", name: "", phone: "" }];
+                                  const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                  setCommittees(newCommittees);
+                                }}
+                                className="border border-dashed border-stone-300 rounded-xl p-4 text-stone-400 text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all"
+                              >
+                                <Plus className="h-4 w-4" /> OB belhna
+                              </button>
+                            </div>
                           </div>
                           <div className="md:col-span-3">
                             <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
@@ -510,17 +571,78 @@ const AdminPanel = () => {
                             />
                           </div>
                           <div className="md:col-span-2">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers (Comma separated)</label>
-                            <textarea 
-                              value={fellowship.officeBearers?.join(', ') || ""}
-                              onChange={(e) => {
-                                const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: e.target.value.split(',').map(s => s.trim()) } : f);
-                                setFellowships(newList);
-                              }}
-                              rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
-                              placeholder="e.g. Leader: John, Secretary: Jane"
-                            />
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers</label>
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {(fellowship.officeBearers || []).map((ob: any, obIdx: number) => {
+                                const isStructured = typeof ob === 'object' && ob !== null;
+                                const role = isStructured ? ob.role : ob.split(':')[0];
+                                const name = isStructured ? ob.name : ob.split(':')[1];
+                                const phone = isStructured ? ob.phone : "";
+                                
+                                return (
+                                  <div key={obIdx} className="p-3 bg-white border border-stone-200 rounded-xl space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <input 
+                                        type="text" 
+                                        value={role}
+                                        onChange={(e) => {
+                                          const newList = [...fellowship.officeBearers];
+                                          newList[obIdx] = { role: e.target.value, name, phone };
+                                          const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
+                                          setFellowships(newFellowships);
+                                        }}
+                                        className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full"
+                                        placeholder="Role"
+                                      />
+                                      <button 
+                                        onClick={() => {
+                                          const newList = fellowship.officeBearers.filter((_: any, i: number) => i !== obIdx);
+                                          const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
+                                          setFellowships(newFellowships);
+                                        }}
+                                        className="text-red-400 hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    </div>
+                                    <input 
+                                      type="text" 
+                                      value={name}
+                                      onChange={(e) => {
+                                        const newList = [...fellowship.officeBearers];
+                                        newList[obIdx] = { role, name: e.target.value, phone };
+                                        const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
+                                        setFellowships(newFellowships);
+                                      }}
+                                      placeholder="Hming"
+                                      className="w-full text-xs border-none p-0 focus:ring-0 text-stone-800 font-medium"
+                                    />
+                                    <input 
+                                      type="text" 
+                                      value={phone}
+                                      onChange={(e) => {
+                                        const newList = [...fellowship.officeBearers];
+                                        newList[obIdx] = { role, name, phone: e.target.value };
+                                        const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
+                                        setFellowships(newFellowships);
+                                      }}
+                                      placeholder="Phone"
+                                      className="w-full text-[10px] border-none p-0 focus:ring-0 text-stone-500"
+                                    />
+                                  </div>
+                                );
+                              })}
+                              <button 
+                                onClick={() => {
+                                  const newList = [...(fellowship.officeBearers || []), { role: "New Role", name: "", phone: "" }];
+                                  const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
+                                  setFellowships(newFellowships);
+                                }}
+                                className="border border-dashed border-stone-300 rounded-xl p-4 text-stone-400 text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all"
+                              >
+                                <Plus className="h-4 w-4" /> OB belhna
+                              </button>
+                            </div>
                           </div>
                           <div className="md:col-span-2">
                             <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
