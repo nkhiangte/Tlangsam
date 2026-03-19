@@ -271,7 +271,7 @@ const Navbar = () => {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${isDarkNav ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center min-h-[64px] md:min-h-[80px]">
           <div className="flex items-center gap-4 group relative">
             <div className="relative flex items-center min-w-[48px] min-h-[48px] justify-center">
               <Link to="/" className="block transition-transform hover:scale-105">
@@ -283,11 +283,9 @@ const Navbar = () => {
                       style={{ 
                         height: `${logoSize}px`, 
                         width: 'auto',
-                        minHeight: '32px',
-                        maxHeight: isDarkNav ? '100px' : '150px',
                         imageRendering: 'auto'
                       }}
-                      className="object-contain transition-all duration-300 drop-shadow-md"
+                      className="object-contain transition-all duration-300 drop-shadow-md max-h-[40px] sm:max-h-[50px] md:max-h-[70px]"
                       referrerPolicy="no-referrer"
                     />
                 ) : (
@@ -333,93 +331,112 @@ const Navbar = () => {
               )}
             </div>
             <Link to="/" className="flex flex-col justify-center">
-              <span className={`text-xl font-serif font-bold leading-none tracking-tight ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
+              <span className={`text-lg sm:text-xl font-serif font-bold leading-none tracking-tight ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
                 Tlangsam
               </span>
-              <span className={`text-sm font-serif font-medium leading-none mt-1 opacity-90 ${isDarkNav ? 'text-church-burgundy' : 'text-church-gold'}`}>
+              <span className={`text-[10px] sm:text-sm font-serif font-medium leading-none mt-1 opacity-90 ${isDarkNav ? 'text-church-burgundy' : 'text-church-gold'}`}>
                 Presbyterian Church
               </span>
             </Link>
           </div>
           
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              link.dropdown ? (
-                <div key={link.name} className="relative group">
-                  <button className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}>
-                    {link.name} <ChevronRight className="h-4 w-4 rotate-90" />
-                  </button>
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100">
-                    {link.dropdown.map((sub) => (
-                      <Link 
-                        key={sub.name} 
-                        to={sub.href}
-                        className="block px-4 py-2 text-base text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
-                      >
-                        {sub.name}
-                      </Link>
-                    ))}
+          {/* Desktop Navigation & Auth */}
+          <div className="hidden md:flex flex-col items-end gap-2">
+            {/* Top Row: Auth & Admin */}
+            <div className="flex items-center gap-4">
+              {user ? (
+                <div className="flex items-center gap-4">
+                  {isAdmin && (
+                    <Link 
+                      to="/admin" 
+                      className={`text-sm font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                    >
+                      <Shield className="h-4 w-4" /> Admin Panel
+                    </Link>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-7 h-7 rounded-full border border-stone-200" />
+                    <span className={`text-xs font-medium ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
+                      {isAdmin ? 'Admin' : 'Member'}
+                    </span>
                   </div>
-                </div>
-              ) : link.href.startsWith('/#') ? (
-                <a 
-                  key={link.name} 
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
-                >
-                  {link.name}
-                </a>
-              ) : (
-                <Link 
-                  key={link.name} 
-                  to={link.href}
-                  className={`text-lg font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
-                >
-                  {link.name}
-                </Link>
-              )
-            ))}
-            
-            {user ? (
-              <div className="flex items-center gap-4">
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className={`text-lg font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                  <button 
+                    onClick={logout}
+                    className="bg-stone-100 text-stone-900 px-3 py-1 rounded-full text-xs font-medium hover:bg-stone-200 transition-all flex items-center gap-1"
                   >
-                    <Shield className="h-5 w-5" /> Admin Panel
-                  </Link>
-                )}
-                <div className="flex items-center gap-2">
-                  <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
-                  <span className={`text-sm font-medium ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
-                    {isAdmin ? 'Admin' : 'Kohhran Member'}
-                  </span>
+                    <LogOut className="h-3 w-3" /> Chhuak rawh
+                  </button>
                 </div>
+              ) : (
                 <button 
-                  onClick={logout}
-                  className="bg-stone-100 text-stone-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-stone-200 transition-all flex items-center gap-2"
+                  onClick={login}
+                  className="bg-church-burgundy text-white px-5 py-1.5 rounded-full text-xs font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center gap-1"
                 >
-                  <LogOut className="h-4 w-4" /> Chhuak rawh
+                  <LogIn className="h-3 w-3" /> Lut rawh
                 </button>
-              </div>
-            ) : (
-              <button 
-                onClick={login}
-                className="bg-church-burgundy text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center gap-2"
-              >
-                <LogIn className="h-4 w-4" /> Lut rawh
-              </button>
-            )}
+              )}
+            </div>
+
+            {/* Bottom Row: Main Menu */}
+            <div className="flex items-center gap-6 lg:gap-8">
+              {navLinks.map((link) => (
+                link.dropdown ? (
+                  <div key={link.name} className="relative group">
+                    <button className={`text-base font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}>
+                      {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
+                    </button>
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100 z-50">
+                      {link.dropdown.map((sub) => (
+                        <Link 
+                          key={sub.name} 
+                          to={sub.href}
+                          className="block px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : link.href.startsWith('/#') ? (
+                  <a 
+                    key={link.name} 
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(link.href);
+                    }}
+                    className={`text-base font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link 
+                    key={link.name} 
+                    to={link.href}
+                    className={`text-base font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              ))}
+            </div>
           </div>
 
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-3">
+            {!user && (
+              <button 
+                onClick={login}
+                className={`p-2 rounded-full transition-colors ${isDarkNav ? 'text-church-burgundy hover:bg-stone-100' : 'text-white hover:bg-white/10'}`}
+                title="Lut rawh"
+              >
+                <LogIn className="h-6 w-6" />
+              </button>
+            )}
+            {user && (
+              <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-stone-200" />
+            )}
             <button onClick={() => setIsOpen(!isOpen)} className={isDarkNav ? 'text-stone-900' : 'text-white'}>
-              {isOpen ? <X /> : <Menu />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -579,7 +596,7 @@ const Hero = () => {
             <p className="text-xl md:text-2xl text-white/90 font-serif font-normal mb-3">
               Mizoram Synod
             </p>
-            <h1 className="text-3xl md:text-5xl text-white font-serif font-bold leading-tight tracking-tight whitespace-nowrap">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl text-white font-serif font-bold leading-tight tracking-tight whitespace-normal">
               Tlangsam Presbyterian Kohhran
             </h1>
           </div>

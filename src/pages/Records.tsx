@@ -153,7 +153,7 @@ const Records = () => {
   };
 
   return (
-    <div className="pt-24 min-h-screen">
+    <div className="pt-32 min-h-screen">
       <section className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
