@@ -127,6 +127,20 @@ const Navbar = () => {
         { name: 'Light & Sound Committee', href: '/committee/light-sound' },
       ]
     },
+    { 
+      name: 'Sunday School', 
+      href: '#',
+      dropdown: [
+        { name: 'Weekly Report', href: '/sunday-school/weekly-report' },
+        { name: 'Puitling', href: '/sunday-school/puitling' },
+        { name: 'Senior', href: '/sunday-school/senior' },
+        { name: 'Sacrament', href: '/sunday-school/sacrament' },
+        { name: 'Intermediate', href: '/sunday-school/intermediate' },
+        { name: 'Junior', href: '/sunday-school/junior' },
+        { name: 'Primary', href: '/sunday-school/primary' },
+        { name: 'Beginner', href: '/sunday-school/beginner' },
+      ]
+    },
     { name: 'Record-te', href: '/records' },
     { name: 'Archive', href: '/archive' },
     { name: 'Biak Pawhna', href: '/contact' },

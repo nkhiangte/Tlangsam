@@ -123,6 +123,20 @@ service cloud.firestore {
              data.legacy is string;
     }
 
+    function isValidSundaySchoolTeacher(data) {
+      return hasRequiredFields(['name', 'role', 'department']) &&
+             data.name is string && data.name.size() < 100 &&
+             data.role in ['Leader', 'Asst. Leader', 'Secretary', 'Teacher'] &&
+             data.department in ['Puitling', 'Senior', 'Sacrament', 'Intermediate', 'Junior', 'Primary', 'Beginner'];
+    }
+
+    function isValidSundaySchoolReport(data) {
+      return hasRequiredFields(['date', 'attendance', 'collection']) &&
+             data.date is string &&
+             data.attendance is int &&
+             data.collection is number;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -181,6 +195,20 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAdmin() && isValidElder(request.resource.data);
       allow update: if isAdmin() && isValidElder(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /sunday_school_teachers/{id} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSundaySchoolTeacher(request.resource.data);
+      allow update: if isAdmin() && isValidSundaySchoolTeacher(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /sunday_school_reports/{id} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
+      allow update: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
       allow delete: if isAdmin();
     }
 

@@ -150,6 +150,32 @@
         "backgroundImage": { "type": "string", "description": "URL of the homepage background image" },
         "updatedAt": { "type": "string", "format": "date-time" }
       }
+    },
+    "SundaySchoolTeacher": {
+      "title": "Sunday School Teacher",
+      "description": "A teacher in a Sunday School department.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["Leader", "Asst. Leader", "Secretary", "Teacher"] },
+        "department": { "type": "string", "enum": ["Puitling", "Senior", "Sacrament", "Intermediate", "Junior", "Primary", "Beginner"] },
+        "order": { "type": "integer", "description": "Display order" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "role", "department"]
+    },
+    "SundaySchoolReport": {
+      "title": "Sunday School Weekly Report",
+      "description": "Weekly report for Sunday School.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "attendance": { "type": "integer" },
+        "collection": { "type": "number" },
+        "remarks": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "attendance", "collection"]
     }
   },
   "firestore": {
@@ -163,6 +189,8 @@
     "/elder_records": { "schema": "ElderRecord", "description": "Collection of elder records" },
     "/committees": { "schema": "Committee", "description": "Collection of church committees" },
     "/fellowships": { "schema": "Fellowship", "description": "Collection of church fellowships" },
-    "/settings": { "schema": "Setting", "description": "Collection of application settings" }
+    "/settings": { "schema": "Setting", "description": "Collection of application settings" },
+    "/sunday_school_teachers": { "schema": "SundaySchoolTeacher", "description": "Collection of Sunday School teachers" },
+    "/sunday_school_reports": { "schema": "SundaySchoolReport", "description": "Collection of Sunday School weekly reports" }
   }
 }

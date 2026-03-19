@@ -30,6 +30,8 @@ import RamtharCommittee from './pages/Committee/RamtharCommittee';
 import BSICommittee from './pages/Committee/BSICommittee';
 import RefreshmentCommittee from './pages/Committee/RefreshmentCommittee';
 import LightAndSoundCommittee from './pages/Committee/LightAndSoundCommittee';
+import { SundaySchoolTeachersPage } from './pages/SundaySchool/TeachersPage';
+import { WeeklyReportPage } from './pages/SundaySchool/WeeklyReportPage';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
@@ -110,6 +112,8 @@ export default function App() {
               <Route path="/committee/bsi" element={<BSICommittee />} />
               <Route path="/committee/refreshment" element={<RefreshmentCommittee />} />
               <Route path="/committee/light-sound" element={<LightAndSoundCommittee />} />
+              <Route path="/sunday-school/weekly-report" element={<WeeklyReportPage />} />
+              <Route path="/sunday-school/:department" element={<SundaySchoolTeachersPage />} />
             </Routes>
           </main>
           <Footer />
