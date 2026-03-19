@@ -192,6 +192,28 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
     }
   };
 
+  const handleMainImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage('main');
+    try {
+      const storageRef = ref(storage, `fellowships/${id}/main_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      await updateDoc(doc(db, 'fellowships', id), {
+        imageUrl: downloadURL,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error uploading main image:', error);
+      alert('Image upload failed');
+    } finally {
+      setUploadingImage(null);
+    }
+  };
+
   const handleRemoveLogo = async () => {
     if (!window.confirm('Are you sure you want to remove the logo?')) return;
     
@@ -286,16 +308,36 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <div className="relative rounded-2xl shadow-xl overflow-hidden aspect-[4/3] bg-stone-200 flex items-center justify-center">
+            <div className="relative rounded-2xl shadow-xl overflow-hidden aspect-[4/3] bg-stone-200 flex items-center justify-center group/main">
               {data.imageUrl ? (
-                <img 
-                  src={data.imageUrl} 
-                  alt={data.name} 
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
+                <>
+                  <img 
+                    src={data.imageUrl} 
+                    alt={data.name} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  {isAdmin && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/main:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <label className="p-3 bg-white text-stone-900 rounded-full shadow-xl cursor-pointer hover:scale-110 transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-wider">
+                        <Camera className="h-4 w-4" />
+                        Thalak thlakna
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleMainImageUpload(e)} />
+                      </label>
+                    </div>
+                  )}
+                </>
               ) : (
-                <LogoPlaceholder className="w-40 h-40" iconClassName="w-20 h-20 text-stone-400" />
+                <div className="flex flex-col items-center gap-4">
+                  <LogoPlaceholder className="w-40 h-40" iconClassName="w-20 h-20 text-stone-400" />
+                  {isAdmin && (
+                    <label className="px-6 py-3 bg-emerald-600 text-white rounded-full shadow-xl cursor-pointer hover:bg-emerald-700 transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-wider">
+                      {uploadingImage === 'main' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                      Thalak dahna
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleMainImageUpload(e)} />
+                    </label>
+                  )}
+                </div>
               )}
             </div>
           </motion.div>
