@@ -311,7 +311,7 @@ const AdminPanel = () => {
                                 const newList = committees.map(c => c.id === committee.id ? { ...c, name: e.target.value } : c);
                                 setCommittees(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-2">
@@ -323,7 +323,7 @@ const AdminPanel = () => {
                                 const newList = committees.map(c => c.id === committee.id ? { ...c, description: e.target.value } : c);
                                 setCommittees(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-3">
@@ -335,7 +335,7 @@ const AdminPanel = () => {
                                 const newList = committees.map(c => c.id === committee.id ? { ...c, meetingTime: e.target.value } : c);
                                 setCommittees(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-3">
@@ -359,7 +359,7 @@ const AdminPanel = () => {
                                           const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
                                           setCommittees(newCommittees);
                                         }}
-                                        className="text-[10px] font-bold text-church-burgundy uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full"
+                                        className="text-xs font-bold text-church-burgundy uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-stone-400"
                                         placeholder="Role"
                                       />
                                       <button 
@@ -383,7 +383,7 @@ const AdminPanel = () => {
                                         setCommittees(newCommittees);
                                       }}
                                       placeholder="Hming"
-                                      className="w-full text-xs border-none p-0 focus:ring-0 text-stone-800 font-medium"
+                                      className="w-full text-base border-none p-0 focus:ring-0 text-stone-900 font-medium placeholder:text-stone-400"
                                     />
                                     <input 
                                       type="text" 
@@ -395,7 +395,7 @@ const AdminPanel = () => {
                                         setCommittees(newCommittees);
                                       }}
                                       placeholder="Phone"
-                                      className="w-full text-[10px] border-none p-0 focus:ring-0 text-stone-500"
+                                      className="w-full text-sm border-none p-0 focus:ring-0 text-stone-600 placeholder:text-stone-400"
                                     />
                                   </div>
                                 );
@@ -421,7 +421,7 @@ const AdminPanel = () => {
                                 setCommittees(newList);
                               }}
                               rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-3">
@@ -433,7 +433,7 @@ const AdminPanel = () => {
                                 setCommittees(newList);
                               }}
                               rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-3">
@@ -445,7 +445,7 @@ const AdminPanel = () => {
                                 setCommittees(newList);
                               }}
                               rows={3}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                         </div>
@@ -507,7 +507,7 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, name: e.target.value } : f);
                                 setFellowships(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div>
@@ -519,7 +519,7 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, imageUrl: e.target.value } : f);
                                 setFellowships(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-2">
@@ -531,7 +531,7 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, description: e.target.value } : f);
                                 setFellowships(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-2">
@@ -543,7 +543,7 @@ const AdminPanel = () => {
                                 setFellowships(newList);
                               }}
                               rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div>
@@ -555,7 +555,7 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, meetingTime: e.target.value } : f);
                                 setFellowships(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div>
@@ -567,7 +567,7 @@ const AdminPanel = () => {
                                 const newList = fellowships.map(f => f.id === fellowship.id ? { ...f, activities: e.target.value.split(',').map(s => s.trim()) } : f);
                                 setFellowships(newList);
                               }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                           <div className="md:col-span-2">
@@ -591,7 +591,7 @@ const AdminPanel = () => {
                                           const newFellowships = fellowships.map(f => f.id === fellowship.id ? { ...f, officeBearers: newList } : f);
                                           setFellowships(newFellowships);
                                         }}
-                                        className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full"
+                                        className="text-sm font-bold text-emerald-600 uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-stone-400"
                                         placeholder="Role"
                                       />
                                       <button 
@@ -615,7 +615,7 @@ const AdminPanel = () => {
                                         setFellowships(newFellowships);
                                       }}
                                       placeholder="Hming"
-                                      className="w-full text-xs border-none p-0 focus:ring-0 text-stone-800 font-medium"
+                                      className="w-full text-base border-none p-0 focus:ring-0 text-stone-900 font-medium placeholder:text-stone-400"
                                     />
                                     <input 
                                       type="text" 
@@ -627,7 +627,7 @@ const AdminPanel = () => {
                                         setFellowships(newFellowships);
                                       }}
                                       placeholder="Phone"
-                                      className="w-full text-[10px] border-none p-0 focus:ring-0 text-stone-500"
+                                      className="w-full text-sm border-none p-0 focus:ring-0 text-stone-600 placeholder:text-stone-400"
                                     />
                                   </div>
                                 );
@@ -653,7 +653,7 @@ const AdminPanel = () => {
                                 setFellowships(newList);
                               }}
                               rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                             />
                           </div>
                         </div>

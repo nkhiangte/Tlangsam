@@ -212,7 +212,7 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
               <input 
                 type="text" 
                 placeholder="Record-te zawnna..." 
-                className="w-full pl-12 pr-4 py-3 bg-white border border-stone-200 rounded-xl focus:outline-none focus:border-church-gold transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-white border border-stone-200 rounded-xl focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
               />
             </div>
             <div className="flex gap-3 w-full md:w-auto">
@@ -261,10 +261,10 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                             <button 
                               onClick={() => handleEditRecord(row)}
-                              className="p-2 text-stone-300 hover:text-church-gold transition-all"
+                              className="p-2 text-church-gold hover:bg-church-gold/10 rounded-lg transition-all"
                               title="Edit rawh"
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-5 w-5" />
                             </button>
                             <button 
                               onClick={() => handleDeleteRecord(row.id)}
@@ -335,7 +335,7 @@ export const RecordTable: React.FC<RecordTableProps> = ({ title, description, co
                         required
                         type={(label as string).toLowerCase().includes('date') || (label as string).toLowerCase().includes('ni') ? 'date' : (label as string).toLowerCase().includes('age') || (label as string).toLowerCase().includes('delegates') || (label as string).toLowerCase().includes('kum') ? 'number' : 'text'}
                         placeholder={`${(label as string).toLowerCase()} dah rawh...`}
-                        className="px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-church-gold transition-all"
+                        className="px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-church-gold transition-all text-lg text-stone-900 placeholder:text-stone-400"
                         value={formData[key] || ''}
                         onChange={(e) => setFormData({ ...formData, [key]: e.target.type === 'number' ? parseInt(e.target.value) : e.target.value })}
                       />

@@ -224,10 +224,10 @@ const News = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Content</label>
                 <textarea 
                   required
-                  rows={6}
+                  rows={8}
                   value={formData.content}
                   onChange={(e) => setFormData({...formData, content: e.target.value})}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
                   placeholder="A chanchin chipchiar..."
                 />
               </div>
@@ -291,12 +291,12 @@ const News = () => {
                     </div>
                     <textarea 
                       value={item.content}
-                      rows={4}
+                      rows={6}
                       onChange={(e) => {
                         const newNews = news.map(n => n.id === item.id ? {...n, content: e.target.value} : n);
                         setNews(newNews);
                       }}
-                      className="w-full text-stone-600 leading-relaxed border border-stone-200 rounded-xl p-4 focus:outline-none focus:border-church-gold"
+                      className="w-full text-stone-900 leading-relaxed border border-stone-200 rounded-xl p-6 focus:outline-none focus:border-church-gold text-base placeholder:text-stone-400"
                     />
                     <div className="flex gap-2">
                       <button 

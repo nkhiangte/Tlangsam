@@ -46,21 +46,21 @@ const Contact = () => {
               <form className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-white/60 mb-2">Hming Hmasa</label>
-                    <input type="text" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
+                    <label className="block text-base font-medium text-white/80 mb-2">Hming Hmasa</label>
+                    <input type="text" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-lg text-white placeholder:text-white/40" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white/60 mb-2">Hming Hnuhnung</label>
-                    <input type="text" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
+                    <label className="block text-base font-medium text-white/80 mb-2">Hming Hnuhnung</label>
+                    <input type="text" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-lg text-white placeholder:text-white/40" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">Email</label>
-                  <input type="email" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all" />
+                  <label className="block text-base font-medium text-white/80 mb-2">Email</label>
+                  <input type="email" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-lg text-white placeholder:text-white/40" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/60 mb-2">Thuchah</label>
-                  <textarea rows={4} className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"></textarea>
+                  <label className="block text-base font-medium text-white/80 mb-2">Thuchah</label>
+                  <textarea rows={4} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-lg text-white placeholder:text-white/40"></textarea>
                 </div>
                 <button className="w-full bg-church-gold text-stone-900 font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all">
                   Thawn rawh

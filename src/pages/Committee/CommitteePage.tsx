@@ -270,7 +270,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...a, title: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-church-gold"
+                          className="flex-1 bg-transparent font-bold text-xl text-stone-900 focus:outline-none border-b border-transparent focus:border-church-gold placeholder:text-stone-400"
                         />
                         <button 
                           onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
@@ -287,8 +287,8 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                           newList[i] = { ...a, content: e.target.value };
                           setEditValue(newList);
                         }}
-                        rows={3}
-                        className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-church-gold"
+                        rows={6}
+                        className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-base text-stone-900 focus:outline-none focus:border-church-gold placeholder:text-stone-400"
                       />
                       <div className="flex items-center gap-4">
                         <input 
@@ -299,10 +299,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...a, date: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="text-[10px] bg-stone-50 border border-stone-100 rounded px-2 py-1"
+                          className="text-sm text-stone-900 font-medium bg-stone-50 border border-stone-200 rounded-lg px-4 py-2 focus:outline-none focus:border-church-gold"
                         />
-                        <label className="cursor-pointer flex items-center gap-1 text-[10px] text-church-burgundy font-bold uppercase">
-                          {uploadingImage === `activities-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                        <label className="cursor-pointer flex items-center gap-1.5 text-xs text-church-burgundy font-bold uppercase tracking-wider">
+                          {uploadingImage === `activities-${i}` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                           {a.imageUrl ? 'Change Image' : 'Add Image'}
                           <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'activities')} />
                         </label>
@@ -402,7 +402,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...a, title: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-church-gold"
+                          className="flex-1 bg-transparent font-bold text-xl text-stone-900 focus:outline-none border-b border-transparent focus:border-church-gold placeholder:text-stone-400"
                         />
                         <button 
                           onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
@@ -419,8 +419,8 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                           newList[i] = { ...a, content: e.target.value };
                           setEditValue(newList);
                         }}
-                        rows={3}
-                        className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-church-gold"
+                        rows={6}
+                        className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-base text-stone-900 focus:outline-none focus:border-church-gold placeholder:text-stone-400"
                       />
                       <div className="flex items-center gap-4">
                         <input 
@@ -431,10 +431,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...a, date: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="text-[10px] bg-stone-50 border border-stone-100 rounded px-2 py-1"
+                          className="text-sm text-stone-900 font-medium bg-stone-50 border border-stone-200 rounded-lg px-4 py-2 focus:outline-none focus:border-church-gold"
                         />
-                        <label className="cursor-pointer flex items-center gap-1 text-[10px] text-church-burgundy font-bold uppercase">
-                          {uploadingImage === `minutes-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                        <label className="cursor-pointer flex items-center gap-1.5 text-xs text-church-burgundy font-bold uppercase tracking-wider">
+                          {uploadingImage === `minutes-${i}` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                           {a.imageUrl ? 'Change Image' : 'Add Image'}
                           <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'minutes')} />
                         </label>
@@ -545,7 +545,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...ob, name: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-church-gold"
+                          className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-church-gold placeholder:text-stone-400"
                         />
                         <input 
                           type="text" 
@@ -556,7 +556,7 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                             newList[i] = { ...ob, phone: e.target.value };
                             setEditValue(newList);
                           }}
-                          className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-church-gold"
+                          className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-church-gold placeholder:text-stone-400"
                         />
                       </div>
                     </div>

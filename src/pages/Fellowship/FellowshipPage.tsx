@@ -274,7 +274,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                               newList[i] = { ...ob, name: e.target.value };
                               setEditValue(newList);
                             }}
-                            className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-emerald-500 placeholder:text-stone-400"
                           />
                           <input 
                             type="text" 
@@ -285,7 +285,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                               newList[i] = { ...ob, phone: e.target.value };
                               setEditValue(newList);
                             }}
-                            className="w-full bg-stone-50 border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-emerald-500 placeholder:text-stone-400"
                           />
                         </div>
                       </div>
@@ -387,7 +387,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                           newList[i] = { ...a, title: e.target.value };
                           setEditValue(newList);
                         }}
-                        className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-emerald-500"
+                        className="flex-1 bg-transparent font-bold text-xl text-stone-900 focus:outline-none border-b border-transparent focus:border-emerald-500 placeholder:text-stone-400"
                       />
                       <button 
                         onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
@@ -404,8 +404,8 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                         newList[i] = { ...a, content: e.target.value };
                         setEditValue(newList);
                       }}
-                      rows={3}
-                      className="w-full bg-white border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                      rows={6}
+                      className="w-full bg-white border border-stone-200 rounded-lg px-4 py-3 text-base text-stone-900 focus:outline-none focus:border-emerald-500 placeholder:text-stone-400"
                     />
                     <div className="flex items-center gap-4">
                       <input 
@@ -416,10 +416,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                           newList[i] = { ...a, date: e.target.value };
                           setEditValue(newList);
                         }}
-                        className="text-[10px] bg-white border border-stone-100 rounded px-2 py-1"
+                        className="text-sm text-stone-900 font-medium bg-white border border-stone-200 rounded-lg px-4 py-2 focus:outline-none focus:border-emerald-500"
                       />
-                      <label className="cursor-pointer flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase">
-                        {uploadingImage === `activities-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                      <label className="cursor-pointer flex items-center gap-1.5 text-xs text-emerald-600 font-bold uppercase tracking-wider">
+                        {uploadingImage === `activities-${i}` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                         {a.imageUrl ? 'Change Image' : 'Add Image'}
                         <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'activities')} />
                       </label>
@@ -527,7 +527,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                           newList[i] = { ...a, title: e.target.value };
                           setEditValue(newList);
                         }}
-                        className="flex-1 bg-transparent font-bold text-sm focus:outline-none border-b border-transparent focus:border-emerald-500"
+                        className="flex-1 bg-transparent font-bold text-xl text-stone-900 focus:outline-none border-b border-transparent focus:border-emerald-500 placeholder:text-stone-400"
                       />
                       <button 
                         onClick={() => setEditValue(editValue.filter((_: any, idx: number) => idx !== i))}
@@ -544,8 +544,8 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                         newList[i] = { ...a, content: e.target.value };
                         setEditValue(newList);
                       }}
-                      rows={3}
-                      className="w-full bg-white border border-stone-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500"
+                      rows={6}
+                      className="w-full bg-white border border-stone-200 rounded-lg px-4 py-3 text-base text-stone-900 focus:outline-none focus:border-emerald-500 placeholder:text-stone-400"
                     />
                     <div className="flex items-center gap-4">
                       <input 
@@ -556,10 +556,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                           newList[i] = { ...a, date: e.target.value };
                           setEditValue(newList);
                         }}
-                        className="text-[10px] bg-white border border-stone-100 rounded px-2 py-1"
+                        className="text-sm text-stone-900 font-medium bg-white border border-stone-200 rounded-lg px-4 py-2 focus:outline-none focus:border-emerald-500"
                       />
-                      <label className="cursor-pointer flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase">
-                        {uploadingImage === `minutes-${i}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                      <label className="cursor-pointer flex items-center gap-1.5 text-xs text-emerald-600 font-bold uppercase tracking-wider">
+                        {uploadingImage === `minutes-${i}` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                         {a.imageUrl ? 'Change Image' : 'Add Image'}
                         <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, i, 'minutes')} />
                       </label>

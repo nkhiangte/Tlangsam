@@ -176,6 +176,16 @@ const Navbar = () => {
         if (data.logoUrl) {
           setLogoUrl(data.logoUrl);
           setLogoError(false);
+          // Update favicon dynamically
+          const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+          if (link) {
+            link.href = data.logoUrl;
+          } else {
+            const newLink = document.createElement('link');
+            newLink.rel = 'icon';
+            newLink.href = data.logoUrl;
+            document.head.appendChild(newLink);
+          }
         }
         if (data.logoSize) setLogoSize(data.logoSize);
       }
