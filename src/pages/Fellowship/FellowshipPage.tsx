@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Users, Music, Calendar, Zap, Loader2, Edit, Trash2, Plus, Check, Save, X, Phone, Camera, Image as ImageIcon, FileText } from 'lucide-react';
-import { doc, onSnapshot, updateDoc, collection } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, collection } from 'firebase/firestore';
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { LogoPlaceholder } from '../../components/LogoPlaceholder';
@@ -101,10 +101,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
   const handleSave = async (field: string, value: any) => {
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'fellowships', id), {
+      await setDoc(doc(db, 'fellowships', id), {
         [field]: value,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
       setEditingSection(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `fellowships/${id}`);
@@ -180,10 +180,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       
-      await updateDoc(doc(db, 'fellowships', id), {
+      await setDoc(doc(db, 'fellowships', id), {
         logoUrl: downloadURL,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
     } catch (error) {
       console.error('Error uploading logo:', error);
       alert('Logo upload failed');
@@ -202,10 +202,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       
-      await updateDoc(doc(db, 'fellowships', id), {
+      await setDoc(doc(db, 'fellowships', id), {
         imageUrl: downloadURL,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
     } catch (error) {
       console.error('Error uploading main image:', error);
       alert('Image upload failed');
@@ -218,10 +218,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
     if (!window.confirm('Are you sure you want to remove the logo?')) return;
     
     try {
-      await updateDoc(doc(db, 'fellowships', id), {
+      await setDoc(doc(db, 'fellowships', id), {
         logoUrl: "",
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `fellowships/${id}`);
     }
