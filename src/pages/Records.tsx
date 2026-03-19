@@ -153,7 +153,18 @@ const Records = () => {
   };
 
   return (
-    <div className="pt-32 min-h-screen">
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-800 pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-px w-8 bg-church-gold"></div>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Kohhran Record-te</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">Church Records</h1>
+        </div>
+      </div>
+
       <section className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

@@ -554,12 +554,13 @@ const Hero = () => {
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
       <div className="absolute inset-0 z-0">
         {bgImage ? (
-          <img 
-            src={bgImage} 
-            alt="Church Interior" 
-            className="w-full h-full object-cover brightness-50"
-            referrerPolicy="no-referrer"
-          />
+          <>
+            <div 
+              className="w-full h-full bg-cover bg-center bg-no-repeat bg-fixed"
+              style={{ backgroundImage: `url(${bgImage})` }}
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </>
         ) : (
           <div className="w-full h-full bg-stone-900" />
         )}

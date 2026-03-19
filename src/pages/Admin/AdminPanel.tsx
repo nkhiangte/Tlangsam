@@ -69,13 +69,42 @@ const AdminPanel = () => {
     if (!isAdmin) return;
     const unsubscribe = onSnapshot(doc(db, 'settings', 'services'), (doc) => {
       if (doc.exists()) {
-        setServices(doc.data().list || []);
+        setServices(doc.data().days || []);
       } else {
         // Initial default services
         const defaultServices = [
-          { title: "Pathian Ni Inkhawm", time: "10:30 AM", description: "Hlabu leh Pathian thu hmanga chibai bukna inkhawm." },
-          { title: "Nilai Zan Thupui Zirna", time: "Nilaini 7:00 PM", description: "Pathian thu zirhona leh sawihona hun hlu." },
-          { title: "Thalai Inkhawm", time: "Zirtawpni 6:30 PM", description: "Thalaite tana rinna lama thanna leh inpawlhona hun." }
+          {
+            day: "Sunday",
+            services: [
+              { title: "Chawhma (Forenoon)", time: "10:30 AM", fields: { "Tantu": "", "Zirlai": "" } },
+              { title: "Chawhnu (Afternoon)", time: "1:30 PM", fields: { "Tantu": "", "Thusawitu": "" } },
+              { title: "Zan (Night)", time: "7:00 PM", fields: { "Thusawitu": "" } }
+            ]
+          },
+          {
+            day: "Monday",
+            services: [
+              { title: "KTP Inkhawm", time: "7:00 PM", fields: { "Hruaitu": "", "Tantu": "", "Thusawitu": "" } }
+            ]
+          },
+          {
+            day: "Tuesday",
+            services: [
+              { title: "Kohhran Hmeichhe Inkhawm", time: "7:00 PM", fields: { "Hruaitu": "", "Tantu": "", "Thusawitu": "" } }
+            ]
+          },
+          {
+            day: "Wednesday",
+            services: [
+              { title: "Nilai Zan Inkhawm", time: "7:00 PM", fields: { "Hruaitu": "", "Tantu": "", "Thupui Hawngtu": "" } }
+            ]
+          },
+          {
+            day: "Saturday",
+            services: [
+              { title: "Inrinni zan inkhawm", time: "7:00 PM", fields: { "Tantu": "", "Thusawitu": "" } }
+            ]
+          }
         ];
         setServices(defaultServices);
       }
@@ -133,11 +162,11 @@ const AdminPanel = () => {
     }
   };
 
-  const saveServices = async (newServices: any[]) => {
+  const saveServices = async (newSchedule: any[]) => {
     setIsSaving(true);
     try {
       await setDoc(doc(db, 'settings', 'services'), {
-        list: newServices,
+        days: newSchedule,
         updatedAt: new Date().toISOString()
       });
       alert("Inkhawm hun-te vawn that a ni ta.");
@@ -220,15 +249,25 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-24 bg-church-cream">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-900 pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-px w-8 bg-church-gold"></div>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Enkawltu Pual</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">Admin Control Panel</h1>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all mb-6">
             <ArrowLeft className="h-4 w-4" /> In-ah let leh rawh
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">Admin Panel</h1>
               <p className="text-stone-600 max-w-2xl">Kohhran enkawlna leh record vawn thatna hmun.</p>
             </div>
           </div>
@@ -806,65 +845,121 @@ const AdminPanel = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-serif">Inkhawm Hun-te Edit-na</h2>
                   <button 
-                    onClick={() => setServices([...services, { title: "", time: "", description: "" }])}
+                    onClick={() => setServices([...services, { day: "New Day", services: [] }])}
                     className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
                   >
-                    <Plus className="h-4 w-4" /> Inkhawm thar belhna
+                    <Plus className="h-4 w-4" /> Ni thar belhna
                   </button>
                 </div>
 
-                <div className="grid gap-6">
-                  {services.map((service, idx) => (
-                    <div key={idx} className="p-6 border border-stone-100 rounded-2xl bg-stone-50/50 space-y-4 relative group">
-                      <button 
-                        onClick={() => setServices(services.filter((_, i) => i !== idx))}
-                        className="absolute top-4 right-4 p-2 text-stone-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Inkhawm Hming</label>
-                          <input 
-                            type="text" 
-                            value={service.title}
-                            onChange={(e) => {
-                              const newServices = [...services];
-                              newServices[idx].title = e.target.value;
-                              setServices(newServices);
-                            }}
-                            className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
-                            placeholder="e.g. Pathian Ni Inkhawm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">A Hun</label>
-                          <input 
-                            type="text" 
-                            value={service.time}
-                            onChange={(e) => {
-                              const newServices = [...services];
-                              newServices[idx].time = e.target.value;
-                              setServices(newServices);
-                            }}
-                            className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
-                            placeholder="e.g. 10:30 AM"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hrilhfiahna</label>
-                        <textarea 
-                          value={service.description}
+                <div className="space-y-12">
+                  {services.map((dayGroup, dayIdx) => (
+                    <div key={dayIdx} className="bg-stone-50 rounded-3xl border border-stone-100 overflow-hidden">
+                      <div className="bg-stone-900 px-8 py-4 flex justify-between items-center">
+                        <input 
+                          type="text" 
+                          value={dayGroup.day}
                           onChange={(e) => {
                             const newServices = [...services];
-                            newServices[idx].description = e.target.value;
+                            newServices[dayIdx].day = e.target.value;
                             setServices(newServices);
                           }}
-                          rows={2}
-                          className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
-                          placeholder="Inkhawm chungchang hrilhfiahna tawite..."
+                          className="bg-transparent border-none text-church-gold font-serif text-xl focus:ring-0 p-0"
                         />
+                        <button 
+                          onClick={() => setServices(services.filter((_, i) => i !== dayIdx))}
+                          className="text-red-400 hover:text-red-500"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                      
+                      <div className="p-8 space-y-8">
+                        {dayGroup.services.map((service: any, sIdx: number) => (
+                          <div key={sIdx} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 relative group">
+                            <button 
+                              onClick={() => {
+                                const newServices = [...services];
+                                newServices[dayIdx].services = dayGroup.services.filter((_: any, i: number) => i !== sIdx);
+                                setServices(newServices);
+                              }}
+                              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+
+                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                              <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Service Title</label>
+                                <input 
+                                  type="text" 
+                                  value={service.title}
+                                  onChange={(e) => {
+                                    const newServices = [...services];
+                                    newServices[dayIdx].services[sIdx].title = e.target.value;
+                                    setServices(newServices);
+                                  }}
+                                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Time</label>
+                                <input 
+                                  type="text" 
+                                  value={service.time}
+                                  onChange={(e) => {
+                                    const newServices = [...services];
+                                    newServices[dayIdx].services[sIdx].time = e.target.value;
+                                    setServices(newServices);
+                                  }}
+                                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {Object.entries(service.fields || {}).map(([label, value]: [string, any]) => (
+                                <div key={label}>
+                                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">{label}</label>
+                                  <input 
+                                    type="text" 
+                                    value={value}
+                                    onChange={(e) => {
+                                      const newServices = [...services];
+                                      newServices[dayIdx].services[sIdx].fields[label] = e.target.value;
+                                      setServices(newServices);
+                                    }}
+                                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 focus:outline-none focus:border-church-gold transition-all text-sm"
+                                  />
+                                </div>
+                              ))}
+                              <button 
+                                onClick={() => {
+                                  const label = prompt("Field hming (e.g. Tantu, Thusawitu):");
+                                  if (label) {
+                                    const newServices = [...services];
+                                    if (!newServices[dayIdx].services[sIdx].fields) newServices[dayIdx].services[sIdx].fields = {};
+                                    newServices[dayIdx].services[sIdx].fields[label] = "";
+                                    setServices(newServices);
+                                  }
+                                }}
+                                className="border border-dashed border-stone-300 rounded-xl p-2 text-stone-400 text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all"
+                              >
+                                <Plus className="h-4 w-4" /> Field belhna
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        <button 
+                          onClick={() => {
+                            const newServices = [...services];
+                            newServices[dayIdx].services.push({ title: "New Service", time: "", fields: {} });
+                            setServices(newServices);
+                          }}
+                          className="w-full border-2 border-dashed border-stone-200 rounded-2xl p-4 text-stone-400 hover:bg-white hover:border-church-gold hover:text-church-gold transition-all flex items-center justify-center gap-2"
+                        >
+                          <Plus className="h-5 w-5" /> Service thar belhna
+                        </button>
                       </div>
                     </div>
                   ))}

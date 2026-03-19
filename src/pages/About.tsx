@@ -4,7 +4,18 @@ import { LogoPlaceholder } from '../components/LogoPlaceholder';
 
 const About = () => {
   return (
-    <div className="pt-32 min-h-screen">
+    <div className="min-h-screen bg-church-cream">
+      {/* Page Header */}
+      <div className="bg-church-burgundy pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-px w-8 bg-church-gold"></div>
+            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Kan Chanchin</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">About Us</h1>
+        </div>
+      </div>
+
       <section className="py-24 bg-church-cream overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">

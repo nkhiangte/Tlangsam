@@ -163,26 +163,32 @@ const News = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 pt-32 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="h-px w-8 bg-church-gold"></div>
-              <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Chanchin Thar</span>
+    <div className="min-h-screen bg-stone-50">
+      {/* Page Header */}
+      <div className="bg-stone-900 pt-40 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-px w-8 bg-church-gold"></div>
+                <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Chanchin Thar</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">Latest News</h1>
             </div>
-            <h1 className="text-4xl font-serif font-bold text-stone-900">Latest News</h1>
+            
+            {isAdmin && !isAdding && (
+              <button 
+                onClick={() => setIsAdding(true)}
+                className="bg-church-burgundy text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center gap-2 shadow-lg"
+              >
+                <Plus className="h-5 w-5" /> News thar siamna
+              </button>
+            )}
           </div>
-          
-          {isAdmin && !isAdding && (
-            <button 
-              onClick={() => setIsAdding(true)}
-              className="bg-church-burgundy text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center gap-2 shadow-lg"
-            >
-              <Plus className="h-5 w-5" /> News thar siamna
-            </button>
-          )}
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 pb-20">
 
         {isAdding && (
           <motion.div 
