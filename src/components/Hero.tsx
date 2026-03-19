@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronRight, Camera, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { db, storage } from '../firebase';
+import { db, storage, handleFirestoreError, OperationType } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -19,6 +19,8 @@ const Hero = () => {
         setBgImage(doc.data().backgroundImage);
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/homepage');
     });
     return unsubscribe;
   }, []);

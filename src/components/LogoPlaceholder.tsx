@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, handleFirestoreError, OperationType } from '../firebase';
 import { Image as ImageIcon } from 'lucide-react';
 
 interface LogoPlaceholderProps {
@@ -21,6 +21,8 @@ export const LogoPlaceholder: React.FC<LogoPlaceholderProps> = ({ className = "w
         }
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/homepage');
     });
 
     return () => unsubscribe();

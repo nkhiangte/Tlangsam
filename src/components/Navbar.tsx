@@ -14,7 +14,7 @@ import {
   Loader2 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { db, storage } from '../firebase';
+import { db, storage, handleFirestoreError, OperationType } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -55,6 +55,8 @@ const Navbar = () => {
         }
         if (data.logoSize) setLogoSize(data.logoSize);
       }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/homepage');
     });
 
     return () => {

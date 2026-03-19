@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, handleFirestoreError, OperationType } from '../firebase';
 
 const Footer = () => {
   const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
@@ -13,6 +13,8 @@ const Footer = () => {
         if (data.logoUrl) setLogoUrl(data.logoUrl);
         if (data.logoSize) setLogoSize(Math.max(32, data.logoSize * 0.8)); // Footer logo slightly smaller
       }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/homepage');
     });
     return unsubscribe;
   }, []);

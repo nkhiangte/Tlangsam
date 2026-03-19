@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { db } from "../firebase";
+import { db, handleFirestoreError, OperationType } from "../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
@@ -10,8 +10,14 @@ export async function getDailyInspiration() {
 
   try {
     // 1. Try to get cached version from Firestore
-    const cachedDoc = await getDoc(docRef);
-    if (cachedDoc.exists()) {
+    let cachedDoc;
+    try {
+      cachedDoc = await getDoc(docRef);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, 'settings/daily_inspiration');
+    }
+
+    if (cachedDoc && cachedDoc.exists()) {
       const data = cachedDoc.data();
       if (data.date === today) {
         return data;
