@@ -143,6 +143,21 @@ service cloud.firestore {
              (data.naupangThawhlawm is number || !('naupangThawhlawm' in data));
     }
 
+    function isValidFinance(data) {
+      return hasRequiredFields(['month', 'pathianRam', 'ramthar', 'tualchhung', 'total']) &&
+             data.month is string &&
+             data.pathianRam is number &&
+             data.ramthar is number &&
+             data.tualchhung is number &&
+             data.total is number;
+    }
+
+    function isValidStatistic(data) {
+      return hasRequiredFields(['head', 'value']) &&
+             data.head is string &&
+             data.value is string;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -215,6 +230,20 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
       allow update: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /finance_records/{id} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidFinance(request.resource.data);
+      allow update: if isAdmin() && isValidFinance(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /statistics/{id} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidStatistic(request.resource.data);
+      allow update: if isAdmin() && isValidStatistic(request.resource.data);
       allow delete: if isAdmin();
     }
 

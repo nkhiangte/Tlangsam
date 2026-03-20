@@ -182,6 +182,32 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["date"]
+    },
+    "FinanceRecord": {
+      "title": "Finance Record",
+      "description": "Monthly Thawhlawm record.",
+      "type": "object",
+      "properties": {
+        "month": { "type": "string", "description": "Month and Year (e.g., January 2024)" },
+        "pathianRam": { "type": "number" },
+        "ramthar": { "type": "number" },
+        "tualchhung": { "type": "number" },
+        "total": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["month", "pathianRam", "ramthar", "tualchhung", "total"]
+    },
+    "StatisticRecord": {
+      "title": "Statistic Record",
+      "description": "Custom church statistic.",
+      "type": "object",
+      "properties": {
+        "head": { "type": "string", "description": "Statistic header/label" },
+        "value": { "type": "string", "description": "Statistic value" },
+        "order": { "type": "integer", "description": "Display order" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["head", "value"]
     }
   },
   "firestore": {
@@ -197,6 +223,8 @@
     "/fellowships": { "schema": "Fellowship", "description": "Collection of church fellowships" },
     "/settings": { "schema": "Setting", "description": "Collection of application settings" },
     "/sunday_school_teachers": { "schema": "SundaySchoolTeacher", "description": "Collection of Sunday School teachers" },
-    "/sunday_school_reports": { "schema": "SundaySchoolReport", "description": "Collection of Sunday School weekly reports" }
+    "/sunday_school_reports": { "schema": "SundaySchoolReport", "description": "Collection of Sunday School weekly reports" },
+    "/finance_records": { "schema": "FinanceRecord", "description": "Collection of monthly finance records" },
+    "/statistics": { "schema": "StatisticRecord", "description": "Collection of church statistics" }
   }
 }

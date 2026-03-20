@@ -20,6 +20,8 @@ import KPP from './pages/Fellowship/KPP';
 import AdminPanel from './pages/Admin/AdminPanel';
 import About from './pages/About';
 import News from './pages/News';
+import Finance from './pages/Finance';
+import Statistics from './pages/Statistics';
 import ServicesPage from './pages/Services';
 import RecordsPage from './pages/Records';
 import ArchivePage from './pages/Archive';
@@ -81,6 +83,8 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/news" element={<News />} />
+              <Route path="/finance" element={<Finance />} />
+              <Route path="/statistics" element={<Statistics />} />
               <Route path="/about" element={<About />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/records" element={<RecordsPage />} />
