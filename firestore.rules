@@ -187,6 +187,26 @@ service cloud.firestore {
              (data.expenditureItems is list || !('expenditureItems' in data));
     }
 
+    function isValidBuhfaitham(data) {
+      return hasRequiredFields(['year', 'month', 'totalWeight', 'totalAmount']) &&
+             data.year is int &&
+             data.month is int &&
+             data.month >= 1 && data.month <= 12 &&
+             data.totalWeight is number &&
+             data.totalAmount is number &&
+             (data.records is list || !('records' in data));
+    }
+
+    function isValidRawngbawltute(data) {
+      return hasRequiredFields(['period']) &&
+             data.period is string &&
+             (data.executiveBody is map || !('executiveBody' in data)) &&
+             (data.sundaySchool is map || !('sundaySchool' in data)) &&
+             (data.thuhriltute is map || !('thuhriltute' in data)) &&
+             (data.nilaiZanThupuiHawngtute is list || !('nilaiZanThupuiHawngtute' in data)) &&
+             (data.tantute is map || !('tantute' in data));
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -280,6 +300,20 @@ service cloud.firestore {
       allow read: if !isBanned();
       allow create: if isAdmin() && isValidFellowshipFinance(request.resource.data);
       allow update: if isAdmin() && isValidFellowshipFinance(request.resource.data);
+      allow delete: if isAdmin();
+    }
+    
+    match /buhfaitham_reports/{id} {
+      allow read: if !isBanned();
+      allow create: if isAdmin() && isValidBuhfaitham(request.resource.data);
+      allow update: if isAdmin() && isValidBuhfaitham(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /rawngbawltute/{id} {
+      allow read: if !isBanned();
+      allow create: if isAdmin() && isValidRawngbawltute(request.resource.data);
+      allow update: if isAdmin() && isValidRawngbawltute(request.resource.data);
       allow delete: if isAdmin();
     }
 

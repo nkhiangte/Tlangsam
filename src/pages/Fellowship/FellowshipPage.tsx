@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { LogoPlaceholder } from '../../components/LogoPlaceholder';
 import { useAuth } from '../../context/AuthContext';
 import { FellowshipFinance } from '../../components/FellowshipFinance';
+import { BuhfaithamReport } from '../../components/BuhfaithamReport';
 
 interface NewsItem {
   title: string;
@@ -631,6 +632,12 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
         <div className="mb-12">
           <FellowshipFinance fellowshipId={id} />
         </div>
+
+        {id === 'kohhran-hmeichhia' && (
+          <div className="mb-12">
+            <BuhfaithamReport />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Activities Section */}

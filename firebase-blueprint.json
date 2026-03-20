@@ -246,6 +246,97 @@
       },
       "required": ["fellowshipId", "year", "month", "income", "expenditure", "closingBalance"]
     },
+    "BuhfaithamReport": {
+      "title": "Buhfaitham Report",
+      "description": "Monthly Buhfaitham report for Kohhran Hmeichhia.",
+      "type": "object",
+      "properties": {
+        "year": { "type": "integer" },
+        "month": { "type": "integer", "description": "1-12" },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "weight": { "type": "number", "description": "in kg" },
+              "amount": { "type": "number", "description": "in rupees" }
+            }
+          }
+        },
+        "totalWeight": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["year", "month", "totalWeight", "totalAmount"]
+    },
+    "Rawngbawltute": {
+      "title": "Rawngbawltute",
+      "description": "Church workers and leaders for a specific period.",
+      "type": "object",
+      "properties": {
+        "period": { "type": "string", "description": "e.g., 2024-2026" },
+        "executiveBody": {
+          "type": "object",
+          "properties": {
+            "chairman": { "type": "string" },
+            "secretary": { "type": "string" },
+            "asstSecretary": { "type": "string" },
+            "treasurerTualchhung": { "type": "string" },
+            "treasurerSynod": { "type": "string" },
+            "financeSecretary": { "type": "string" }
+          }
+        },
+        "sundaySchool": {
+          "type": "object",
+          "properties": {
+            "hotute": {
+              "type": "object",
+              "properties": {
+                "superintendent": { "type": "string" },
+                "asstSuperintendentPTSS": { "type": "string" },
+                "asstSuperintendentNPSS": { "type": "string" },
+                "secretary": { "type": "string" },
+                "asstSecretariesPTSS": { "type": "string" },
+                "asstSecretariesNPSS": { "type": "string" }
+              }
+            },
+            "deptLeaders": {
+              "type": "object",
+              "properties": {
+                "senior": { "type": "string" },
+                "sacrament": { "type": "string" },
+                "intermediate": { "type": "string" },
+                "junior": { "type": "string" },
+                "primary": { "type": "string" },
+                "beginner": { "type": "string" },
+                "preBeginner": { "type": "string" }
+              }
+            },
+            "puitlingTeachers": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "thuhriltute": {
+          "type": "object",
+          "properties": {
+            "pathianniZan": { "type": "array", "items": { "type": "string" } },
+            "pathianniChawhnu": { "type": "array", "items": { "type": "string" } },
+            "inrinniZan": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "nilaiZanThupuiHawngtute": { "type": "array", "items": { "type": "string" } },
+        "tantute": {
+          "type": "object",
+          "properties": {
+            "sundaySchool": { "type": "array", "items": { "type": "string" } },
+            "pathianniChawhnu": { "type": "array", "items": { "type": "string" } },
+            "nilaiLehInrinniZan": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["period"]
+    },
     "User": {
       "title": "User Profile",
       "description": "User profile and permissions.",
@@ -278,6 +369,8 @@
     "/finance_records": { "schema": "FinanceRecord", "description": "Collection of monthly finance records" },
     "/statistics": { "schema": "StatisticRecord", "description": "Collection of church statistics" },
     "/fellowship_finance_reports": { "schema": "FellowshipFinanceReport", "description": "Collection of monthly finance reports for fellowships" },
+    "/buhfaitham_reports": { "schema": "BuhfaithamReport", "description": "Collection of monthly Buhfaitham reports" },
+    "/rawngbawltute": { "schema": "Rawngbawltute", "description": "Collection of church workers and leaders" },
     "/users": { "schema": "User", "description": "Collection of user profiles" }
   }
 }

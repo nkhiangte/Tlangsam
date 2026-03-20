@@ -103,6 +103,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', href: '/' },
+    { name: 'Rawngbawltute', href: '/rawngbawltute' },
     { name: 'Latest News', href: '/news' },
     { name: 'Chanchin', href: '/about' },
     { name: 'Inkhawm', href: '/services' },
