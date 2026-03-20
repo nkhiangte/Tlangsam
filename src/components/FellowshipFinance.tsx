@@ -34,6 +34,117 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
+const calculateTotal = (items: FinanceItem[] = []) => {
+  return items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+};
+
+interface FinanceTableProps {
+  items: FinanceItem[];
+  title: string;
+  type: 'income' | 'expenditure';
+  isEdit?: boolean;
+  onAdd?: (type: 'income' | 'expenditure') => void;
+  onUpdate?: (type: 'income' | 'expenditure', index: number, field: keyof FinanceItem, value: string | number) => void;
+  onRemove?: (type: 'income' | 'expenditure', index: number) => void;
+}
+
+const FinanceTable = ({ items, title, type, isEdit, onAdd, onUpdate, onRemove }: FinanceTableProps) => {
+  const total = calculateTotal(items);
+  const accentColor = type === 'income' ? 'emerald' : 'red';
+
+  return (
+    <div className={`bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm`}>
+      <div className={`bg-${accentColor}-50 px-6 py-4 border-b border-${accentColor}-100 flex justify-between items-center`}>
+        <h4 className={`text-sm font-bold uppercase tracking-widest text-${accentColor}-800`}>{title}</h4>
+        {isEdit && onAdd && (
+          <button 
+            onClick={() => onAdd(type)}
+            className={`p-1.5 bg-${accentColor}-600 text-white rounded-lg hover:bg-${accentColor}-700 transition-all`}
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-stone-50 border-b border-stone-100">
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 w-16">Sl.No</th>
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400">Head</th>
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 text-right">Amount</th>
+              {isEdit && <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 w-16"></th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-50">
+            {items.map((item, index) => (
+              <tr key={index} className="hover:bg-stone-50/50 transition-colors">
+                <td className="px-6 py-3 text-sm text-stone-400 font-mono">{index + 1}</td>
+                <td className="px-6 py-3">
+                  {isEdit && onUpdate ? (
+                    <input 
+                      type="text"
+                      value={item.head}
+                      onChange={(e) => onUpdate(type, index, 'head', e.target.value)}
+                      className="w-full bg-transparent border-b border-stone-200 focus:border-emerald-500 focus:outline-none py-1 text-sm"
+                      placeholder="Description"
+                    />
+                  ) : (
+                    <span className="text-sm text-stone-700">{item.head}</span>
+                  )}
+                </td>
+                <td className="px-6 py-3 text-right">
+                  {isEdit && onUpdate ? (
+                    <input 
+                      type="number"
+                      value={item.amount}
+                      onChange={(e) => onUpdate(type, index, 'amount', Number(e.target.value))}
+                      className="w-24 bg-transparent border-b border-stone-200 focus:border-emerald-500 focus:outline-none py-1 text-sm text-right"
+                    />
+                  ) : (
+                    <span className="text-sm font-medium text-stone-900">{formatCurrency(item.amount)}</span>
+                  )}
+                </td>
+                {isEdit && onRemove && (
+                  <td className="px-6 py-3 text-right">
+                    <button 
+                      onClick={() => onRemove(type, index)}
+                      className="text-stone-300 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+            {items.length === 0 && (
+              <tr>
+                <td colSpan={isEdit ? 4 : 3} className="px-6 py-8 text-center text-stone-400 text-xs italic">
+                  No items added yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+          <tfoot>
+            <tr className={`bg-${accentColor}-50/30 font-bold`}>
+              <td colSpan={2} className="px-6 py-4 text-sm text-stone-900">Grand Total</td>
+              <td className={`px-6 py-4 text-right text-sm text-${accentColor}-700`}>{formatCurrency(total)}</td>
+              {isEdit && <td></td>}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 export const FellowshipFinance: React.FC<FellowshipFinanceProps> = ({ fellowshipId }) => {
   const { isAdmin } = useAuth();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -95,10 +206,6 @@ export const FellowshipFinance: React.FC<FellowshipFinanceProps> = ({ fellowship
     setIsEditing(true);
   };
 
-  const calculateTotal = (items: FinanceItem[] = []) => {
-    return items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -157,103 +264,6 @@ export const FellowshipFinance: React.FC<FellowshipFinanceProps> = ({ fellowship
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, 'fellowship_finance_reports');
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
-
-  const FinanceTable = ({ items, title, type, isEdit }: { items: FinanceItem[], title: string, type: 'income' | 'expenditure', isEdit?: boolean }) => {
-    const total = calculateTotal(items);
-    const accentColor = type === 'income' ? 'emerald' : 'red';
-
-    return (
-      <div className={`bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm`}>
-        <div className={`bg-${accentColor}-50 px-6 py-4 border-b border-${accentColor}-100 flex justify-between items-center`}>
-          <h4 className={`text-sm font-bold uppercase tracking-widest text-${accentColor}-800`}>{title}</h4>
-          {isEdit && (
-            <button 
-              onClick={() => addFinanceItem(type)}
-              className={`p-1.5 bg-${accentColor}-600 text-white rounded-lg hover:bg-${accentColor}-700 transition-all`}
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-stone-50 border-b border-stone-100">
-                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 w-16">Sl.No</th>
-                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400">Head</th>
-                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 text-right">Amount</th>
-                {isEdit && <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 w-16"></th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-50">
-              {items.map((item, index) => (
-                <tr key={index} className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-6 py-3 text-sm text-stone-400 font-mono">{index + 1}</td>
-                  <td className="px-6 py-3">
-                    {isEdit ? (
-                      <input 
-                        type="text"
-                        value={item.head}
-                        onChange={(e) => updateFinanceItem(type, index, 'head', e.target.value)}
-                        className="w-full bg-transparent border-b border-stone-200 focus:border-emerald-500 focus:outline-none py-1 text-sm"
-                        placeholder="Description"
-                      />
-                    ) : (
-                      <span className="text-sm text-stone-700">{item.head}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-3 text-right">
-                    {isEdit ? (
-                      <input 
-                        type="number"
-                        value={item.amount}
-                        onChange={(e) => updateFinanceItem(type, index, 'amount', Number(e.target.value))}
-                        className="w-24 bg-transparent border-b border-stone-200 focus:border-emerald-500 focus:outline-none py-1 text-sm text-right"
-                      />
-                    ) : (
-                      <span className="text-sm font-medium text-stone-900">{formatCurrency(item.amount)}</span>
-                    )}
-                  </td>
-                  {isEdit && (
-                    <td className="px-6 py-3 text-right">
-                      <button 
-                        onClick={() => removeFinanceItem(type, index)}
-                        className="text-stone-300 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={isEdit ? 4 : 3} className="px-6 py-8 text-center text-stone-400 text-xs italic">
-                    No items added yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            <tfoot>
-              <tr className={`bg-${accentColor}-50/30 font-bold`}>
-                <td colSpan={2} className="px-6 py-4 text-sm text-stone-900">Grand Total</td>
-                <td className={`px-6 py-4 text-right text-sm text-${accentColor}-700`}>{formatCurrency(total)}</td>
-                {isEdit && <td></td>}
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -326,12 +336,18 @@ export const FellowshipFinance: React.FC<FellowshipFinanceProps> = ({ fellowship
                 title="Income Breakdown" 
                 type="income" 
                 isEdit 
+                onAdd={addFinanceItem}
+                onUpdate={updateFinanceItem}
+                onRemove={removeFinanceItem}
               />
               <FinanceTable 
                 items={editData.expenditureItems || []} 
                 title="Expenditure Breakdown" 
                 type="expenditure" 
                 isEdit 
+                onAdd={addFinanceItem}
+                onUpdate={updateFinanceItem}
+                onRemove={removeFinanceItem}
               />
             </div>
 
