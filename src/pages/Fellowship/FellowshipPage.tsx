@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Users, Music, Calendar, Zap, Loader2, Edit, Trash2, Plus, Check, Save, X, Phone, Camera, Image as ImageIcon, FileText } from 'lucide-react';
+import { Users, Music, Calendar, Zap, Loader2, Edit, Trash2, Plus, Check, Save, X, Phone, Camera, Image as ImageIcon, FileText, Calculator } from 'lucide-react';
 import { doc, onSnapshot, setDoc, collection } from 'firebase/firestore';
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { LogoPlaceholder } from '../../components/LogoPlaceholder';
 import { useAuth } from '../../context/AuthContext';
+import { FellowshipFinance } from '../../components/FellowshipFinance';
 
 interface NewsItem {
   title: string;
@@ -625,6 +626,10 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
               </div>
             )}
           </motion.div>
+        </div>
+
+        <div className="mb-12">
+          <FellowshipFinance fellowshipId={id} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">

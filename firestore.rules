@@ -40,23 +40,26 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() &&
-        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' &&
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status != 'banned') ||
-          request.auth.token.email == "nkhiangte@gmail.com");
+      return isAuthenticated() && (
+        (request.auth.token.email == "nkhiangte@gmail.com" && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'admin' &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'active') != 'banned')
+      );
     }
 
     function isBanned() {
       return isAuthenticated() && 
+        request.auth.token.email != "nkhiangte@gmail.com" &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'banned';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'active') == 'banned';
     }
 
     function isBlocked() {
       return isAuthenticated() && 
+        request.auth.token.email != "nkhiangte@gmail.com" &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'blocked';
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'active') == 'blocked';
     }
 
     function hasRequiredFields(fields) {
@@ -171,6 +174,19 @@ service cloud.firestore {
              data.value is string;
     }
 
+    function isValidFellowshipFinance(data) {
+      return hasRequiredFields(['fellowshipId', 'year', 'month', 'income', 'expenditure', 'closingBalance']) &&
+             data.fellowshipId is string &&
+             data.year is int &&
+             data.month is int &&
+             data.month >= 1 && data.month <= 12 &&
+             data.income is number &&
+             data.expenditure is number &&
+             data.closingBalance is number &&
+             (data.incomeItems is list || !('incomeItems' in data)) &&
+             (data.expenditureItems is list || !('expenditureItems' in data));
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -257,6 +273,13 @@ service cloud.firestore {
       allow read: if !isBanned();
       allow create: if isAdmin() && isValidStatistic(request.resource.data);
       allow update: if isAdmin() && isValidStatistic(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /fellowship_finance_reports/{id} {
+      allow read: if !isBanned();
+      allow create: if isAdmin() && isValidFellowshipFinance(request.resource.data);
+      allow update: if isAdmin() && isValidFellowshipFinance(request.resource.data);
       allow delete: if isAdmin();
     }
 

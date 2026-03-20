@@ -209,6 +209,43 @@
       },
       "required": ["head", "value"]
     },
+    "FellowshipFinanceReport": {
+      "title": "Fellowship Finance Report",
+      "description": "Monthly finance report for a fellowship.",
+      "type": "object",
+      "properties": {
+        "fellowshipId": { "type": "string", "description": "ID of the fellowship (e.g., ktp, kpp)" },
+        "year": { "type": "integer" },
+        "month": { "type": "integer", "description": "1-12" },
+        "openingBalance": { "type": "number" },
+        "income": { "type": "number" },
+        "expenditure": { "type": "number" },
+        "closingBalance": { "type": "number" },
+        "incomeItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "head": { "type": "string" },
+              "amount": { "type": "number" }
+            }
+          }
+        },
+        "expenditureItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "head": { "type": "string" },
+              "amount": { "type": "number" }
+            }
+          }
+        },
+        "details": { "type": "string", "description": "Additional details or breakdown" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fellowshipId", "year", "month", "income", "expenditure", "closingBalance"]
+    },
     "User": {
       "title": "User Profile",
       "description": "User profile and permissions.",
@@ -240,6 +277,7 @@
     "/sunday_school_reports": { "schema": "SundaySchoolReport", "description": "Collection of Sunday School weekly reports" },
     "/finance_records": { "schema": "FinanceRecord", "description": "Collection of monthly finance records" },
     "/statistics": { "schema": "StatisticRecord", "description": "Collection of church statistics" },
+    "/fellowship_finance_reports": { "schema": "FellowshipFinanceReport", "description": "Collection of monthly finance reports for fellowships" },
     "/users": { "schema": "User", "description": "Collection of user profiles" }
   }
 }
