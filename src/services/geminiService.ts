@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export async function getDailyInspiration() {
   const today = new Date().toISOString().split('T')[0];
-  const docRef = doc(db, 'settings', 'daily_inspiration');
+  const docRef = doc(db, 'settings', 'daily_inspiration_mizo');
 
   try {
     // 1. Try to get cached version from Firestore
@@ -27,7 +27,7 @@ export async function getDailyInspiration() {
     // 2. If no cache or cache is old, try to fetch from Gemini
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: "Provide a short, uplifting Bible verse and a brief 1-sentence reflection for a Presbyterian church website. Return it as JSON with fields 'verse', 'reference', and 'reflection'.",
+      contents: "Provide a short, uplifting Bible verse in Mizo (Mizo Bible) and a brief 1-sentence reflection in Mizo for a Presbyterian church website. Return it as JSON with fields 'verse', 'reference', and 'reflection'.",
       config: {
         responseMimeType: "application/json",
       },
@@ -59,9 +59,9 @@ export async function getDailyInspiration() {
 
     // 5. Ultimate fallback
     return {
-      verse: "The Lord is my shepherd; I shall not want.",
-      reference: "Psalm 23:1",
-      reflection: "Trust in God's guidance and provision for your life today.",
+      verse: "LALPA chu mi vêngtu a ni a, ka tlachham lo vang.",
+      reference: "Sâm 23:1",
+      reflection: "Vawiinah hian Pathian kaihhruaina leh min chawmnaah rinna nghat tlat rawh.",
       date: today
     };
   }

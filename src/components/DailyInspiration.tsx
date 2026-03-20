@@ -1,20 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RefreshCw } from 'lucide-react';
 import { getDailyInspiration } from '../services/geminiService';
+import { useAuth } from '../context/AuthContext';
+import { db } from '../firebase';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const DailyInspiration = () => {
   const [inspiration, setInspiration] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const { isAdmin } = useAuth();
+
+  const fetchInspiration = async () => {
+    setLoading(true);
+    const data = await getDailyInspiration();
+    setInspiration(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchInspiration = async () => {
-      const data = await getDailyInspiration();
-      setInspiration(data);
-      setLoading(false);
-    };
     fetchInspiration();
   }, []);
+
+  const handleRefresh = async () => {
+    if (!isAdmin) return;
+    setRefreshing(true);
+    try {
+      // Clear the cache for today
+      await deleteDoc(doc(db, 'settings', 'daily_inspiration_mizo'));
+      // Fetch new
+      await fetchInspiration();
+    } catch (error) {
+      console.error("Error refreshing inspiration:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <section className="py-16 bg-stone-50">
@@ -24,9 +46,21 @@ const DailyInspiration = () => {
             <Sparkles className="h-24 w-24 text-church-burgundy" />
           </div>
           
-          <div className="flex items-center gap-2 mb-6">
-            <div className="h-px w-8 bg-church-gold"></div>
-            <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Vawiin Changvawn</span>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <div className="h-px w-8 bg-church-gold"></div>
+              <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Vawiin Changvawn</span>
+            </div>
+            {isAdmin && (
+              <button 
+                onClick={handleRefresh}
+                disabled={refreshing || loading}
+                className="p-2 text-stone-400 hover:text-church-burgundy transition-colors disabled:opacity-50"
+                title="Refresh Verse"
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+            )}
           </div>
 
           {loading ? (
