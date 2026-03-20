@@ -48,7 +48,7 @@ const Footer = () => {
           </div>
 
           <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. Dikna zawng zawng vawn a ni.
+            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. 
           </p>
         </div>
       </div>

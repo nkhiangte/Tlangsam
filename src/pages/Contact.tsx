@@ -76,7 +76,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-serif text-xl mb-1 text-stone-900">Kan awmna</h4>
-                    <p className="text-stone-500">Tlangsam Village, Mizoram, India</p>
+                    <p className="text-stone-500">Tlangsam, Champhai, Mizoram, 796321, India</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">

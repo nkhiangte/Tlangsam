@@ -131,10 +131,16 @@ service cloud.firestore {
     }
 
     function isValidSundaySchoolReport(data) {
-      return hasRequiredFields(['date', 'attendance', 'collection']) &&
+      return hasRequiredFields(['date']) &&
              data.date is string &&
-             data.attendance is int &&
-             data.collection is number;
+             (data.puitlingHmingZiak is int || !('puitlingHmingZiak' in data)) &&
+             (data.puitlingInkhawmZat is int || !('puitlingInkhawmZat' in data)) &&
+             (data.puitlingChhimtuZat is int || !('puitlingChhimtuZat' in data)) &&
+             (data.puitlingThawhlawm is number || !('puitlingThawhlawm' in data)) &&
+             (data.naupangHmingZiak is int || !('naupangHmingZiak' in data)) &&
+             (data.naupangInkhawmZat is int || !('naupangInkhawmZat' in data)) &&
+             (data.naupangChhimtuZat is int || !('naupangChhimtuZat' in data)) &&
+             (data.naupangThawhlawm is number || !('naupangThawhlawm' in data));
     }
 
     // ===============================================================

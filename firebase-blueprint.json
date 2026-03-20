@@ -170,12 +170,18 @@
       "type": "object",
       "properties": {
         "date": { "type": "string", "format": "date" },
-        "attendance": { "type": "integer" },
-        "collection": { "type": "number" },
+        "puitlingHmingZiak": { "type": "integer" },
+        "puitlingInkhawmZat": { "type": "integer" },
+        "puitlingChhimtuZat": { "type": "integer" },
+        "puitlingThawhlawm": { "type": "number" },
+        "naupangHmingZiak": { "type": "integer" },
+        "naupangInkhawmZat": { "type": "integer" },
+        "naupangChhimtuZat": { "type": "integer" },
+        "naupangThawhlawm": { "type": "number" },
         "remarks": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["date", "attendance", "collection"]
+      "required": ["date"]
     }
   },
   "firestore": {
