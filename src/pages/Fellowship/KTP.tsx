@@ -5,6 +5,7 @@ const KTP = () => {
   return (
     <FellowshipPage 
       id="ktp"
+      label="KTP"
       defaultName="Kristian Thalai Pawl (KTP)"
       defaultDescription="Tlangsam Presbyterian Kohhran thalaite inpawlhona leh thlarau lama hmasawnna tura din."
       defaultPurpose="KTP hi kan kohhran thalaite tana thlarau lama hmasawnna leh rawngbawlna hmun pawimawh tak a ni. Thalaite rinna kawnga chawm len leh, rawngbawlna hrang hrangah an theihna hman thiamtir kan tum a ni."

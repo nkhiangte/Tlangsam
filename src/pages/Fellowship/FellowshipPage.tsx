@@ -44,6 +44,7 @@ const DEFAULT_OB_ROLES = [
 
 interface FellowshipPageProps {
   id: string;
+  label: string;
   defaultName: string;
   defaultDescription: string;
   defaultPurpose: string;
@@ -57,6 +58,7 @@ interface FellowshipPageProps {
 
 const FellowshipPage: React.FC<FellowshipPageProps> = ({ 
   id, 
+  label,
   defaultName, 
   defaultDescription,
   defaultPurpose,
@@ -352,7 +354,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                   <>
                     <div className="flex items-center gap-2 mb-4">
                       <div className="h-px w-8 bg-church-gold"></div>
-                      <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Fellowship</span>
+                      <span className="text-church-gold font-medium uppercase tracking-widest text-xs">{label}</span>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">{data.name}</h1>
                     <p className="text-stone-400 max-w-2xl">{data.description}</p>
