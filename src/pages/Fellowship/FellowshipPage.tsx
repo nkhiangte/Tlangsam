@@ -51,6 +51,8 @@ interface FellowshipPageProps {
   defaultMeetingTime: string;
   defaultLogoUrl?: string;
   defaultActivities: string[];
+  thiltumte?: string[];
+  thuvawn?: { text: string; reference: string };
 }
 
 const FellowshipPage: React.FC<FellowshipPageProps> = ({ 
@@ -61,7 +63,9 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
   defaultImageUrl,
   defaultLogoUrl,
   defaultMeetingTime,
-  defaultActivities
+  defaultActivities,
+  thiltumte,
+  thuvawn
 }) => {
   const [data, setData] = useState<FellowshipData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,11 +102,23 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
     return () => unsub();
   }, [id, defaultName, defaultDescription, defaultPurpose, defaultImageUrl, defaultMeetingTime, defaultActivities]);
 
-  const handleSave = async (field: string, value: any) => {
+  const handleSave = async (fieldOrUpdates: string | any, value?: any) => {
     setIsSaving(true);
     try {
+      const updates = typeof fieldOrUpdates === 'string' 
+        ? { [fieldOrUpdates]: value } 
+        : fieldOrUpdates;
+
+      // Clean undefined values
+      const cleanUpdates = { ...updates };
+      Object.keys(cleanUpdates).forEach(key => {
+        if (cleanUpdates[key] === undefined) {
+          delete cleanUpdates[key];
+        }
+      });
+
       await setDoc(doc(db, 'fellowships', id), {
-        [field]: value,
+        ...cleanUpdates,
         updatedAt: new Date().toISOString()
       }, { merge: true });
       setEditingSection(null);
@@ -328,7 +344,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                       rows={2}
                     />
                     <div className="flex gap-2">
-                      <button onClick={handleSave} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
+                      <button onClick={() => handleSave({ name: editValue.name, description: editValue.description })} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
                       <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-stone-700 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-600">Cancel</button>
                     </div>
                   </div>
@@ -405,6 +421,30 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
 
             <h2 className="text-3xl font-serif text-stone-900">Kan Thiltum</h2>
             
+            {thuvawn && (
+              <div className="bg-stone-50 p-6 rounded-2xl border-l-4 border-church-gold italic">
+                <p className="text-xl text-stone-800 mb-2">"{thuvawn.text}"</p>
+                <p className="text-sm font-bold text-stone-500">— {thuvawn.reference}</p>
+              </div>
+            )}
+
+            {thiltumte && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-stone-800 uppercase tracking-wider flex items-center gap-2">
+                  <Check className="h-5 w-5 text-emerald-600" />
+                  Thiltumte
+                </h3>
+                <ul className="space-y-2">
+                  {thiltumte.map((t, i) => (
+                    <li key={i} className="flex gap-3 text-stone-600">
+                      <span className="font-bold text-emerald-600">{i + 1}.</span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
             {editingSection === 'purpose' ? (
               <div className="space-y-4 bg-stone-50 p-6 rounded-2xl border border-stone-200">
                 <div>
@@ -435,7 +475,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                   />
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={handleSave} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
+                  <button onClick={() => handleSave({ purpose: editValue.purpose, meetingTime: editValue.meetingTime, members: editValue.members })} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-emerald-700">Save</button>
                   <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-stone-200 text-stone-600 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-300">Cancel</button>
                 </div>
               </div>
@@ -659,7 +699,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                         <button 
                           onClick={() => {
                             const newList = [...editValue];
-                            newList[i] = { ...a, imageUrl: undefined };
+                            newList[i] = { ...a, imageUrl: null };
                             setEditValue(newList);
                           }}
                           className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
@@ -799,7 +839,7 @@ const FellowshipPage: React.FC<FellowshipPageProps> = ({
                         <button 
                           onClick={() => {
                             const newList = [...editValue];
-                            newList[i] = { ...a, imageUrl: undefined };
+                            newList[i] = { ...a, imageUrl: null };
                             setEditValue(newList);
                           }}
                           className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"

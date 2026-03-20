@@ -15,6 +15,16 @@ const KTP = () => {
         "Thalaite hnena Chanchin Tha hril.",
         "Thla tin group hrang hrangah inpawlhona neih thin a ni."
       ]}
+      thiltumte={[
+        "Isua Krista rinna leh Amah anna kawnga thalaite hruai.",
+        "Kohhran kutke ni tura thalaite buatsaih.",
+        "Kohhran hnathawh tih puitlin.",
+        "Krista chanchin tha puan darh."
+      ]}
+      thuvawn={{
+        text: "Rawngbawl tura chhandam",
+        reference: "Ephesi 2:10"
+      }}
     />
   );
 };
