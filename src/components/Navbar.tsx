@@ -371,12 +371,23 @@ const Navbar = () => {
               )
             ))}
             {user ? (
-              <button 
-                onClick={() => { logout(); setIsOpen(false); }}
-                className="bg-stone-100 text-stone-900 px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2"
-              >
-                <LogOut className="h-4 w-4" /> Chhuak rawh
-              </button>
+              <div className="flex flex-col gap-3">
+                {isAdmin && (
+                  <Link 
+                    to="/admin" 
+                    onClick={() => setIsOpen(false)}
+                    className="bg-stone-50 text-church-burgundy px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2 border border-stone-100"
+                  >
+                    <Shield className="h-4 w-4" /> Admin Panel
+                  </Link>
+                )}
+                <button 
+                  onClick={() => { logout(); setIsOpen(false); }}
+                  className="bg-stone-100 text-stone-900 px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" /> Chhuak rawh
+                </button>
+              </div>
             ) : (
               <button 
                 onClick={() => { login(); setIsOpen(false); }}
