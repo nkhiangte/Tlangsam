@@ -14,7 +14,11 @@ import {
   Loader2,
   ArrowLeft,
   Sparkles,
-  Camera
+  Camera,
+  Ban,
+  Lock,
+  Unlock,
+  UserPlus
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -169,6 +173,18 @@ const AdminPanel = () => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     try {
       await updateDoc(doc(db, 'users', userId), { role: newRole });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${userId}`);
+    }
+  };
+
+  const updateUserStatus = async (userId: string, newStatus: 'active' | 'banned' | 'blocked') => {
+    if (userId === user?.uid) {
+      alert("I mahni status i thlak thei lo.");
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'users', userId), { status: newStatus });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${userId}`);
     }
@@ -866,7 +882,14 @@ const AdminPanel = () => {
                           <td className="py-4">
                             <div className="flex items-center gap-3">
                               <img src={u.photoURL} alt="" className="w-10 h-10 rounded-full border border-stone-200" />
-                              <span className="font-medium text-stone-900">{u.displayName}</span>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-stone-900">{u.displayName}</span>
+                                {u.status && u.status !== 'active' && (
+                                  <span className={`text-[10px] font-bold uppercase tracking-wider ${u.status === 'banned' ? 'text-red-500' : 'text-orange-500'}`}>
+                                    {u.status}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </td>
                           <td className="py-4 text-stone-600">{u.email}</td>
@@ -876,14 +899,45 @@ const AdminPanel = () => {
                             </span>
                           </td>
                           <td className="py-4 text-right">
-                            <button 
-                              onClick={() => toggleUserRole(u.id, u.role)}
-                              disabled={u.id === user?.uid}
-                              className={`p-2 rounded-lg transition-all ${u.id === user?.uid ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-200 text-stone-600'}`}
-                              title={u.role === 'admin' ? 'Demote to User' : 'Promote to Admin'}
-                            >
-                              {u.role === 'admin' ? <UserMinus className="h-5 w-5" /> : <UserCheck className="h-5 w-5" />}
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              {/* Role Toggle */}
+                              <button 
+                                onClick={() => toggleUserRole(u.id, u.role)}
+                                disabled={u.id === user?.uid}
+                                className={`p-2 rounded-lg transition-all ${u.id === user?.uid ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-200 text-stone-600'}`}
+                                title={u.role === 'admin' ? 'Demote to User' : 'Promote to Admin'}
+                              >
+                                {u.role === 'admin' ? <UserMinus className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+                              </button>
+
+                              {/* Block/Unblock */}
+                              <button 
+                                onClick={() => updateUserStatus(u.id, u.status === 'blocked' ? 'active' : 'blocked')}
+                                disabled={u.id === user?.uid}
+                                className={`p-2 rounded-lg transition-all ${u.id === user?.uid ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-200 text-orange-500'}`}
+                                title={u.status === 'blocked' ? 'Unblock User' : 'Block User'}
+                              >
+                                {u.status === 'blocked' ? <Unlock className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
+                              </button>
+
+                              {/* Ban/Unban */}
+                              <button 
+                                onClick={() => {
+                                  if (u.status === 'banned') {
+                                    updateUserStatus(u.id, 'active');
+                                  } else {
+                                    if (window.confirm(`${u.displayName} hi ban i duh tak tak em?`)) {
+                                      updateUserStatus(u.id, 'banned');
+                                    }
+                                  }
+                                }}
+                                disabled={u.id === user?.uid}
+                                className={`p-2 rounded-lg transition-all ${u.id === user?.uid ? 'opacity-30 cursor-not-allowed' : 'hover:bg-red-50 text-red-500'}`}
+                                title={u.status === 'banned' ? 'Unban User' : 'Ban User'}
+                              >
+                                <Ban className="h-5 w-5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

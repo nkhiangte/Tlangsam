@@ -14,7 +14,7 @@ interface StatisticRecord {
 }
 
 const Statistics = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<StatisticRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -87,7 +87,7 @@ const Statistics = () => {
     });
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
         <Loader2 className="h-12 w-12 text-church-burgundy animate-spin" />
@@ -210,8 +210,20 @@ const Statistics = () => {
         </div>
 
         {stats.length === 0 && (
-          <div className="bg-white p-12 rounded-3xl shadow-sm border border-stone-100 text-center">
+          <div className="bg-white p-12 rounded-3xl shadow-sm border border-stone-100 text-center flex flex-col items-center gap-4">
             <p className="text-stone-400 italic">Statistic engmah a la awm lo.</p>
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setIsAdding(true);
+                  setFormData({ ...formData, order: stats.length + 1 });
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                Add First Statistic
+              </button>
+            )}
           </div>
         )}
 

@@ -16,7 +16,7 @@ interface FinanceRecord {
 }
 
 const Finance = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const [records, setRecords] = useState<FinanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -105,7 +105,7 @@ const Finance = () => {
 
   const currentRecord = records.find(r => r.month === selectedMonth);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
         <Loader2 className="h-12 w-12 text-church-burgundy animate-spin" />
@@ -290,8 +290,17 @@ const Finance = () => {
             )}
           </div>
         ) : (
-          <div className="bg-white p-12 rounded-3xl shadow-sm border border-stone-100 text-center">
+          <div className="bg-white p-12 rounded-3xl shadow-sm border border-stone-100 text-center flex flex-col items-center gap-4">
             <p className="text-stone-400 italic">Record engmah a la awm lo.</p>
+            {isAdmin && (
+              <button
+                onClick={() => setIsAdding(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-wider hover:bg-emerald-700 transition-all shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                Add First Record
+              </button>
+            )}
           </div>
         )}
 

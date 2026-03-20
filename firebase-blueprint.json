@@ -208,6 +208,20 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["head", "value"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "User profile and permissions.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "status": { "type": "string", "enum": ["active", "banned", "blocked"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
     }
   },
   "firestore": {
@@ -225,6 +239,7 @@
     "/sunday_school_teachers": { "schema": "SundaySchoolTeacher", "description": "Collection of Sunday School teachers" },
     "/sunday_school_reports": { "schema": "SundaySchoolReport", "description": "Collection of Sunday School weekly reports" },
     "/finance_records": { "schema": "FinanceRecord", "description": "Collection of monthly finance records" },
-    "/statistics": { "schema": "StatisticRecord", "description": "Collection of church statistics" }
+    "/statistics": { "schema": "StatisticRecord", "description": "Collection of church statistics" },
+    "/users": { "schema": "User", "description": "Collection of user profiles" }
   }
 }

@@ -42,8 +42,21 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() &&
         ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status != 'banned') ||
           request.auth.token.email == "nkhiangte@gmail.com");
+    }
+
+    function isBanned() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'banned';
+    }
+
+    function isBlocked() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'blocked';
     }
 
     function hasRequiredFields(fields) {
@@ -164,108 +177,108 @@ service cloud.firestore {
 
     // Publicly readable for authenticated users, but writable only by admins
     match /baptism_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidBaptism(request.resource.data);
       allow update: if isAdmin() && isValidBaptism(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /wedding_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidWedding(request.resource.data);
       allow update: if isAdmin() && isValidWedding(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /funeral_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidFuneral(request.resource.data);
       allow update: if isAdmin() && isValidFuneral(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /conference_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidConference(request.resource.data);
       allow update: if isAdmin() && isValidConference(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /transfer_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidTransfer(request.resource.data);
       allow update: if isAdmin() && isValidTransfer(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /admission_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidAdmission(request.resource.data);
       allow update: if isAdmin() && isValidAdmission(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /minute_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidMinute(request.resource.data);
       allow update: if isAdmin() && isValidMinute(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /elder_records/{id} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && !isBanned();
       allow create: if isAdmin() && isValidElder(request.resource.data);
       allow update: if isAdmin() && isValidElder(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /sunday_school_teachers/{id} {
-      allow read: if true;
+      allow read: if !isBanned();
       allow create: if isAdmin() && isValidSundaySchoolTeacher(request.resource.data);
       allow update: if isAdmin() && isValidSundaySchoolTeacher(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /sunday_school_reports/{id} {
-      allow read: if true;
+      allow read: if !isBanned();
       allow create: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
       allow update: if isAdmin() && isValidSundaySchoolReport(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /finance_records/{id} {
-      allow read: if true;
+      allow read: if !isBanned();
       allow create: if isAdmin() && isValidFinance(request.resource.data);
       allow update: if isAdmin() && isValidFinance(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /statistics/{id} {
-      allow read: if true;
+      allow read: if !isBanned();
       allow create: if isAdmin() && isValidStatistic(request.resource.data);
       allow update: if isAdmin() && isValidStatistic(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /news/{id} {
-      allow read: if true; // Publicly readable
+      allow read: if !isBanned(); // Publicly readable
       allow create: if isAdmin() && isValidNews(request.resource.data);
       allow update: if isAdmin() && isValidNews(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /committees/{id} {
-      allow read: if true; // Publicly readable
+      allow read: if !isBanned(); // Publicly readable
       allow write: if isAdmin();
     }
 
     match /fellowships/{id} {
-      allow read: if true; // Publicly readable
+      allow read: if !isBanned(); // Publicly readable
       allow write: if isAdmin();
     }
 
     match /settings/{id} {
-      allow read: if true; // Publicly readable
+      allow read: if !isBanned(); // Publicly readable
       allow write: if isAdmin();
     }
 
@@ -275,8 +288,9 @@ service cloud.firestore {
       allow list: if isAdmin();
       allow create: if isAuthenticated() && request.auth.uid == userId && 
         (request.resource.data.role == 'user' || 
-         (request.resource.data.role == 'admin' && request.auth.token.email == "nkhiangte@gmail.com"));
-      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
+         (request.resource.data.role == 'admin' && request.auth.token.email == "nkhiangte@gmail.com")) &&
+        (request.resource.data.status == 'active' || !('status' in request.resource.data));
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == resource.data.role && request.resource.data.status == resource.data.status);
     }
   }
 }
