@@ -234,7 +234,7 @@ const Navbar = () => {
           <img 
             src={bannerUrl} 
             alt="" 
-            className="w-full h-full object-cover md:object-contain"
+            className="w-full h-full object-cover opacity-40 grayscale"
             referrerPolicy="no-referrer"
           />
         ) : (
@@ -242,8 +242,8 @@ const Navbar = () => {
             Banner Background
           </div>
         )}
-        {/* Overlay to ensure menu readability if needed */}
-        <div className={`absolute inset-0 transition-colors duration-300 ${isDarkNav ? 'bg-white/40 backdrop-blur-[2px]' : 'bg-black/10'}`} />
+        {/* Stronger overlay for maximum readability */}
+        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
         
         {isAdmin && (
           <div className="absolute top-2 right-2 flex gap-2 z-20">
@@ -257,7 +257,7 @@ const Navbar = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Row: Logo & Auth */}
-        <div className="flex justify-between items-center py-3 md:py-4">
+        <div className="flex justify-between items-center py-3 md:py-4 relative z-10 bg-white/90 backdrop-blur-md px-4 md:px-8 rounded-b-xl shadow-sm">
           <div className="flex items-center gap-4 group relative">
             <div className="relative flex items-center min-w-[40px] md:min-w-[48px] justify-center">
               <Link to="/" className="block transition-transform hover:scale-105">
@@ -382,12 +382,12 @@ const Navbar = () => {
         </div>
 
         {/* Bottom Row: Desktop Navigation */}
-        <div className="hidden md:block border-t border-black/5 bg-white/10 backdrop-blur-[2px]">
-          <div className="flex items-center justify-center gap-4 lg:gap-6 py-2">
+        <div className="hidden md:block border-t border-black/5 bg-white/95 backdrop-blur-md shadow-md px-4 md:px-8 rounded-t-xl mt-auto">
+          <div className="flex items-center justify-center gap-2 lg:gap-4 py-4 flex-wrap">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className={`text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy flex items-center gap-1 uppercase tracking-wider ${menuTextColor} drop-shadow-sm`}>
+                  <button className="text-sm lg:text-base font-black transition-all hover:text-church-burgundy flex items-center gap-1 uppercase tracking-widest text-stone-900 drop-shadow-sm">
                     {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
                   </button>
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100 z-50">
@@ -406,7 +406,7 @@ const Navbar = () => {
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className={`text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy uppercase tracking-wider ${menuTextColor} drop-shadow-sm`}
+                  className="text-sm lg:text-base font-black transition-all hover:text-church-burgundy uppercase tracking-widest text-stone-900 whitespace-nowrap drop-shadow-sm"
                 >
                   {link.name}
                 </Link>
