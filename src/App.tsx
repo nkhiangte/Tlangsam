@@ -80,7 +80,7 @@ export default function App() {
         <ScrollToTop />
         <div className="min-h-screen flex flex-col">
           <Navbar />
-          <main className="flex-grow">
+          <main className="flex-grow pt-[80px] sm:pt-[120px] md:pt-[160px] lg:pt-[200px]">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/news" element={<News />} />

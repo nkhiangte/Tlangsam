@@ -27,6 +27,8 @@ const Navbar = () => {
   const [logoError, setLogoError] = useState(false);
   const [showSizeSlider, setShowSizeSlider] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [bannerUrl, setBannerUrl] = useState('');
+  const [bannerUploading, setBannerUploading] = useState(false);
   const { user, login, logout, isAdmin } = useAuth();
 
   const isHomePage = pathname === '/';
@@ -36,7 +38,7 @@ const Navbar = () => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     
-    const unsubscribe = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
+    const unsubscribeHomepage = onSnapshot(doc(db, 'settings', 'homepage'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         if (data.logoUrl) {
@@ -59,11 +61,36 @@ const Navbar = () => {
       handleFirestoreError(error, OperationType.GET, 'settings/homepage');
     });
 
+    const unsubscribeBranding = onSnapshot(doc(db, 'settings', 'branding'), (doc) => {
+      if (doc.exists() && doc.data().bannerUrl) {
+        setBannerUrl(doc.data().bannerUrl);
+      }
+    });
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      unsubscribe();
+      unsubscribeHomepage();
+      unsubscribeBranding();
     };
   }, []);
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBannerUploading(true);
+    try {
+      const storageRef = ref(storage, `branding/banner_${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      await setDoc(doc(db, 'settings', 'branding'), { bannerUrl: url }, { merge: true });
+      alert('Banner thlak a ni ta!');
+    } catch (error) {
+      console.error('Error uploading banner:', error);
+      alert('Banner thlaknaah harsatna a awm.');
+    } finally {
+      setBannerUploading(false);
+    }
+  };
 
   const handleLogoSizeChange = async (newSize: number) => {
     setLogoSize(newSize);
@@ -153,7 +180,32 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${isDarkNav ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
+    <nav className="fixed w-full z-50 top-0 left-0 shadow-lg h-[80px] sm:h-[120px] md:h-[160px] lg:h-[200px] flex flex-col justify-center">
+      {/* Banner Background Layer */}
+      <div className="absolute inset-0 z-[-1] bg-[#f5c48c]">
+        {bannerUrl ? (
+          <img 
+            src={bannerUrl} 
+            alt="" 
+            className="w-full h-full object-cover md:object-contain"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-stone-400 text-[10px] uppercase tracking-widest font-bold">
+            Banner Background
+          </div>
+        )}
+        {/* Overlay to ensure menu readability if needed */}
+        <div className={`absolute inset-0 transition-colors duration-300 ${isDarkNav ? 'bg-white/40 backdrop-blur-[2px]' : 'bg-black/10'}`} />
+        
+        {isAdmin && (
+          <label className="absolute top-2 right-2 bg-church-burgundy text-white p-1.5 rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform z-20">
+            {bannerUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+            <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} disabled={bannerUploading} />
+          </label>
+        )}
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Row: Logo & Auth */}
         <div className="flex justify-between items-center py-3 md:py-4">
@@ -265,7 +317,7 @@ const Navbar = () => {
             {!user && (
               <button 
                 onClick={login}
-                className={`p-2 rounded-full transition-colors ${isDarkNav ? 'text-church-burgundy hover:bg-stone-100' : 'text-white hover:bg-white/10'}`}
+                className="p-2 rounded-full transition-colors text-church-burgundy hover:bg-white/20"
                 title="Lut rawh"
               >
                 <LogIn className="h-6 w-6" />
@@ -274,19 +326,19 @@ const Navbar = () => {
             {user && (
               <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-stone-200" />
             )}
-            <button onClick={() => setIsOpen(!isOpen)} className={isDarkNav ? 'text-stone-900' : 'text-white'}>
+            <button onClick={() => setIsOpen(!isOpen)} className="text-stone-900">
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
         {/* Bottom Row: Desktop Navigation */}
-        <div className={`hidden md:block border-t transition-colors ${isDarkNav ? 'border-stone-100' : 'border-white/10'}`}>
-          <div className="flex items-center justify-center gap-6 lg:gap-8 py-3">
+        <div className="hidden md:block border-t border-black/5">
+          <div className="flex items-center justify-center gap-4 lg:gap-6 py-2">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className={`text-sm lg:text-base font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}>
+                  <button className="text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy flex items-center gap-1 text-stone-900 uppercase tracking-wider">
                     {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
                   </button>
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100 z-50">
@@ -294,30 +346,18 @@ const Navbar = () => {
                       <Link 
                         key={sub.name} 
                         to={sub.href}
-                        className="block px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors"
+                        className="block px-4 py-2 text-xs text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors font-bold uppercase tracking-wider"
                       >
                         {sub.name}
                       </Link>
                     ))}
                   </div>
                 </div>
-              ) : link.href.startsWith('/#') ? (
-                <a 
-                  key={link.name} 
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className={`text-sm lg:text-base font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
-                >
-                  {link.name}
-                </a>
               ) : (
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className={`text-sm lg:text-base font-semibold transition-colors hover:text-church-gold ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                  className="text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy text-stone-900 uppercase tracking-wider"
                 >
                   {link.name}
                 </Link>
