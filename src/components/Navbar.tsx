@@ -29,10 +29,51 @@ const Navbar = () => {
   const [uploading, setUploading] = useState(false);
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [menuTextColor, setMenuTextColor] = useState('text-stone-900');
   const { user, login, logout, isAdmin } = useAuth();
 
   const isHomePage = pathname === '/';
   const isDarkNav = scrolled || !isHomePage;
+
+  const analyzeImageBrightness = (url: string) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = url;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      canvas.width = 100; // Small size for performance
+      canvas.height = 100;
+      ctx.drawImage(img, 0, 0, 100, 100);
+
+      const imageData = ctx.getImageData(0, 0, 100, 100);
+      const data = imageData.data;
+      let r, g, b, avg;
+      let colorSum = 0;
+
+      for (let x = 0, len = data.length; x < len; x += 4) {
+        r = data[x];
+        g = data[x + 1];
+        b = data[x + 2];
+
+        avg = Math.floor((r + g + b) / 3);
+        colorSum += avg;
+      }
+
+      const brightness = Math.floor(colorSum / (canvas.width * canvas.height));
+      // If brightness is low (dark image), use white text. Otherwise use dark text.
+      const nextColor = brightness < 128 ? 'text-white' : 'text-stone-900';
+      setMenuTextColor(nextColor);
+      
+      // Persist the detected color so it's consistent for all users
+      if (isAdmin) {
+        setDoc(doc(db, 'settings', 'branding'), { menuTextColor: nextColor }, { merge: true })
+          .catch(err => console.error('Error persisting auto color:', err));
+      }
+    };
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -62,8 +103,14 @@ const Navbar = () => {
     });
 
     const unsubscribeBranding = onSnapshot(doc(db, 'settings', 'branding'), (doc) => {
-      if (doc.exists() && doc.data().bannerUrl) {
-        setBannerUrl(doc.data().bannerUrl);
+      if (doc.exists()) {
+        const data = doc.data();
+        if (data.bannerUrl) {
+          setBannerUrl(data.bannerUrl);
+          // Automatically analyze the new banner image
+          analyzeImageBrightness(data.bannerUrl);
+        }
+        if (data.menuTextColor) setMenuTextColor(data.menuTextColor);
       }
     });
 
@@ -199,10 +246,12 @@ const Navbar = () => {
         <div className={`absolute inset-0 transition-colors duration-300 ${isDarkNav ? 'bg-white/40 backdrop-blur-[2px]' : 'bg-black/10'}`} />
         
         {isAdmin && (
-          <label className="absolute top-2 right-2 bg-church-burgundy text-white p-1.5 rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform z-20">
-            {bannerUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
-            <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} disabled={bannerUploading} />
-          </label>
+          <div className="absolute top-2 right-2 flex gap-2 z-20">
+            <label className="bg-church-burgundy text-white p-1.5 rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform">
+              {bannerUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+              <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} disabled={bannerUploading} />
+            </label>
+          </div>
         )}
       </div>
 
@@ -268,10 +317,10 @@ const Navbar = () => {
               )}
             </div>
             <Link to="/" className="flex flex-col justify-center">
-              <span className={`text-base md:text-xl font-serif font-bold leading-none tracking-tight ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
+              <span className={`text-base md:text-xl font-serif font-bold leading-none tracking-tight ${menuTextColor}`}>
                 Tlangsam
               </span>
-              <span className={`text-[8px] md:text-sm font-serif font-medium leading-none mt-1 opacity-90 ${isDarkNav ? 'text-church-burgundy' : 'text-church-gold'}`}>
+              <span className={`text-[8px] md:text-sm font-serif font-medium leading-none mt-1 opacity-90 ${menuTextColor === 'text-white' ? 'text-church-gold' : 'text-church-burgundy'}`}>
                 Presbyterian Church
               </span>
             </Link>
@@ -284,14 +333,14 @@ const Navbar = () => {
                 {isAdmin && (
                   <Link 
                     to="/admin" 
-                    className={`text-sm font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${isDarkNav ? 'text-stone-900' : 'text-white/90'}`}
+                    className={`text-sm font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${menuTextColor}`}
                   >
                     <Shield className="h-4 w-4" /> Admin Panel
                   </Link>
                 )}
                 <div className="flex items-center gap-2">
                   <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-7 h-7 rounded-full border border-stone-200" />
-                  <span className={`text-xs font-medium ${isDarkNav ? 'text-stone-900' : 'text-white'}`}>
+                  <span className={`text-xs font-medium ${menuTextColor}`}>
                     {isAdmin ? 'Admin' : 'Member'}
                   </span>
                 </div>
@@ -333,12 +382,12 @@ const Navbar = () => {
         </div>
 
         {/* Bottom Row: Desktop Navigation */}
-        <div className="hidden md:block border-t border-black/5">
+        <div className="hidden md:block border-t border-black/5 bg-white/10 backdrop-blur-[2px]">
           <div className="flex items-center justify-center gap-4 lg:gap-6 py-2">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div key={link.name} className="relative group">
-                  <button className="text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy flex items-center gap-1 text-stone-900 uppercase tracking-wider">
+                  <button className={`text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy flex items-center gap-1 uppercase tracking-wider ${menuTextColor} drop-shadow-sm`}>
                     {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
                   </button>
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100 z-50">
@@ -357,7 +406,7 @@ const Navbar = () => {
                 <Link 
                   key={link.name} 
                   to={link.href}
-                  className="text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy text-stone-900 uppercase tracking-wider"
+                  className={`text-xs lg:text-sm font-bold transition-colors hover:text-church-burgundy uppercase tracking-wider ${menuTextColor} drop-shadow-sm`}
                 >
                   {link.name}
                 </Link>
