@@ -375,8 +375,12 @@ const Navbar = () => {
             {user && (
               <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-stone-200" />
             )}
-            <button onClick={() => setIsOpen(!isOpen)} className="text-stone-900">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button 
+              onClick={() => setIsOpen(!isOpen)} 
+              className="text-stone-900 flex items-center gap-2 hover:text-church-burgundy transition-colors"
+            >
+              <span className="text-xs font-black uppercase tracking-widest">Main Menu</span>
+              {isOpen ? <X className="h-10 w-10" /> : <Menu className="h-10 w-10" />}
             </button>
           </div>
         </div>
