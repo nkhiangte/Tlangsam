@@ -20,11 +20,11 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-stone-950 text-white py-12 border-t border-white/5">
+    <footer className="bg-white text-stone-900 py-12 border-t border-stone-200 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12 hidden">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-2 shadow-inner overflow-hidden">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center p-2 overflow-hidden">
               <img 
                 src={logoUrl} 
                 alt="Tlangsam Presbyterian Logo" 
@@ -36,26 +36,26 @@ const Footer = () => {
               <span className="text-lg font-serif font-bold tracking-tight">
                 Tlangsam
               </span>
-              <span className="text-xs font-serif font-medium text-church-gold opacity-80">
+              <span className="text-xs font-serif font-medium text-church-burgundy opacity-80">
                 Presbyterian Church
               </span>
             </div>
           </div>
+        </div>
           
-          <div className="flex gap-8 text-sm text-white/40">
-            <a href="#" className="hover:text-white transition-colors">Vawn Himna</a>
-            <a href="#" className="hover:text-white transition-colors">Inkaihhruaina</a>
-            <a href="#" className="hover:text-white transition-colors">Sitemap</a>
+        <div className="flex flex-col items-center gap-3 text-center w-full">
+          <div className="flex flex-col items-center gap-3 text-xs text-stone-500 font-semibold tracking-wider">
+            <a href="#" className="hover:text-church-burgundy transition-colors">Vawn Himna</a>
+            <a href="#" className="hover:text-church-burgundy transition-colors">Inkaihhruaina</a>
+            <a href="#" className="hover:text-church-burgundy transition-colors">Sitemap</a>
           </div>
 
-          <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} Tlangsam Presbyterian Kohhran. 
+          <p className="text-xs text-stone-500 font-medium mt-4">
+            &copy; 2026 Tlangsam Presbyterian Kohhran.
           </p>
-        </div>
 
-        <div className="pt-8 border-t border-white/5 text-center">
-          <p className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-bold">
-            Powered by <a href="tel:9612447703" className="hover:text-white transition-colors underline underline-offset-8 decoration-white/10 hover:decoration-white/40">MegaBits</a>
+          <p className="text-[10px] text-stone-400 uppercase tracking-[0.3em] font-bold mt-1">
+            Powered by <a href="tel:9612447703" className="text-church-burgundy hover:text-stone-900 transition-colors">MegaBits</a>
           </p>
         </div>
       </div>

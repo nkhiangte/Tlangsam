@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
 import DailyInspiration from './components/DailyInspiration';
+import LatestNewsSummary from './components/LatestNewsSummary';
+import InkhawmSummary from './components/InkhawmSummary';
 import Baptism from './pages/Records/Baptism';
 import Wedding from './pages/Records/Wedding';
 import Funeral from './pages/Records/Funeral';
@@ -68,7 +70,9 @@ const Home = () => {
   return (
     <>
       <Hero />
+      <LatestNewsSummary />
       <DailyInspiration />
+      <InkhawmSummary />
     </>
   );
 };
@@ -78,51 +82,53 @@ export default function App() {
     <FirebaseProvider>
       <Router>
         <ScrollToTop />
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col md:flex-row">
           <Navbar />
-          <main className="flex-grow pt-[80px] sm:pt-[120px] md:pt-[160px] lg:pt-[200px]">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/finance" element={<Finance />} />
-              <Route path="/statistics" element={<Statistics />} />
-              <Route path="/rawngbawltute" element={<Rawngbawltute />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/records" element={<RecordsPage />} />
-              <Route path="/archive" element={<ArchivePage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route 
-                path="/admin" 
-                element={
-                  <ProtectedRoute>
-                    <AdminPanel />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/records/baptism" element={<Baptism />} />
-              <Route path="/records/wedding" element={<Wedding />} />
-              <Route path="/records/funeral" element={<Funeral />} />
-              <Route path="/records/conference" element={<Conference />} />
-              <Route path="/records/pem-dawnsawn" element={<PemDawnsawn />} />
-              <Route path="/records/pawl-dang" element={<PawlDang />} />
-              <Route path="/archive/minutes" element={<Minutes />} />
-              <Route path="/archive/upa-kal-ta-te" element={<UpaKalTaTe />} />
-              <Route path="/archive/gallery" element={<Gallery />} />
-              <Route path="/fellowship/hmeichhia" element={<KohhranHmeichhia />} />
-              <Route path="/fellowship/ktp" element={<KTP />} />
-              <Route path="/fellowship/kpp" element={<KPP />} />
-              <Route path="/committee/kohhran" element={<KohhranCommittee />} />
-              <Route path="/committee/sunday-school" element={<SundaySchoolCommittee />} />
-              <Route path="/committee/ramthar" element={<RamtharCommittee />} />
-              <Route path="/committee/bsi" element={<BSICommittee />} />
-              <Route path="/committee/refreshment" element={<RefreshmentCommittee />} />
-              <Route path="/committee/light-sound" element={<LightAndSoundCommittee />} />
-              <Route path="/sunday-school/weekly-report" element={<WeeklyReportPage />} />
-              <Route path="/sunday-school/:department" element={<SundaySchoolTeachersPage />} />
-            </Routes>
+          <main className="flex-grow pt-[80px] md:pt-0 md:ml-72 w-full flex flex-col min-h-screen">
+            <div className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/finance" element={<Finance />} />
+                <Route path="/statistics" element={<Statistics />} />
+                <Route path="/rawngbawltute" element={<Rawngbawltute />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/records" element={<RecordsPage />} />
+                <Route path="/archive" element={<ArchivePage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route 
+                  path="/admin" 
+                  element={
+                    <ProtectedRoute>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="/records/baptism" element={<Baptism />} />
+                <Route path="/records/wedding" element={<Wedding />} />
+                <Route path="/records/funeral" element={<Funeral />} />
+                <Route path="/records/conference" element={<Conference />} />
+                <Route path="/records/pem-dawnsawn" element={<PemDawnsawn />} />
+                <Route path="/records/pawl-dang" element={<PawlDang />} />
+                <Route path="/archive/minutes" element={<Minutes />} />
+                <Route path="/archive/upa-kal-ta-te" element={<UpaKalTaTe />} />
+                <Route path="/archive/gallery" element={<Gallery />} />
+                <Route path="/fellowship/hmeichhia" element={<KohhranHmeichhia />} />
+                <Route path="/fellowship/ktp" element={<KTP />} />
+                <Route path="/fellowship/kpp" element={<KPP />} />
+                <Route path="/committee/kohhran" element={<KohhranCommittee />} />
+                <Route path="/committee/sunday-school" element={<SundaySchoolCommittee />} />
+                <Route path="/committee/ramthar" element={<RamtharCommittee />} />
+                <Route path="/committee/bsi" element={<BSICommittee />} />
+                <Route path="/committee/refreshment" element={<RefreshmentCommittee />} />
+                <Route path="/committee/light-sound" element={<LightAndSoundCommittee />} />
+                <Route path="/sunday-school/weekly-report" element={<WeeklyReportPage />} />
+                <Route path="/sunday-school/:department" element={<SundaySchoolTeachersPage />} />
+              </Routes>
+            </div>
+            <Footer />
           </main>
-          <Footer />
         </div>
       </Router>
     </FirebaseProvider>

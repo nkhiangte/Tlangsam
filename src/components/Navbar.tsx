@@ -227,7 +227,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed w-full z-50 top-0 left-0 shadow-lg h-[80px] sm:h-[120px] md:h-[160px] lg:h-[200px] flex flex-col justify-center">
+    <nav className="fixed z-50 top-0 left-0 shadow-lg w-full h-[80px] md:w-72 md:h-screen flex flex-col justify-center md:justify-start">
       {/* Banner Background Layer */}
       <div className="absolute inset-0 z-[-1] bg-[#f5c48c]">
         {bannerUrl ? (
@@ -243,7 +243,7 @@ const Navbar = () => {
           </div>
         )}
         {/* Stronger overlay for maximum readability */}
-        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-md md:bg-white/95 md:backdrop-blur-xl" />
         
         {isAdmin && (
           <div className="absolute top-2 right-2 flex gap-2 z-20">
@@ -255,11 +255,11 @@ const Navbar = () => {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Row: Logo & Auth */}
-        <div className="flex justify-between items-center py-3 md:py-4 relative z-10 bg-white/90 backdrop-blur-md px-4 md:px-8 rounded-b-xl shadow-sm">
-          <div className="flex items-center gap-4 group relative">
-            <div className="relative flex items-center min-w-[40px] md:min-w-[48px] justify-center">
+      <div className="w-full h-full flex flex-col md:py-6 md:px-6">
+        {/* Top Section: Logo & Auth */}
+        <div className="flex justify-between md:flex-col md:justify-start items-center md:items-start py-3 px-4 md:p-0 relative z-10 w-full gap-4 md:gap-6 bg-white shadow-sm md:bg-transparent md:shadow-none">
+          <div className="flex items-center md:items-start md:flex-col gap-4 group relative w-full">
+            <div className="relative flex items-center min-w-[40px] md:min-w-[64px] justify-center md:justify-start">
               <Link to="/" className="block transition-transform hover:scale-105">
                 {!logoError ? (
                     <img 
@@ -271,7 +271,7 @@ const Navbar = () => {
                         width: 'auto',
                         imageRendering: 'auto'
                       }}
-                      className="object-contain transition-all duration-300 drop-shadow-md max-h-[32px] sm:max-h-[40px] md:max-h-[60px]"
+                      className="object-contain transition-all duration-300 drop-shadow-md max-h-[40px] md:max-h-none"
                       referrerPolicy="no-referrer"
                     />
                 ) : (
@@ -317,48 +317,13 @@ const Navbar = () => {
               )}
             </div>
             <Link to="/" className="flex flex-col justify-center">
-              <span className={`text-base md:text-xl font-serif font-bold leading-none tracking-tight ${menuTextColor}`}>
+              <span className={`text-base md:text-2xl font-serif font-bold leading-none tracking-tight ${menuTextColor}`}>
                 Tlangsam
               </span>
-              <span className={`text-[8px] md:text-sm font-serif font-medium leading-none mt-1 opacity-90 ${menuTextColor === 'text-white' ? 'text-church-gold' : 'text-church-burgundy'}`}>
+              <span className={`text-[8px] md:text-xs font-serif font-medium leading-none mt-1 opacity-90 ${menuTextColor === 'text-white' ? 'text-church-gold' : 'text-church-burgundy'}`}>
                 Presbyterian Church
               </span>
             </Link>
-          </div>
-
-          {/* Desktop Auth & Admin */}
-          <div className="hidden md:flex items-center gap-4">
-            {user ? (
-              <div className="flex items-center gap-4">
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className={`text-sm font-semibold transition-colors hover:text-church-gold flex items-center gap-1 ${menuTextColor}`}
-                  >
-                    <Shield className="h-4 w-4" /> Admin Panel
-                  </Link>
-                )}
-                <div className="flex items-center gap-2">
-                  <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-7 h-7 rounded-full border border-stone-200" />
-                  <span className={`text-xs font-medium ${menuTextColor}`}>
-                    {isAdmin ? 'Admin' : 'Member'}
-                  </span>
-                </div>
-                <button 
-                  onClick={logout}
-                  className="bg-stone-100 text-stone-900 px-3 py-1 rounded-full text-xs font-medium hover:bg-stone-200 transition-all flex items-center gap-1"
-                >
-                  <LogOut className="h-3 w-3" /> Chhuak rawh
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={login}
-                className="bg-church-burgundy text-white px-5 py-1.5 rounded-full text-xs font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center gap-1"
-              >
-                <LogIn className="h-3 w-3" /> Lut rawh
-              </button>
-            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -366,7 +331,7 @@ const Navbar = () => {
             {!user && (
               <button 
                 onClick={login}
-                className="p-2 rounded-full transition-colors text-church-burgundy hover:bg-white/20"
+                className="p-2 rounded-full transition-colors text-church-burgundy hover:bg-stone-100"
                 title="Lut rawh"
               >
                 <LogIn className="h-6 w-6" />
@@ -385,38 +350,72 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Bottom Row: Desktop Navigation */}
-        <div className="hidden md:block border-t border-black/5 bg-white/95 backdrop-blur-md shadow-md px-4 md:px-8 rounded-t-xl mt-auto">
-          <div className="flex items-center justify-center gap-2 lg:gap-4 py-4 flex-wrap">
-            {navLinks.map((link) => (
-              link.dropdown ? (
-                <div key={link.name} className="relative group">
-                  <button className="text-sm lg:text-base font-black transition-all hover:text-church-burgundy flex items-center gap-1 uppercase tracking-widest text-stone-900 drop-shadow-sm">
-                    {link.name} <ChevronRight className="h-3 w-3 rotate-90" />
-                  </button>
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-stone-100 z-50">
-                    {link.dropdown.map((sub) => (
-                      <Link 
-                        key={sub.name} 
-                        to={sub.href}
-                        className="block px-4 py-2 text-xs text-stone-600 hover:bg-stone-50 hover:text-church-burgundy transition-colors font-bold uppercase tracking-wider"
-                      >
-                        {sub.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <Link 
-                  key={link.name} 
-                  to={link.href}
-                  className="text-sm lg:text-base font-black transition-all hover:text-church-burgundy uppercase tracking-widest text-stone-900 whitespace-nowrap drop-shadow-sm"
-                >
+        {/* Desktop Sidebar Navigation */}
+        <div className="hidden md:flex flex-col gap-2 mt-6 overflow-y-auto pb-6 w-full flex-grow custom-scrollbar">
+          {navLinks.map((link) => (
+            link.dropdown ? (
+              <div key={link.name} className="flex flex-col gap-1 w-full group">
+                <div className={`text-sm font-extrabold transition-all hover:text-church-burgundy flex items-center justify-between uppercase tracking-widest text-stone-900 drop-shadow-sm py-2 w-full text-left cursor-default`}>
                   {link.name}
+                  <ChevronRight className="h-4 w-4 opacity-50 group-hover:rotate-90 transition-transform" />
+                </div>
+                <div className="flex flex-col pl-3 gap-1 overflow-hidden h-0 group-hover:h-auto opacity-0 group-hover:opacity-100 transition-all duration-300 border-l-2 border-stone-200 ml-1">
+                  {link.dropdown.map((sub) => (
+                    <Link 
+                      key={sub.name} 
+                      to={sub.href}
+                      className="block px-3 py-1.5 text-xs text-stone-600 hover:text-church-burgundy hover:bg-white/50 transition-colors font-bold uppercase tracking-wider rounded-r-lg"
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Link 
+                key={link.name} 
+                to={link.href}
+                className={`block text-sm font-extrabold transition-all hover:text-church-burgundy uppercase tracking-widest text-stone-900 py-2 drop-shadow-sm`}
+              >
+                {link.name}
+              </Link>
+            )
+          ))}
+        </div>
+
+        {/* Desktop Auth & Admin */}
+        <div className="hidden md:flex flex-col gap-3 mt-auto pt-6 border-t border-black/10">
+          {user ? (
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex items-center gap-3 mb-2">
+                <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
+                <span className={`text-xs font-bold uppercase tracking-wider ${menuTextColor}`}>
+                  {isAdmin ? 'Admin' : 'Member'}
+                </span>
+              </div>
+              {isAdmin && (
+                <Link 
+                  to="/admin" 
+                  className={`text-xs font-extrabold transition-colors hover:text-church-gold flex items-center gap-2 ${menuTextColor}`}
+                >
+                  <Shield className="h-4 w-4" /> Admin Panel
                 </Link>
-              )
-            ))}
-          </div>
+              )}
+              <button 
+                onClick={logout}
+                className="bg-white/50 hover:bg-white/80 text-stone-900 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-black/5 shadow-sm"
+              >
+                <LogOut className="h-4 w-4" /> Chhuak rawh
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={login}
+              className="bg-church-burgundy text-white w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+            >
+              <LogIn className="h-4 w-4" /> Lut rawh
+            </button>
+          )}
         </div>
       </div>
 
@@ -426,7 +425,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden bg-white absolute top-full left-0 w-full shadow-xl py-4 px-4 flex flex-col gap-4 max-h-[calc(100vh-100px)] overflow-y-auto"
+            className="md:hidden bg-white absolute top-full left-0 w-full shadow-xl py-4 px-4 flex flex-col gap-4 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             {navLinks.map((link) => (
               link.dropdown ? (
