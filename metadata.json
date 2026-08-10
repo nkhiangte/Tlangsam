@@ -1,5 +1,6 @@
 {
   "name": "Tlangsam Presbyterian Kohhran",
-  "description": "Official web application for Tlangsam Presbyterian Kohhran, providing service times, events, and spiritual resources.",
-  "requestFramePermissions": []
+  "description": "Official web application for Tlangsam Presbyterian Kohhran, providing service times, events, records, and spiritual resources.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

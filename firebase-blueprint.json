@@ -350,6 +350,33 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["email", "role"]
+    },
+    "ProgrammeArchive": {
+      "title": "Inkhawm Programme Archive",
+      "description": "Archived weekly church service programmes.",
+      "type": "object",
+      "properties": {
+        "weekId": { "type": "string", "description": "Unique week identifier e.g. 2025-W08 or 2025-02-16" },
+        "weekTitle": { "type": "string", "description": "Display title for the week e.g. 16 - 22 February 2025" },
+        "weekStartDate": { "type": "string", "format": "date", "description": "Starting date of the week" },
+        "weekEndDate": { "type": "string", "format": "date", "description": "Ending date of the week" },
+        "theme": { "type": "string", "description": "Weekly theme or verse if any" },
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": { "type": "string" },
+              "date": { "type": "string" },
+              "services": { "type": "array" }
+            }
+          }
+        },
+        "archivedAt": { "type": "string", "format": "date-time" },
+        "archivedBy": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["weekStartDate", "days"]
     }
   },
   "firestore": {
@@ -371,6 +398,7 @@
     "/fellowship_finance_reports": { "schema": "FellowshipFinanceReport", "description": "Collection of monthly finance reports for fellowships" },
     "/buhfaitham_reports": { "schema": "BuhfaithamReport", "description": "Collection of monthly Buhfaitham reports" },
     "/rawngbawltute": { "schema": "Rawngbawltute", "description": "Collection of church workers and leaders" },
-    "/users": { "schema": "User", "description": "Collection of user profiles" }
+    "/users": { "schema": "User", "description": "Collection of user profiles" },
+    "/programme_archives": { "schema": "ProgrammeArchive", "description": "Collection of archived weekly inkhawm service programmes" }
   }
 }

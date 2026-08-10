@@ -207,6 +207,12 @@ service cloud.firestore {
              (data.tantute is map || !('tantute' in data));
     }
 
+    function isValidProgrammeArchive(data) {
+      return hasRequiredFields(['weekStartDate', 'days']) &&
+             data.weekStartDate is string &&
+             data.days is list;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -337,6 +343,13 @@ service cloud.firestore {
     match /settings/{id} {
       allow read: if !isBanned(); // Publicly readable
       allow write: if isAdmin();
+    }
+
+    match /programme_archives/{id} {
+      allow read: if !isBanned(); // Publicly readable
+      allow create: if isAdmin() && isValidProgrammeArchive(request.resource.data);
+      allow update: if isAdmin() && isValidProgrammeArchive(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // User profiles

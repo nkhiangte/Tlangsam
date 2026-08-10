@@ -1,11 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ScrollText, History, ChevronRight } from 'lucide-react';
+import { ScrollText, History, ChevronRight, Calendar } from 'lucide-react';
 import { LogoPlaceholder } from '../components/LogoPlaceholder';
 
 const Archive = () => {
   const archives = [
+    {
+      title: "Inkhawm Programme",
+      description: "Kar tin Pathian biak inkhawm programme kal tawhte vawn thatna.",
+      icon: <Calendar className="h-6 w-6" />,
+      link: "/archive/inkhawm-programme"
+    },
     {
       title: "Minutes",
       description: "Kohhran committee thureltute vawn thatna.",

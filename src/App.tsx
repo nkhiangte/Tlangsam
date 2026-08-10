@@ -16,6 +16,7 @@ import PawlDang from './pages/Records/PawlDang';
 import Minutes from './pages/Archive/Minutes';
 import UpaKalTaTe from './pages/Archive/UpaKalTaTe';
 import Gallery from './pages/Archive/Gallery';
+import InkhawmProgrammeArchive from './pages/Archive/InkhawmProgrammeArchive';
 import KohhranHmeichhia from './pages/Fellowship/KohhranHmeichhia';
 import KTP from './pages/Fellowship/KTP';
 import KPP from './pages/Fellowship/KPP';
@@ -114,6 +115,7 @@ export default function App() {
                 <Route path="/archive/minutes" element={<Minutes />} />
                 <Route path="/archive/upa-kal-ta-te" element={<UpaKalTaTe />} />
                 <Route path="/archive/gallery" element={<Gallery />} />
+                <Route path="/archive/inkhawm-programme" element={<InkhawmProgrammeArchive />} />
                 <Route path="/fellowship/hmeichhia" element={<KohhranHmeichhia />} />
                 <Route path="/fellowship/ktp" element={<KTP />} />
                 <Route path="/fellowship/kpp" element={<KPP />} />
