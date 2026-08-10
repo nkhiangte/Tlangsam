@@ -31,51 +31,13 @@ const Navbar = () => {
   const [uploading, setUploading] = useState(false);
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerUploading, setBannerUploading] = useState(false);
-  const [menuTextColor, setMenuTextColor] = useState('text-stone-900');
   const { user, logout, isAdmin } = useAuth();
 
   const isHomePage = pathname === '/';
   const isDarkNav = scrolled || !isHomePage;
 
-  const analyzeImageBrightness = (url: string) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.src = url;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+// Analyze image logic removed as not needed with fixed white sidebar
 
-      canvas.width = 100; // Small size for performance
-      canvas.height = 100;
-      ctx.drawImage(img, 0, 0, 100, 100);
-
-      const imageData = ctx.getImageData(0, 0, 100, 100);
-      const data = imageData.data;
-      let r, g, b, avg;
-      let colorSum = 0;
-
-      for (let x = 0, len = data.length; x < len; x += 4) {
-        r = data[x];
-        g = data[x + 1];
-        b = data[x + 2];
-
-        avg = Math.floor((r + g + b) / 3);
-        colorSum += avg;
-      }
-
-      const brightness = Math.floor(colorSum / (canvas.width * canvas.height));
-      // If brightness is low (dark image), use white text. Otherwise use dark text.
-      const nextColor = brightness < 128 ? 'text-white' : 'text-stone-900';
-      setMenuTextColor(nextColor);
-      
-      // Persist the detected color so it's consistent for all users
-      if (isAdmin) {
-        setDoc(doc(db, 'settings', 'branding'), { menuTextColor: nextColor }, { merge: true })
-          .catch(err => console.error('Error persisting auto color:', err));
-      }
-    };
-  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -110,9 +72,7 @@ const Navbar = () => {
         if (data.bannerUrl) {
           setBannerUrl(data.bannerUrl);
           // Automatically analyze the new banner image
-          analyzeImageBrightness(data.bannerUrl);
         }
-        if (data.menuTextColor) setMenuTextColor(data.menuTextColor);
       }
     });
 
@@ -319,10 +279,10 @@ const Navbar = () => {
               )}
             </div>
             <Link to="/" className="flex flex-col justify-center">
-              <span className={`text-base md:text-2xl font-serif font-bold leading-none tracking-tight ${menuTextColor}`}>
+              <span className="text-base md:text-2xl font-serif font-bold leading-none tracking-tight text-stone-900">
                 Tlangsam
               </span>
-              <span className={`text-[8px] md:text-xs font-serif font-medium leading-none mt-1 opacity-90 ${menuTextColor === 'text-white' ? 'text-church-gold' : 'text-church-burgundy'}`}>
+              <span className="text-[8px] md:text-xs font-serif font-medium leading-none mt-1 opacity-90 text-church-burgundy">
                 Presbyterian Church
               </span>
             </Link>
@@ -391,14 +351,14 @@ const Navbar = () => {
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-center gap-3 mb-2">
                 <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-8 h-8 rounded-full border border-stone-200" />
-                <span className={`text-xs font-bold uppercase tracking-wider ${menuTextColor}`}>
+                <span className="text-xs font-bold uppercase tracking-wider text-stone-900">
                   {isAdmin ? 'Admin' : 'Member'}
                 </span>
               </div>
               {isAdmin && (
                 <Link 
                   to="/admin" 
-                  className={`text-xs font-extrabold transition-colors hover:text-church-gold flex items-center gap-2 ${menuTextColor}`}
+                  className="text-xs font-extrabold transition-colors hover:text-church-burgundy flex items-center gap-2 text-stone-900"
                 >
                   <Shield className="h-4 w-4" /> Admin Panel
                 </Link>

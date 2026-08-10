@@ -50,7 +50,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
+    <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-stone-900">
       <div className="absolute inset-0 z-0">
         {bgImage ? (
           <>
