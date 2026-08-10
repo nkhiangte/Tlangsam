@@ -36,6 +36,9 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signOut as firebaseSignOut } from 'firebase/auth';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 const AdminPanel = () => {
   const { isAdmin, user, loading: authLoading } = useAuth();
@@ -48,6 +51,40 @@ const AdminPanel = () => {
   const [inspiration, setInspiration] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserName, setNewUserName] = useState('');
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserEmail || !newUserPassword || !newUserName) return;
+    setIsCreatingUser(true);
+    try {
+      const secondaryApp = initializeApp(firebaseConfig, 'SecondaryApp' + Date.now());
+      const secondaryAuth = getAuth(secondaryApp);
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, newUserEmail, newUserPassword);
+      await firebaseSignOut(secondaryAuth);
+      
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: newUserEmail,
+        displayName: newUserName,
+        role: 'user',
+        status: 'active',
+        createdAt: new Date().toISOString()
+      });
+      
+      setNewUserEmail('');
+      setNewUserPassword('');
+      setNewUserName('');
+      alert('User thar siam a ni ta!');
+    } catch (error: any) {
+      alert('User siam theih a ni lo: ' + error.message);
+    } finally {
+      setIsCreatingUser(false);
+    }
+  };
 
   // Redirect if not admin
   useEffect(() => {
@@ -866,6 +903,54 @@ const AdminPanel = () => {
                   <h2 className="text-2xl font-serif">Kohhran Member-te</h2>
                   <span className="bg-stone-100 text-stone-600 px-4 py-1 rounded-full text-sm">{users.length} members</span>
                 </div>
+                
+                {/* Create New User Form */}
+                <div className="bg-stone-50 border border-stone-100 p-6 rounded-2xl mb-8">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-stone-400 mb-4 flex items-center gap-2">
+                    <UserPlus className="h-4 w-4" /> User Thar Siamna
+                  </h3>
+                  <form onSubmit={handleCreateUser} className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="w-full">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hming</label>
+                      <input 
+                        type="text" 
+                        value={newUserName}
+                        onChange={e => setNewUserName(e.target.value)}
+                        required
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-burgundy"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Email</label>
+                      <input 
+                        type="email" 
+                        value={newUserEmail}
+                        onChange={e => setNewUserEmail(e.target.value)}
+                        required
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-burgundy"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Password</label>
+                      <input 
+                        type="password" 
+                        value={newUserPassword}
+                        onChange={e => setNewUserPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-burgundy"
+                      />
+                    </div>
+                    <button 
+                      type="submit"
+                      disabled={isCreatingUser}
+                      className="w-full md:w-auto bg-church-burgundy text-white px-6 py-3 rounded-xl font-bold uppercase tracking-wider hover:bg-opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
+                      {isCreatingUser ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Siam Rawh'}
+                    </button>
+                  </form>
+                </div>
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>

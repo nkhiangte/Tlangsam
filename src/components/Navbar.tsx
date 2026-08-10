@@ -17,9 +17,11 @@ import { useAuth } from '../context/AuthContext';
 import { db, storage, handleFirestoreError, OperationType } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
   const [logoUrl, setLogoUrl] = useState('https://storage.googleapis.com/static-content-ais-build/applets/oq4isheib3jbvhiqgatqar/logo.png');
@@ -30,7 +32,7 @@ const Navbar = () => {
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerUploading, setBannerUploading] = useState(false);
   const [menuTextColor, setMenuTextColor] = useState('text-stone-900');
-  const { user, login, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
 
   const isHomePage = pathname === '/';
   const isDarkNav = scrolled || !isHomePage;
@@ -330,7 +332,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center gap-3">
             {!user && (
               <button 
-                onClick={login}
+                onClick={() => setIsLoginModalOpen(true)}
                 className="p-2 rounded-full transition-colors text-church-burgundy hover:bg-stone-100"
                 title="Lut rawh"
               >
@@ -410,7 +412,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button 
-              onClick={login}
+              onClick={() => setIsLoginModalOpen(true)}
               className="bg-church-burgundy text-white w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <LogIn className="h-4 w-4" /> Lut rawh
@@ -485,7 +487,7 @@ const Navbar = () => {
               </div>
             ) : (
               <button 
-                onClick={() => { login(); setIsOpen(false); }}
+                onClick={() => { setIsLoginModalOpen(true); setIsOpen(false); }}
                 className="bg-church-burgundy text-white px-6 py-3 rounded-xl text-center font-medium flex items-center justify-center gap-2"
               >
                 <LogIn className="h-4 w-4" /> Lut rawh
@@ -494,6 +496,7 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </nav>
   );
 };

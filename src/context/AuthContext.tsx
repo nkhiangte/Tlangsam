@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signOut, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { Shield } from 'lucide-react';
@@ -10,7 +10,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isBanned: boolean;
   isBlocked: boolean;
-  login: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -79,9 +80,13 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return unsubscribe;
   }, []);
 
-  const login = async () => {
+  const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
+  };
+
+  const loginWithEmail = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = async () => {
@@ -89,7 +94,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, isBanned, isBlocked, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, isBanned, isBlocked, loginWithGoogle, loginWithEmail, logout }}>
       {isBanned ? (
         <div className="min-h-screen flex items-center justify-center bg-stone-50 p-4">
           <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 text-center border border-red-100">
