@@ -24,11 +24,13 @@ import {
   formatDateDisplay, 
   checkAndAutoArchivePreviousWeek 
 } from '../utils/programmeDateUtils';
+import { InkhawmProgrammeManager } from '../components/Admin/InkhawmProgrammeManager';
 
 const Services = () => {
   const [programme, setProgramme] = useState<WeeklyProgramme | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { isAdmin } = useAuth();
 
   useEffect(() => {
@@ -127,12 +129,12 @@ const Services = () => {
 
             <div className="flex flex-wrap items-center gap-3">
               {isAdmin && (
-                <Link
-                  to="/admin"
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
                   className="bg-stone-800 hover:bg-stone-700 text-white font-medium px-4 py-2.5 rounded-xl border border-stone-700 transition-all text-xs sm:text-sm flex items-center gap-2 shadow-sm"
                 >
-                  <Edit3 className="h-4 w-4 text-church-gold" /> Admin Edit
-                </Link>
+                  {isEditing ? 'Cancel Edit' : <><Edit3 className="h-4 w-4 text-church-gold" /> Admin Edit</>}
+                </button>
               )}
 
               <Link
@@ -147,7 +149,13 @@ const Services = () => {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Weekly Header Banner */}
+        {isEditing ? (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-200 mb-8">
+            <InkhawmProgrammeManager />
+          </div>
+        ) : (
+          <>
+            {/* Weekly Header Banner */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-200 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-100">
             <div>
@@ -306,6 +314,8 @@ const Services = () => {
             Archive En Rawh <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

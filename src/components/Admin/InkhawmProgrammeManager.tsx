@@ -495,7 +495,7 @@ export const InkhawmProgrammeManager: React.FC = () => {
             className="px-6 py-2.5 bg-church-burgundy hover:bg-opacity-90 text-white rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
           >
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Vawng tha rawh
+            Save
           </button>
         </div>
       </div>
@@ -977,7 +977,7 @@ export const InkhawmProgrammeManager: React.FC = () => {
             className="px-8 py-3.5 bg-church-burgundy hover:bg-opacity-90 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
           >
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Vawng tha rawh
+            Save
           </button>
         </div>
       </div>

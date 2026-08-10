@@ -289,7 +289,7 @@ const AdminPanel = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all mb-6">
-            <ArrowLeft className="h-4 w-4" /> In-ah let leh rawh
+            <ArrowLeft className="h-4 w-4" /> Back to Home
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -820,7 +820,7 @@ const AdminPanel = () => {
                       className="flex items-center gap-2 bg-church-burgundy text-white px-8 py-4 rounded-xl hover:bg-opacity-90 transition-all shadow-lg font-bold disabled:opacity-50"
                     >
                       {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                      Vawng tha rawh
+                      Save
                     </button>
                   </div>
                 </div>

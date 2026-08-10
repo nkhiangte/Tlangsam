@@ -119,7 +119,7 @@ export const SundaySchoolTeachersPage: React.FC = () => {
       <div className="bg-stone-900 pt-40 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link to="/" className="inline-flex items-center gap-2 text-church-gold font-medium hover:gap-3 transition-all mb-8">
-            <ArrowLeft className="h-4 w-4" /> In-ah let leh rawh
+            <ArrowLeft className="h-4 w-4" /> Back to Home
           </Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -279,7 +279,7 @@ export const SundaySchoolTeachersPage: React.FC = () => {
                     disabled={isSubmitting}
                     className="flex-1 px-8 py-4 bg-church-burgundy text-white rounded-xl font-medium hover:bg-opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : (editingId ? 'Update rawh' : 'Save rawh')}
+                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : (editingId ? 'Update' : 'Save')}
                   </button>
                 </div>
               </form>
