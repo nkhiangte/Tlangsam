@@ -75,6 +75,18 @@ const Services = () => {
     if (programme.verse) text += `Bible Chang: ${programme.verse}\n`;
     text += `==============================\n\n`;
 
+    if (programme.tunKarRawngbawltute) {
+      const tr = programme.tunKarRawngbawltute;
+      if (tr.khuangpute?.trim() || tr.hlaHriltu?.trim() || tr.thawhlawmKhawntute?.trim() || tr.lightAndSoundDuty?.trim()) {
+        text += `TUN KAR RAWNGBAWLTUTE:\n`;
+        if (tr.khuangpute?.trim()) text += `Khuangpute: ${tr.khuangpute}\n`;
+        if (tr.hlaHriltu?.trim()) text += `Hla Hriltu: ${tr.hlaHriltu}\n`;
+        if (tr.thawhlawmKhawntute?.trim()) text += `Thawhlawm Khawntute: ${tr.thawhlawmKhawntute}\n`;
+        if (tr.lightAndSoundDuty?.trim()) text += `Light & Sound Duty: ${tr.lightAndSoundDuty}\n`;
+        text += `==============================\n\n`;
+      }
+    }
+
     (programme.days || []).forEach(day => {
       text += `📅 ${day.day}${day.date ? ` (${day.date})` : ''}\n`;
       text += `------------------------------\n`;
@@ -221,6 +233,46 @@ const Services = () => {
           )}
         </div>
 
+        {/* Tun Kar Rawngbawltute Section */}
+        {programme?.tunKarRawngbawltute && (
+          (programme.tunKarRawngbawltute.khuangpute?.trim() ||
+           programme.tunKarRawngbawltute.hlaHriltu?.trim() ||
+           programme.tunKarRawngbawltute.thawhlawmKhawntute?.trim() ||
+           programme.tunKarRawngbawltute.lightAndSoundDuty?.trim())
+        ) && (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-200 mb-8">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-stone-900 mb-6 flex items-center gap-2">
+              <Users className="h-6 w-6 text-church-burgundy" /> Tun Kar Rawngbawltute
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {programme.tunKarRawngbawltute.khuangpute?.trim() && (
+                <div className="bg-stone-50 p-4 rounded-2xl border border-stone-100">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Khuangpute</span>
+                  <span className="text-stone-900 font-semibold text-sm">{programme.tunKarRawngbawltute.khuangpute}</span>
+                </div>
+              )}
+              {programme.tunKarRawngbawltute.hlaHriltu?.trim() && (
+                <div className="bg-stone-50 p-4 rounded-2xl border border-stone-100">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Hla Hriltu</span>
+                  <span className="text-stone-900 font-semibold text-sm">{programme.tunKarRawngbawltute.hlaHriltu}</span>
+                </div>
+              )}
+              {programme.tunKarRawngbawltute.thawhlawmKhawntute?.trim() && (
+                <div className="bg-stone-50 p-4 rounded-2xl border border-stone-100">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Thawhlawm Khawntute</span>
+                  <span className="text-stone-900 font-semibold text-sm">{programme.tunKarRawngbawltute.thawhlawmKhawntute}</span>
+                </div>
+              )}
+              {programme.tunKarRawngbawltute.lightAndSoundDuty?.trim() && (
+                <div className="bg-stone-50 p-4 rounded-2xl border border-stone-100">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Light & Sound Duty</span>
+                  <span className="text-stone-900 font-semibold text-sm">{programme.tunKarRawngbawltute.lightAndSoundDuty}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Days & Services List */}
         <div className="space-y-8">
           {days.map((dayGroup, dayIdx) => (
@@ -271,9 +323,11 @@ const Services = () => {
                       )}
                     </div>
                     
-                    {service.fields && Object.keys(service.fields).length > 0 && (
+                    {service.fields && Object.keys(service.fields).filter(k => service.fields![k] && service.fields![k].trim() !== '').length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                        {Object.entries(service.fields).map(([label, value]) => (
+                        {Object.entries(service.fields)
+                          .filter(([_, value]) => value && value.trim() !== '')
+                          .map(([label, value]) => (
                           <div 
                             key={label} 
                             className="bg-stone-50 hover:bg-stone-100/80 transition-colors p-4 rounded-2xl border border-stone-200/80"
@@ -282,7 +336,7 @@ const Services = () => {
                               {label}
                             </span>
                             <span className="text-stone-900 font-semibold text-sm">
-                              {value || '---'}
+                              {value}
                             </span>
                           </div>
                         ))}

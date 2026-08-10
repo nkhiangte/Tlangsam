@@ -218,7 +218,9 @@ const Rawngbawltute = () => {
     );
   }
 
-  const renderArrayField = (title: string, path: string[], items: string[]) => (
+  const renderArrayField = (title: string, path: string[], items: string[]) => {
+    if (!isEditing && (!items || items.length === 0)) return null;
+    return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h4 className="text-sm font-bold uppercase tracking-widest text-stone-900">{title}</h4>
@@ -255,14 +257,13 @@ const Rawngbawltute = () => {
             )}
           </div>
         ))}
-        {!isEditing && items.length === 0 && (
-          <p className="text-stone-400 text-sm italic">Awm rih lo</p>
-        )}
       </div>
     </div>
-  );
+  )};
 
-  const renderInputField = (label: string, path: string[], value: string) => (
+  const renderInputField = (label: string, path: string[], value: string) => {
+    if (!isEditing && (!value || value.trim() === "")) return null;
+    return (
     <div className="space-y-1">
       <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-900">{label}</label>
       {isEditing ? (
@@ -274,10 +275,10 @@ const Rawngbawltute = () => {
           placeholder={`${label} hming`}
         />
       ) : (
-        <p className="text-stone-800 font-medium">{value || "—"}</p>
+        <p className="text-stone-800 font-medium">{value}</p>
       )}
     </div>
-  );
+  )};
 
   const displayData = isEditing ? editData! : data!;
 

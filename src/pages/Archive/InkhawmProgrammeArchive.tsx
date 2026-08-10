@@ -91,6 +91,18 @@ const InkhawmProgrammeArchive: React.FC = () => {
     if (prog.theme) text += `Thupui: ${prog.theme}\n`;
     text += `==============================\n\n`;
 
+    if (prog.tunKarRawngbawltute) {
+      const tr = prog.tunKarRawngbawltute;
+      if (tr.khuangpute?.trim() || tr.hlaHriltu?.trim() || tr.thawhlawmKhawntute?.trim() || tr.lightAndSoundDuty?.trim()) {
+        text += `TUN KAR RAWNGBAWLTUTE:\n`;
+        if (tr.khuangpute?.trim()) text += `Khuangpute: ${tr.khuangpute}\n`;
+        if (tr.hlaHriltu?.trim()) text += `Hla Hriltu: ${tr.hlaHriltu}\n`;
+        if (tr.thawhlawmKhawntute?.trim()) text += `Thawhlawm Khawntute: ${tr.thawhlawmKhawntute}\n`;
+        if (tr.lightAndSoundDuty?.trim()) text += `Light & Sound Duty: ${tr.lightAndSoundDuty}\n`;
+        text += `==============================\n\n`;
+      }
+    }
+
     (prog.days || []).forEach(day => {
       text += `📅 ${day.day} (${day.date})\n`;
       text += `------------------------------\n`;
@@ -302,6 +314,45 @@ const InkhawmProgrammeArchive: React.FC = () => {
                           </div>
                         )}
 
+                        {prog.tunKarRawngbawltute && (
+                          (prog.tunKarRawngbawltute.khuangpute?.trim() ||
+                           prog.tunKarRawngbawltute.hlaHriltu?.trim() ||
+                           prog.tunKarRawngbawltute.thawhlawmKhawntute?.trim() ||
+                           prog.tunKarRawngbawltute.lightAndSoundDuty?.trim())
+                        ) && (
+                          <div className="bg-stone-50 rounded-2xl p-6 border border-stone-200">
+                            <h4 className="text-base font-serif font-bold text-stone-900 mb-4 flex items-center gap-2">
+                              <Users className="h-5 w-5 text-church-burgundy" /> Tun Kar Rawngbawltute
+                            </h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                              {prog.tunKarRawngbawltute.khuangpute?.trim() && (
+                                <div className="bg-white p-3 rounded-xl border border-stone-200 shadow-sm">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Khuangpute</span>
+                                  <span className="text-stone-900 font-semibold text-sm">{prog.tunKarRawngbawltute.khuangpute}</span>
+                                </div>
+                              )}
+                              {prog.tunKarRawngbawltute.hlaHriltu?.trim() && (
+                                <div className="bg-white p-3 rounded-xl border border-stone-200 shadow-sm">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Hla Hriltu</span>
+                                  <span className="text-stone-900 font-semibold text-sm">{prog.tunKarRawngbawltute.hlaHriltu}</span>
+                                </div>
+                              )}
+                              {prog.tunKarRawngbawltute.thawhlawmKhawntute?.trim() && (
+                                <div className="bg-white p-3 rounded-xl border border-stone-200 shadow-sm">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Thawhlawm Khawntute</span>
+                                  <span className="text-stone-900 font-semibold text-sm">{prog.tunKarRawngbawltute.thawhlawmKhawntute}</span>
+                                </div>
+                              )}
+                              {prog.tunKarRawngbawltute.lightAndSoundDuty?.trim() && (
+                                <div className="bg-white p-3 rounded-xl border border-stone-200 shadow-sm">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Light & Sound Duty</span>
+                                  <span className="text-stone-900 font-semibold text-sm">{prog.tunKarRawngbawltute.lightAndSoundDuty}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="grid gap-6">
                           {(prog.days || []).map((dayGroup, dayIdx) => (
                             <div 
@@ -342,9 +393,11 @@ const InkhawmProgrammeArchive: React.FC = () => {
                                       )}
                                     </div>
 
-                                    {srv.fields && Object.keys(srv.fields).length > 0 && (
+                                    {srv.fields && Object.keys(srv.fields).filter(k => srv.fields![k] && srv.fields![k].trim() !== '').length > 0 && (
                                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {Object.entries(srv.fields).map(([label, val]) => (
+                                        {Object.entries(srv.fields)
+                                          .filter(([_, val]) => val && val.trim() !== '')
+                                          .map(([label, val]) => (
                                           <div 
                                             key={label} 
                                             className="bg-white p-3.5 rounded-xl border border-stone-200 shadow-2xs"
@@ -353,7 +406,7 @@ const InkhawmProgrammeArchive: React.FC = () => {
                                               {label}
                                             </span>
                                             <span className="text-sm font-semibold text-stone-800">
-                                              {val || '---'}
+                                              {val}
                                             </span>
                                           </div>
                                         ))}

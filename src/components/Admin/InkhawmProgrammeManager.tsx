@@ -673,6 +673,99 @@ export const InkhawmProgrammeManager: React.FC = () => {
         </div>
       </div>
 
+      {/* Tun Kar Rawngbawltute Editor */}
+      <div className="bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-8">
+        <h3 className="font-serif font-bold text-lg text-stone-900 mb-4 flex items-center gap-2">
+          Tun Kar Rawngbawltute
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+              Khuangpute
+            </label>
+            <input
+              type="text"
+              value={programme.tunKarRawngbawltute?.khuangpute || ''}
+              onChange={(e) => setProgramme(prev => ({ 
+                ...prev, 
+                tunKarRawngbawltute: { 
+                  ...prev.tunKarRawngbawltute, 
+                  khuangpute: e.target.value,
+                  hlaHriltu: prev.tunKarRawngbawltute?.hlaHriltu || '',
+                  thawhlawmKhawntute: prev.tunKarRawngbawltute?.thawhlawmKhawntute || '',
+                  lightAndSoundDuty: prev.tunKarRawngbawltute?.lightAndSoundDuty || ''
+                } 
+              }))}
+              placeholder="Khuangpute hming..."
+              className="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-burgundy"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+              Hla Hriltu
+            </label>
+            <input
+              type="text"
+              value={programme.tunKarRawngbawltute?.hlaHriltu || ''}
+              onChange={(e) => setProgramme(prev => ({ 
+                ...prev, 
+                tunKarRawngbawltute: { 
+                  ...prev.tunKarRawngbawltute, 
+                  khuangpute: prev.tunKarRawngbawltute?.khuangpute || '',
+                  hlaHriltu: e.target.value,
+                  thawhlawmKhawntute: prev.tunKarRawngbawltute?.thawhlawmKhawntute || '',
+                  lightAndSoundDuty: prev.tunKarRawngbawltute?.lightAndSoundDuty || ''
+                } 
+              }))}
+              placeholder="Hla hriltu hming..."
+              className="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-burgundy"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+              Thawhlawm Khawntute
+            </label>
+            <input
+              type="text"
+              value={programme.tunKarRawngbawltute?.thawhlawmKhawntute || ''}
+              onChange={(e) => setProgramme(prev => ({ 
+                ...prev, 
+                tunKarRawngbawltute: { 
+                  ...prev.tunKarRawngbawltute, 
+                  khuangpute: prev.tunKarRawngbawltute?.khuangpute || '',
+                  hlaHriltu: prev.tunKarRawngbawltute?.hlaHriltu || '',
+                  thawhlawmKhawntute: e.target.value,
+                  lightAndSoundDuty: prev.tunKarRawngbawltute?.lightAndSoundDuty || ''
+                } 
+              }))}
+              placeholder="Thawhlawm khawntute hming..."
+              className="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-burgundy"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+              Light & Sound Duty
+            </label>
+            <input
+              type="text"
+              value={programme.tunKarRawngbawltute?.lightAndSoundDuty || ''}
+              onChange={(e) => setProgramme(prev => ({ 
+                ...prev, 
+                tunKarRawngbawltute: { 
+                  ...prev.tunKarRawngbawltute,
+                  khuangpute: prev.tunKarRawngbawltute?.khuangpute || '',
+                  hlaHriltu: prev.tunKarRawngbawltute?.hlaHriltu || '',
+                  thawhlawmKhawntute: prev.tunKarRawngbawltute?.thawhlawmKhawntute || '',
+                  lightAndSoundDuty: e.target.value 
+                } 
+              }))}
+              placeholder="Light & sound duty te hming..."
+              className="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-burgundy"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Days & Services Editor Container */}
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">

@@ -14,6 +14,13 @@ export interface DayProgramme {
   note?: string;
 }
 
+export interface TunKarRawngbawltute {
+  khuangpute: string;
+  hlaHriltu: string;
+  thawhlawmKhawntute: string;
+  lightAndSoundDuty: string;
+}
+
 export interface WeeklyProgramme {
   id?: string;
   weekId?: string;
@@ -22,6 +29,7 @@ export interface WeeklyProgramme {
   weekEndDate: string;
   theme?: string;
   verse?: string;
+  tunKarRawngbawltute?: TunKarRawngbawltute;
   days: DayProgramme[];
   updatedAt?: string;
   updatedBy?: string;
