@@ -173,6 +173,8 @@ const Rawngbawltute = () => {
       csvContent += "field,value\nchairman,\nsecretary,\nasstSecretary,\ntreasurerTualchhung,\ntreasurerSynod,\nfinanceSecretary,";
     } else if (section === 'sundaySchool') {
       csvContent += "field,value\nsuperintendent,\nasstSuperintendentPTSS,\nasstSuperintendentNPSS,\nsecretary,\nasstSecretariesPTSS,\nasstSecretariesNPSS,\nsenior,\nsacrament,\nintermediate,\njunior,\nprimary,\nbeginner,\npreBeginner,";
+    } else if (section === 'puitlingTeachers') {
+      csvContent += "Zirtirtute\n";
     } else if (section === 'thuhriltute') {
       csvContent += "PathianniZan,PathianniChawhnu,InrinniZan\n";
     } else if (section === 'nilaiZanThupuiHawngtute') {
@@ -219,6 +221,11 @@ const Rawngbawltute = () => {
                 (newData.sundaySchool.deptLeaders as any)[row.field] = row.value;
               }
             }
+          });
+        } else if (uploadSection === 'puitlingTeachers') {
+          newData.sundaySchool.puitlingTeachers = [];
+          data.forEach(row => {
+            if (row.Zirtirtute) newData.sundaySchool.puitlingTeachers.push(row.Zirtirtute);
           });
         } else if (uploadSection === 'thuhriltute') {
           newData.thuhriltute.pathianniZan = [];
@@ -420,12 +427,6 @@ const Rawngbawltute = () => {
               {isEditing ? (
                 <>
                   <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileUpload} />
-                  <button onClick={downloadTemplate} className="flex items-center gap-2 px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-stone-300 transition-all">
-                    <Download className="h-4 w-4" /> Template
-                  </button>
-                  <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-stone-300 transition-all">
-                    <Upload className="h-4 w-4" /> Upload CSV
-                  </button>
                   <button 
                     onClick={handleSave}
                     disabled={isSaving}
@@ -514,6 +515,7 @@ const Rawngbawltute = () => {
 
               {/* C - Puitling Sunday School Zirtirtute */}
               <div className="space-y-6">
+                {renderUploadControls('puitlingTeachers')}
                 <h3 className="text-lg font-bold text-church-burgundy border-b border-stone-100 pb-2">C — Puitling Sunday School Zirtirtute</h3>
                 {renderArrayField("Zirtirtute", ["sundaySchool", "puitlingTeachers"], displayData.sundaySchool.puitlingTeachers)}
               </div>
