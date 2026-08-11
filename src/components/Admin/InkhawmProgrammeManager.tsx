@@ -236,7 +236,7 @@ export const InkhawmProgrammeManager: React.FC = () => {
 
   const handleAddService = (dayIdx: number) => {
     const newService: ServiceItem = {
-      title: "Inkhawm",
+      title: "Service Thar",
       time: "7:00 PM",
       fields: {
         "Hruaitu": "",

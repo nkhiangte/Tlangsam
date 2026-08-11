@@ -304,7 +304,9 @@ const Services = () => {
 
               {/* Day Services */}
               <div className="p-6 sm:p-8 divide-y divide-stone-100">
-                {dayGroup.services.map((service, sIdx) => (
+                {dayGroup.services
+                  .filter((service) => service.title !== "Inkhawm")
+                  .map((service, sIdx) => (
                   <div key={sIdx} className="py-6 first:pt-0 last:pb-0">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                       <div className="flex items-center gap-2.5">
