@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
+import Papa from 'papaparse';
 import { 
   Users, 
   Plus, 
@@ -12,10 +13,12 @@ import {
   BookOpen, 
   Mic2, 
   MessageSquare, 
-  Heart 
+  Heart,
+  Upload,
+  Download
 } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { doc, onSnapshot, setDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, collection, query, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
 interface ExecutiveBody {
@@ -118,6 +121,7 @@ const Rawngbawltute = () => {
   const [editData, setEditData] = useState<RawngbawltuteData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { isAdmin } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // We'll fetch the latest period. For now, we use a fixed ID or fetch the most recent.
@@ -159,6 +163,41 @@ const Rawngbawltute = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const downloadTemplate = () => {
+    // Generate a simple CSV template based on RawngbawltuteData structure
+    // This is a simplified flat structure example
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "field,value\n" +
+      "period,2024-2026\n" +
+      "chairman,\n" +
+      "secretary,\n" +
+      "asstSecretary,\n" +
+      "treasurerTualchhung,\n" +
+      "treasurerSynod,\n" +
+      "financeSecretary,";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "rawngbawltute_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      complete: (results) => {
+        // Here you would process the parsed CSV and update `editData`
+        console.log("Parsed CSV:", results.data);
+        alert("Upload feature is partially implemented. Check console for parsed data.");
+      }
+    });
   };
 
   const addArrayItem = (path: string[]) => {
@@ -313,6 +352,13 @@ const Rawngbawltute = () => {
             <div className="flex gap-3">
               {isEditing ? (
                 <>
+                  <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileUpload} />
+                  <button onClick={downloadTemplate} className="flex items-center gap-2 px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-stone-300 transition-all">
+                    <Download className="h-4 w-4" /> Template
+                  </button>
+                  <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-6 py-3 bg-stone-200 text-stone-700 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-stone-300 transition-all">
+                    <Upload className="h-4 w-4" /> Upload CSV
+                  </button>
                   <button 
                     onClick={handleSave}
                     disabled={isSaving}
