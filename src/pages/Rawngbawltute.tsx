@@ -174,11 +174,11 @@ const Rawngbawltute = () => {
     } else if (section === 'sundaySchool') {
       csvContent += "field,value\nsuperintendent,\nasstSuperintendentPTSS,\nasstSuperintendentNPSS,\nsecretary,\nasstSecretariesPTSS,\nasstSecretariesNPSS,\nsenior,\nsacrament,\nintermediate,\njunior,\nprimary,\nbeginner,\npreBeginner,";
     } else if (section === 'thuhriltute') {
-      csvContent += "name";
+      csvContent += "PathianniZan,PathianniChawhnu,InrinniZan\n";
     } else if (section === 'nilaiZanThupuiHawngtute') {
-      csvContent += "name";
+      csvContent += "Name\n";
     } else if (section === 'tantute') {
-      csvContent += "name";
+      csvContent += "SundaySchool,PathianniChawhnu,NilaiLehInrinniZan\n";
     }
 
     const encodedUri = encodeURI(csvContent);
@@ -196,22 +196,60 @@ const Rawngbawltute = () => {
 
     Papa.parse(file, {
       header: true,
+      skipEmptyLines: true,
       complete: (results) => {
         if (!editData) return;
         const newData = { ...editData };
+        const data = results.data as any[];
         
-        // Process data based on uploadSection
-        console.log(`Parsed CSV for ${uploadSection}:`, results.data);
-        
-        // Example implementation for one section to test
-        if (uploadSection === 'thuhriltute') {
-          // This would map names from CSV to a specific array in thuhriltute. e.g., pathianniZan
-          // Need more context from user which sub-section it maps to.
-          // For now, alerting user.
+        if (uploadSection === 'executiveBody') {
+          data.forEach(row => {
+            if (row.field && row.value !== undefined) {
+              if (row.field in newData.executiveBody) {
+                (newData.executiveBody as any)[row.field] = row.value;
+              }
+            }
+          });
+        } else if (uploadSection === 'sundaySchool') {
+          data.forEach(row => {
+            if (row.field && row.value !== undefined) {
+              if (row.field in newData.sundaySchool.hotute) {
+                (newData.sundaySchool.hotute as any)[row.field] = row.value;
+              } else if (row.field in newData.sundaySchool.deptLeaders) {
+                (newData.sundaySchool.deptLeaders as any)[row.field] = row.value;
+              }
+            }
+          });
+        } else if (uploadSection === 'thuhriltute') {
+          newData.thuhriltute.pathianniZan = [];
+          newData.thuhriltute.pathianniChawhnu = [];
+          newData.thuhriltute.inrinniZan = [];
+          
+          data.forEach(row => {
+            if (row.PathianniZan) newData.thuhriltute.pathianniZan.push(row.PathianniZan);
+            if (row.PathianniChawhnu) newData.thuhriltute.pathianniChawhnu.push(row.PathianniChawhnu);
+            if (row.InrinniZan) newData.thuhriltute.inrinniZan.push(row.InrinniZan);
+          });
+        } else if (uploadSection === 'nilaiZanThupuiHawngtute') {
+          newData.nilaiZanThupuiHawngtute = [];
+          data.forEach(row => {
+            if (row.Name) newData.nilaiZanThupuiHawngtute.push(row.Name);
+          });
+        } else if (uploadSection === 'tantute') {
+          newData.tantute.sundaySchool = [];
+          newData.tantute.pathianniChawhnu = [];
+          newData.tantute.nilaiLehInrinniZan = [];
+          
+          data.forEach(row => {
+            if (row.SundaySchool) newData.tantute.sundaySchool.push(row.SundaySchool);
+            if (row.PathianniChawhnu) newData.tantute.pathianniChawhnu.push(row.PathianniChawhnu);
+            if (row.NilaiLehInrinniZan) newData.tantute.nilaiLehInrinniZan.push(row.NilaiLehInrinniZan);
+          });
         }
         
-        alert(`Upload for ${uploadSection} is partially implemented.`);
+        setEditData(newData);
         setUploadSection(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
       }
     });
   };
