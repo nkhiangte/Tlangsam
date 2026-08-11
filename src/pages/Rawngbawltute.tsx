@@ -120,6 +120,7 @@ const Rawngbawltute = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<RawngbawltuteData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadSection, setUploadSection] = useState<string | null>(null);
   const { isAdmin } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -165,22 +166,25 @@ const Rawngbawltute = () => {
     }
   };
 
-  const downloadTemplate = () => {
-    // Generate a simple CSV template based on RawngbawltuteData structure
-    // This is a simplified flat structure example
-    const csvContent = "data:text/csv;charset=utf-8," + 
-      "field,value\n" +
-      "period,2024-2026\n" +
-      "chairman,\n" +
-      "secretary,\n" +
-      "asstSecretary,\n" +
-      "treasurerTualchhung,\n" +
-      "treasurerSynod,\n" +
-      "financeSecretary,";
+  const downloadTemplate = (section: string) => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    if (section === 'executiveBody') {
+      csvContent += "field,value\nchairman,\nsecretary,\nasstSecretary,\ntreasurerTualchhung,\ntreasurerSynod,\nfinanceSecretary,";
+    } else if (section === 'sundaySchool') {
+      csvContent += "field,value\nsuperintendent,\nasstSuperintendentPTSS,\nasstSuperintendentNPSS,\nsecretary,\nasstSecretariesPTSS,\nasstSecretariesNPSS,\nsenior,\nsacrament,\nintermediate,\njunior,\nprimary,\nbeginner,\npreBeginner,";
+    } else if (section === 'thuhriltute') {
+      csvContent += "name";
+    } else if (section === 'nilaiZanThupuiHawngtute') {
+      csvContent += "name";
+    } else if (section === 'tantute') {
+      csvContent += "name";
+    }
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "rawngbawltute_template.csv");
+    link.setAttribute("download", `${section}_template.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -188,14 +192,26 @@ const Rawngbawltute = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !uploadSection) return;
 
     Papa.parse(file, {
       header: true,
       complete: (results) => {
-        // Here you would process the parsed CSV and update `editData`
-        console.log("Parsed CSV:", results.data);
-        alert("Upload feature is partially implemented. Check console for parsed data.");
+        if (!editData) return;
+        const newData = { ...editData };
+        
+        // Process data based on uploadSection
+        console.log(`Parsed CSV for ${uploadSection}:`, results.data);
+        
+        // Example implementation for one section to test
+        if (uploadSection === 'thuhriltute') {
+          // This would map names from CSV to a specific array in thuhriltute. e.g., pathianniZan
+          // Need more context from user which sub-section it maps to.
+          // For now, alerting user.
+        }
+        
+        alert(`Upload for ${uploadSection} is partially implemented.`);
+        setUploadSection(null);
       }
     });
   };
@@ -299,6 +315,19 @@ const Rawngbawltute = () => {
       </div>
     </div>
   )};
+
+  const renderUploadControls = (section: string) => (
+    isEditing ? (
+      <div className="flex gap-2 mt-4">
+        <button onClick={() => downloadTemplate(section)} className="flex items-center gap-1 px-3 py-1.5 bg-stone-200 text-stone-700 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-stone-300 transition-all">
+          <Download className="h-3 w-3" /> Template
+        </button>
+        <button onClick={() => { setUploadSection(section); fileInputRef.current?.click(); }} className="flex items-center gap-1 px-3 py-1.5 bg-stone-200 text-stone-700 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-stone-300 transition-all">
+          <Upload className="h-3 w-3" /> Upload
+        </button>
+      </div>
+    ) : null
+  );
 
   const renderInputField = (label: string, path: string[], value: string) => {
     if (!isEditing && (!value || value.trim() === "")) return null;
@@ -404,6 +433,7 @@ const Rawngbawltute = () => {
               {renderInputField("Treasurer (Tualchhung)", ["executiveBody", "treasurerTualchhung"], displayData.executiveBody.treasurerTualchhung)}
               {renderInputField("Treasurer (Synod)", ["executiveBody", "treasurerSynod"], displayData.executiveBody.treasurerSynod)}
               {renderInputField("Finance Secretary", ["executiveBody", "financeSecretary"], displayData.executiveBody.financeSecretary)}
+              <div className="px-8 pb-4">{renderUploadControls('executiveBody')}</div>
             </div>
           </section>
 
@@ -418,6 +448,7 @@ const Rawngbawltute = () => {
             <div className="p-8 space-y-12">
               {/* A - Hotute */}
               <div className="space-y-6">
+                {renderUploadControls('sundaySchool')}
                 <h3 className="text-lg font-bold text-church-burgundy border-b border-stone-100 pb-2">A — Hotute</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {renderInputField("Superintendent", ["sundaySchool", "hotute", "superintendent"], displayData.sundaySchool.hotute.superintendent)}
@@ -460,6 +491,7 @@ const Rawngbawltute = () => {
               <h2 className="text-2xl font-serif text-white">3. THUHRILTUTE</h2>
             </div>
             <div className="p-8 space-y-12">
+              {renderUploadControls('thuhriltute')}
               {renderArrayField("A — Pathianni Zan", ["thuhriltute", "pathianniZan"], displayData.thuhriltute.pathianniZan)}
               {renderArrayField("B — Pathianni Chawhnu", ["thuhriltute", "pathianniChawhnu"], displayData.thuhriltute.pathianniChawhnu)}
               {renderArrayField("C — Inrinni Zan", ["thuhriltute", "inrinniZan"], displayData.thuhriltute.inrinniZan)}
@@ -475,6 +507,7 @@ const Rawngbawltute = () => {
               <h2 className="text-2xl font-serif text-white">4. NILAI ZAN THUPUI HAWNGTUTE</h2>
             </div>
             <div className="p-8">
+              {renderUploadControls('nilaiZanThupuiHawngtute')}
               {renderArrayField("Thupui Hawngtute", ["nilaiZanThupuiHawngtute"], displayData.nilaiZanThupuiHawngtute)}
             </div>
           </section>
@@ -488,6 +521,7 @@ const Rawngbawltute = () => {
               <h2 className="text-2xl font-serif text-white">5. TANTUTE</h2>
             </div>
             <div className="p-8 space-y-12">
+              {renderUploadControls('tantute')}
               {renderArrayField("A — Sunday School", ["tantute", "sundaySchool"], displayData.tantute.sundaySchool)}
               {renderArrayField("B — Pathianni Chawhnu", ["tantute", "pathianniChawhnu"], displayData.tantute.pathianniChawhnu)}
               {renderArrayField("C — Nilai leh Inrinni Zan", ["tantute", "nilaiLehInrinniZan"], displayData.tantute.nilaiLehInrinniZan)}
