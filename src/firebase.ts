@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDocFromServer } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -9,7 +8,23 @@ import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
+
+// Initialize Analytics conditionally and safely
+export let analytics: import("firebase/analytics").Analytics | null = null;
+if (typeof window !== "undefined" && firebaseConfig.measurementId && firebaseConfig.measurementId.trim() !== "") {
+  import("firebase/analytics").then(({ getAnalytics, isSupported }) => {
+    isSupported().then((supported) => {
+      if (supported) {
+        try {
+          analytics = getAnalytics(app);
+        } catch (e) {
+          // Ignore analytics initialization errors in sandbox / restricted environments
+        }
+      }
+    }).catch(() => {});
+  }).catch(() => {});
+}
+
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
 export const auth = getAuth(app);
 export const storage = getStorage(app);

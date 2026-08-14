@@ -23,7 +23,8 @@ import {
   Search,
   CheckCircle,
   FileSpreadsheet,
-  Phone
+  Phone,
+  LogOut
 } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -65,7 +66,7 @@ const DEFAULT_OB_ROLES = [
 ];
 
 const AdminPanel = () => {
-  const { isAdmin, user, loading: authLoading } = useAuth();
+  const { isAdmin, user, loading: authLoading, logout } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -410,9 +411,21 @@ const AdminPanel = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
-          <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all mb-6">
-            <ArrowLeft className="h-4 w-4" /> Back to Home
-          </Link>
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <Link to="/" className="inline-flex items-center gap-2 text-church-burgundy font-medium hover:gap-3 transition-all">
+              <ArrowLeft className="h-4 w-4" /> Back to Home
+            </Link>
+            <button 
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              className="inline-flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+              title="Sign Out / Log Out"
+            >
+              <LogOut className="h-3.5 w-3.5 text-red-500" /> Sign Out (Chhuak rawh)
+            </button>
+          </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <p className="text-stone-600 max-w-2xl">Kohhran enkawlna leh record vawn thatna hmun.</p>
