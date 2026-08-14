@@ -265,18 +265,20 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, 
   // Template Download Handler (CSV or Excel)
   const handleDownloadTemplate = (format: 'csv' | 'xlsx') => {
     const templateRows = [
-      { Type: "Office Bearer", Role: "Chairman", Name: "Pu Chairman Hming", Phone: "9876543210" },
-      { Type: "Office Bearer", Role: "Vice Chairman", Name: "Pu Vice Chairman Hming", Phone: "9876543211" },
-      { Type: "Office Bearer", Role: "Secretary", Name: "Pu Secretary Hming", Phone: "9876543212" },
-      { Type: "Office Bearer", Role: "Asst. Secretary", Name: "Pu Asst Secretary Hming", Phone: "9876543213" },
-      { Type: "Office Bearer", Role: "Treasurer", Name: "Pi Treasurer Hming", Phone: "9876543214" },
-      { Type: "Office Bearer", Role: "Finance Secretary", Name: "Pu Finance Secretary Hming", Phone: "9876543215" },
-      { Type: "Member", Role: "Member", Name: "Pu Committee Member 1", Phone: "9876543216" },
-      { Type: "Member", Role: "Member", Name: "Pi Committee Member 2", Phone: "9876543217" },
-      { Type: "Member", Role: "Member", Name: "Pu Committee Member 3", Phone: "9876543218" }
+      { Category: "Office Bearer", Role: "Chairman", Name: "Pu Chairman Hming", Phone: "9876543210" },
+      { Category: "Office Bearer", Role: "Vice Chairman", Name: "Pu Vice Chairman Hming", Phone: "9876543211" },
+      { Category: "Office Bearer", Role: "Secretary", Name: "Pu Secretary Hming", Phone: "9876543212" },
+      { Category: "Office Bearer", Role: "Asst. Secretary", Name: "Pu Asst Secretary Hming", Phone: "9876543213" },
+      { Category: "Office Bearer", Role: "Treasurer", Name: "Pi Treasurer Hming", Phone: "9876543214" },
+      { Category: "Office Bearer", Role: "Finance Secretary", Name: "Pu Finance Secretary Hming", Phone: "9876543215" },
+      { Category: "Member", Role: "Member", Name: "Pu Committee Member 1", Phone: "9876543216" },
+      { Category: "Member", Role: "Member", Name: "Pi Committee Member 2", Phone: "9876543217" },
+      { Category: "Member", Role: "Member", Name: "Pu Committee Member 3", Phone: "9876543218" },
+      { Category: "Member", Role: "Member", Name: "Pi Committee Member 4", Phone: "9876543219" },
+      { Category: "Member", Role: "Member", Name: "Pu Committee Member 5", Phone: "9876543220" }
     ];
 
-    const safeTitle = (data?.name || defaultName).replace(/[^a-zA-Z0-9]/g, '_');
+    const safeTitle = (data?.name || fallbackTitle).replace(/[^a-zA-Z0-9]/g, '_');
 
     if (format === 'csv') {
       const csv = Papa.unparse(templateRows);
@@ -290,8 +292,14 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, 
       document.body.removeChild(link);
     } else {
       const worksheet = XLSX.utils.json_to_sheet(templateRows);
+      worksheet['!cols'] = [
+        { wch: 18 },
+        { wch: 22 },
+        { wch: 30 },
+        { wch: 18 },
+      ];
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Committee");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Committee Roster");
       XLSX.writeFile(workbook, `${safeTitle}_OB_and_Members_Template.xlsx`);
     }
   };
@@ -309,6 +317,38 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, 
         return;
       }
 
+      // Helper to extract a column value from a row object with multiple alias options
+      const extractField = (row: any, aliases: string[]): string => {
+        const keys = Object.keys(row);
+        // 1. Try exact match on clean lowercase string
+        for (const alias of aliases) {
+          for (const k of keys) {
+            const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanKey === alias) {
+              const val = row[k];
+              if (val !== undefined && val !== null) {
+                const str = String(val).trim();
+                if (str !== '') return str;
+              }
+            }
+          }
+        }
+        // 2. Try prefix/includes match
+        for (const alias of aliases) {
+          for (const k of keys) {
+            const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanKey.includes(alias) || (alias.length >= 4 && cleanKey.startsWith(alias))) {
+              const val = row[k];
+              if (val !== undefined && val !== null) {
+                const str = String(val).trim();
+                if (str !== '') return str;
+              }
+            }
+          }
+        }
+        return '';
+      };
+
       // Prepare target OB list
       const currentOBs = isEditingRoster 
         ? [...editOB] 
@@ -319,67 +359,120 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, 
       let memberCount = 0;
 
       rows.forEach((row: any) => {
-        // Find keys flexibly
-        const keys = Object.keys(row);
-        const findVal = (terms: string[]) => {
-          for (const k of keys) {
-            const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-            for (const t of terms) {
-              if (cleanKey.includes(t)) {
-                return String(row[k] || '').trim();
-              }
-            }
-          }
-          return '';
-        };
+        const category = extractField(row, ['category', 'type', 'group', 'classification', 'obormember', 'obmember', 'section']);
+        const role = extractField(row, ['role', 'designation', 'mawhphurhna', 'position', 'post', 'title']);
+        const name = extractField(row, ['name', 'hming', 'fullname', 'membername', 'person', 'obname']);
+        const phone = extractField(row, ['phone', 'phonenumber', 'contact', 'mobile', 'mobilenumber', 'tel', 'whatsapp', 'cell', 'ph']);
 
-        const role = findVal(['role', 'mawhphurhna', 'position', 'post', 'designation', 'type']);
-        const name = findVal(['name', 'hming', 'member', 'memberName', 'fullname']);
-        const phone = findVal(['phone', 'contact', 'mobile', 'tel', 'cell']);
+        // Skip completely empty rows
+        if (!name && !phone && !role) return;
 
-        if (!name && !phone) return;
+        const roleClean = role.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+        const catClean = category.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
-        // Check if role corresponds to an OB
-        const lowerRole = role.toLowerCase();
+        // Determine if this row is an Office Bearer vs Committee Member
+        const isExplicitOB = catClean.includes('ob') || 
+                             catClean.includes('office bearer') || 
+                             catClean.includes('officebearer') || 
+                             catClean.includes('hruaitu') ||
+                             catClean.includes('leader');
+
+        const isExplicitMember = (catClean.includes('member') && !isExplicitOB) || 
+                                 roleClean === 'member' || 
+                                 roleClean === 'committee member' || 
+                                 roleClean === 'memberte' ||
+                                 roleClean === 'cm';
+
+        // Check for specific OB roles
         let matchedOBIdx = -1;
 
-        if (lowerRole.includes('vice') && lowerRole.includes('chair')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'vice chairman');
-        } else if (lowerRole.includes('chair')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'chairman');
-        } else if (lowerRole.includes('asst') && lowerRole.includes('sec')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'asst. secretary');
-        } else if (lowerRole.includes('finance') || lowerRole.includes('fin')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'finance secretary');
-        } else if (lowerRole.includes('treasurer') || lowerRole.includes('sumvawng')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'treasurer');
-        } else if (lowerRole.includes('sec') || lowerRole.includes('secretary')) {
-          matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase() === 'secretary');
+        if (!isExplicitMember) {
+          // 1. Vice Chairman
+          if (
+            (roleClean.includes('vice') || roleClean.startsWith('v ') || roleClean.startsWith('v-') || roleClean.includes(' v chair')) &&
+            (roleClean.includes('chair') || roleClean.includes('president'))
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase().includes('vice') && o.role.toLowerCase().includes('chair'));
+          }
+          // 2. Chairman (must not be vice)
+          else if (
+            (roleClean.includes('chair') || roleClean === 'president' || roleClean === 'chairman') &&
+            !roleClean.includes('vice') && !roleClean.startsWith('v ')
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase().includes('chair') && !o.role.toLowerCase().includes('vice'));
+          }
+          // 3. Asst. Secretary
+          else if (
+            (roleClean.includes('asst') || roleClean.includes('assistant') || roleClean.includes('joint') || roleClean.includes('jt')) &&
+            (roleClean.includes('sec') || roleClean.includes('secretary') || roleClean.includes('secy'))
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => (o.role.toLowerCase().includes('asst') || o.role.toLowerCase().includes('assistant')) && o.role.toLowerCase().includes('sec'));
+          }
+          // 4. Finance Secretary
+          else if (
+            (roleClean.includes('finance') || roleClean.includes('fin')) &&
+            (roleClean.includes('sec') || roleClean.includes('secretary') || roleClean.includes('secy'))
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => (o.role.toLowerCase().includes('finance') || o.role.toLowerCase().includes('fin')) && o.role.toLowerCase().includes('sec'));
+          }
+          // 5. Secretary (General)
+          else if (
+            (roleClean === 'secretary' || roleClean === 'secy' || roleClean.includes('general secretary') || roleClean.includes('gen secretary') || roleClean === 'sec') ||
+            (roleClean.includes('sec') && !roleClean.includes('asst') && !roleClean.includes('fin') && !roleClean.includes('assistant') && !roleClean.includes('joint'))
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => {
+              const r = o.role.toLowerCase();
+              return r.includes('sec') && !r.includes('asst') && !r.includes('fin') && !r.includes('assistant') && !r.includes('finance');
+            });
+          }
+          // 6. Treasurer / Sumvawngtu
+          else if (
+            roleClean.includes('treasurer') || roleClean.includes('treas') || roleClean.includes('sumvawng')
+          ) {
+            matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase().includes('treasurer') || o.role.toLowerCase().includes('sumvawng'));
+          }
+          // 7. Exact match with any existing OB role in currentOBs
+          else if (roleClean) {
+            matchedOBIdx = currentOBs.findIndex(o => o.role.toLowerCase().trim() === roleClean);
+          }
         }
 
+        // Apply placement
         if (matchedOBIdx !== -1) {
+          // Matched to an existing OB slot
           currentOBs[matchedOBIdx] = {
             ...currentOBs[matchedOBIdx],
             name: name || currentOBs[matchedOBIdx].name,
             phone: phone || currentOBs[matchedOBIdx].phone
           };
           obMatchCount++;
+        } else if (isExplicitOB && role && !isExplicitMember) {
+          // Custom extra OB role specified in CSV
+          currentOBs.push({
+            role: role,
+            name: name,
+            phone: phone
+          });
+          obMatchCount++;
         } else {
-          // It's a committee member
-          if (name) {
-            newMembers.push({ name, phone });
+          // Regular Committee Member
+          if (name || phone) {
+            newMembers.push({ 
+              name: name || 'Member', 
+              phone: phone 
+            });
             memberCount++;
           }
         }
       });
 
-      // Update state
+      // Update states
       setEditOB(currentOBs);
       if (newMembers.length > 0) {
         setEditMembers(newMembers);
       }
       setIsEditingRoster(true);
-      setImportStatus(`Imported successfully: ${obMatchCount} Office Bearers & ${memberCount} Members. Review below and click "Save Changes".`);
+      setImportStatus(`Imported successfully: ${obMatchCount} Office Bearers & ${memberCount} Members from "${file.name}". Review below and click "Save Changes".`);
       
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
@@ -590,13 +683,21 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, 
                     >
                       <Upload className="h-4 w-4" /> Upload CSV/Excel
                     </button>
-                    <div className="relative group">
+                    <div className="flex items-center bg-stone-800 rounded-xl border border-stone-700 p-0.5">
                       <button 
                         onClick={() => handleDownloadTemplate('xlsx')}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl font-bold text-xs uppercase tracking-wider border border-stone-700 transition-all"
-                        title="Download template"
+                        className="flex items-center gap-1.5 px-3 py-2 hover:bg-stone-700 text-stone-200 rounded-lg font-bold text-xs uppercase tracking-wider transition-all"
+                        title="Download Excel template containing both Office Bearers and Members"
                       >
-                        <Download className="h-4 w-4" /> Template (.xlsx)
+                        <Download className="h-3.5 w-3.5 text-church-gold" /> Template (.xlsx)
+                      </button>
+                      <div className="h-4 w-px bg-stone-700" />
+                      <button 
+                        onClick={() => handleDownloadTemplate('csv')}
+                        className="flex items-center gap-1.5 px-3 py-2 hover:bg-stone-700 text-stone-300 rounded-lg font-bold text-xs uppercase tracking-wider transition-all"
+                        title="Download CSV template containing both Office Bearers and Members"
+                      >
+                        <Download className="h-3.5 w-3.5 text-church-gold" /> .CSV
                       </button>
                     </div>
                     <Link
