@@ -8,19 +8,24 @@ import {
   UserMinus, 
   Edit, 
   Save, 
-  X,
-  Plus,
-  Trash2,
-  Loader2,
-  ArrowLeft,
-  Sparkles,
-  Camera,
-  Ban,
-  Lock,
-  Unlock,
-  UserPlus
+  X, 
+  Plus, 
+  Trash2, 
+  Loader2, 
+  ArrowLeft, 
+  Sparkles, 
+  Camera, 
+  Ban, 
+  Lock, 
+  Unlock, 
+  UserPlus,
+  ExternalLink,
+  Search,
+  CheckCircle,
+  FileSpreadsheet,
+  Phone
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -30,10 +35,10 @@ import {
   doc, 
   updateDoc, 
   setDoc, 
-  getDocs,
-  query,
-  where,
-  deleteDoc
+  getDocs, 
+  query, 
+  where, 
+  deleteDoc 
 } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { initializeApp } from 'firebase/app';
@@ -41,10 +46,34 @@ import { getAuth, createUserWithEmailAndPassword, signOut as firebaseSignOut } f
 import firebaseConfig from '../../firebase-applet-config.json';
 import { InkhawmProgrammeManager } from '../../components/Admin/InkhawmProgrammeManager';
 
+const DEFAULT_COMMITTEE_LIST = [
+  { id: 'kohhran', name: 'Kohhran Committee', description: 'Kohhran inrelbawlna leh hmalakna hrang hrangte reltu leh kengkawhtu bawk.' },
+  { id: 'sunday-school', name: 'Sunday School Committee', description: 'Sunday School zirlaibu, zirtirtute leh naupangte enkawlna leh hmalakna.' },
+  { id: 'ramthar', name: 'Ramthar Committee', description: 'Chanchin tha puandarhna leh Ramthar rawngbawlna puih leh buaipui kawnga hmalatu.' },
+  { id: 'bsi', name: 'BSI Committee', description: 'Bible Society of India rawngbawlna leh Bible thehdarh kawnga Kohhran hmalakna.' },
+  { id: 'refreshment', name: 'Refreshment Committee', description: 'Kohhran inkhawmpui, ruai leh programme hrang hranga eitur leh in tur ruahmanna buaipuitu.' },
+  { id: 'light-sound', name: 'Light & Sound Committee', description: 'Biak In leh hall hrang hranga eng leh sound system enkawl leh buaipuitu.' }
+];
+
+const DEFAULT_OB_ROLES = [
+  "Chairman",
+  "Vice Chairman",
+  "Secretary",
+  "Asst. Secretary",
+  "Treasurer",
+  "Finance Secretary"
+];
+
 const AdminPanel = () => {
   const { isAdmin, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'services' | 'records' | 'committees' | 'fellowships' | 'inspiration'>('users');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const tabParam = searchParams.get('tab') as 'users' | 'services' | 'records' | 'committees' | 'fellowships' | 'inspiration' | null;
+  const [activeTab, setActiveTab] = useState<'users' | 'services' | 'records' | 'committees' | 'fellowships' | 'inspiration'>(
+    tabParam && ['users', 'services', 'records', 'committees', 'fellowships', 'inspiration'].includes(tabParam) ? tabParam : 'users'
+  );
+  
   const [users, setUsers] = useState<any[]>([]);
   const [committees, setCommittees] = useState<any[]>([]);
   const [fellowships, setFellowships] = useState<any[]>([]);
@@ -56,7 +85,77 @@ const AdminPanel = () => {
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserName, setNewUserName] = useState('');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
-  
+
+  // Committee Management States
+  const [committeeSearch, setCommitteeSearch] = useState('');
+  const [isCreateCommitteeModalOpen, setIsCreateCommitteeModalOpen] = useState(false);
+  const [newCommName, setNewCommName] = useState('');
+  const [newCommId, setNewCommId] = useState('');
+  const [newCommDesc, setNewCommDesc] = useState('');
+  const [newCommMeeting, setNewCommMeeting] = useState('Thla tin Thawhtan zan hmasa ber');
+  const [newCommIncludeOB, setNewCommIncludeOB] = useState(true);
+  const [isCreatingCommittee, setIsCreatingCommittee] = useState(false);
+
+  // Auto-slugify committee name to ID if ID is not manually modified
+  const handleCommNameChange = (val: string) => {
+    setNewCommName(val);
+    const slug = val
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
+    setNewCommId(slug);
+  };
+
+  const handleCreateNewCommitteeCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCommName.trim()) {
+      alert("Committee hming ziak rawh le.");
+      return;
+    }
+    
+    const finalId = (newCommId.trim() || newCommName.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')).replace(/^-+|-+$/g, '');
+    if (!finalId) {
+      alert("Committee ID dik tawk lo.");
+      return;
+    }
+
+    setIsCreatingCommittee(true);
+    try {
+      const initialOB = newCommIncludeOB 
+        ? DEFAULT_OB_ROLES.map(role => ({ role, name: '', phone: '' }))
+        : [];
+
+      const newCommitteeDoc = {
+        name: newCommName.trim(),
+        description: newCommDesc.trim() || `${newCommName.trim()} rawngbawlna leh hmalakna hrang hrangte.`,
+        meetingTime: newCommMeeting.trim() || 'Committee thutkhawm hun leh hmun hrang hrangte.',
+        officeBearers: initialOB,
+        members: [],
+        activities: [],
+        reports: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'committees', finalId), newCommitteeDoc, { merge: true });
+      
+      // Reset form
+      setNewCommName('');
+      setNewCommId('');
+      setNewCommDesc('');
+      setNewCommMeeting('Thla tin Thawhtan zan hmasa ber');
+      setIsCreateCommitteeModalOpen(false);
+
+      alert(`"${newCommitteeDoc.name}" category thar siam a ni ta! Committee page-ah i kal thei e.`);
+      navigate(`/committee/${finalId}`);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, `committees/${finalId}`);
+    } finally {
+      setIsCreatingCommittee(false);
+    }
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserEmail || !newUserPassword || !newUserName) return;
@@ -113,11 +212,34 @@ const AdminPanel = () => {
   useEffect(() => {
     if (!isAdmin) return;
     const unsubscribe = onSnapshot(collection(db, 'committees'), (snapshot) => {
-      const list = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setCommittees(list);
+      const dbMap = new Map<string, any>();
+      
+      // Default baseline
+      DEFAULT_COMMITTEE_LIST.forEach(def => {
+        dbMap.set(def.id, {
+          id: def.id,
+          name: def.name,
+          description: def.description,
+          meetingTime: "Committee thutkhawm hun leh hmun hrang hrangte.",
+          officeBearers: DEFAULT_OB_ROLES.map(role => ({ role, name: '', phone: '' })),
+          members: [],
+          activities: [],
+          reports: ''
+        });
+      });
+
+      // Overlay Firestore data
+      snapshot.docs.forEach(docSnap => {
+        const d = docSnap.data();
+        const existing = dbMap.get(docSnap.id) || {};
+        dbMap.set(docSnap.id, {
+          id: docSnap.id,
+          ...existing,
+          ...d
+        });
+      });
+
+      setCommittees(Array.from(dbMap.values()));
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'committees');
     });
@@ -348,107 +470,318 @@ const AdminPanel = () => {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-8"
               >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-serif">Committee Management</h2>
-                  <button 
-                    onClick={() => {
-                      const id = prompt("Committee ID (e.g. kohhran, sunday-school):");
-                      if (id) handleSaveCommittee(id, { name: "", description: "", meetingTime: "", members: [], officeBearers: [], activities: [], reports: "" });
-                    }}
-                    className="flex items-center gap-2 text-church-burgundy hover:text-church-gold transition-all font-medium"
-                  >
-                    <Plus className="h-4 w-4" /> Committee thar belhna
-                  </button>
+                {/* Header & Actions */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200">
+                  <div>
+                    <h2 className="text-2xl font-serif font-bold text-stone-900 flex items-center gap-2">
+                      Committee Categories ({committees.length})
+                    </h2>
+                    <p className="text-sm text-stone-500 mt-1">
+                      Committee category thar siam leh OB / member-te enkawlna hmun.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                      <input 
+                        type="text" 
+                        value={committeeSearch}
+                        onChange={(e) => setCommitteeSearch(e.target.value)}
+                        placeholder="Search committee..."
+                        className="pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-church-gold"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => setIsCreateCommitteeModalOpen(true)}
+                      className="flex items-center gap-2 bg-church-burgundy hover:bg-church-burgundy/90 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md transition-all whitespace-nowrap"
+                    >
+                      <Plus className="h-4 w-4" /> Category Thar Belhna
+                    </button>
+                  </div>
                 </div>
 
-                <div className="grid gap-6">
-                  {committees.map((committee) => (
-                    <div key={committee.id} className="p-6 border border-stone-100 rounded-2xl bg-stone-50/50 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 grid md:grid-cols-3 gap-4">
+                {/* Modal for Creating New Committee Category */}
+                <AnimatePresence>
+                  {isCreateCommitteeModalOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+                    >
+                      <motion.div 
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        className="bg-white rounded-3xl max-w-xl w-full p-6 md:p-8 shadow-2xl border border-stone-100 overflow-hidden"
+                      >
+                        <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-6">
                           <div>
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hming</label>
+                            <span className="text-xs font-bold uppercase tracking-widest text-church-burgundy">Committee Management</span>
+                            <h3 className="text-xl font-serif font-bold text-stone-900 mt-1">Committee Category Thar Siamna</h3>
+                          </div>
+                          <button 
+                            onClick={() => setIsCreateCommitteeModalOpen(false)}
+                            className="p-2 text-stone-400 hover:text-stone-600 rounded-full hover:bg-stone-100 transition-colors"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <form onSubmit={handleCreateNewCommitteeCategory} className="space-y-4">
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                              Committee Hming / Category Name <span className="text-red-500">*</span>
+                            </label>
                             <input 
                               type="text" 
-                              value={committee.name}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, name: e.target.value } : c);
-                                setCommittees(newList);
-                              }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
+                              required
+                              value={newCommName}
+                              onChange={(e) => handleCommNameChange(e.target.value)}
+                              placeholder="e.g. Building Committee, Music & Choir Committee"
+                              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-stone-900 font-medium focus:outline-none focus:border-church-gold"
                             />
                           </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Hrilhfiahna</label>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                              URL Slug / Identifier <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-stone-400 font-mono">/committee/</span>
+                              <input 
+                                type="text" 
+                                required
+                                value={newCommId}
+                                onChange={(e) => setNewCommId(e.target.value)}
+                                placeholder="building-committee"
+                                className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 font-mono text-sm focus:outline-none focus:border-church-gold"
+                              />
+                            </div>
+                            <p className="text-[11px] text-stone-400 mt-1">Hemi URL hmang hian committee page a in hawng ang.</p>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                              Hrilhfiahna / Description
+                            </label>
+                            <textarea 
+                              value={newCommDesc}
+                              onChange={(e) => setNewCommDesc(e.target.value)}
+                              rows={2}
+                              placeholder="He committee mawhphurhna leh hmalaknate..."
+                              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-gold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                              Inkhawm / Meeting Time
+                            </label>
                             <input 
                               type="text" 
-                              value={committee.description}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, description: e.target.value } : c);
-                                setCommittees(newList);
-                              }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
+                              value={newCommMeeting}
+                              onChange={(e) => setNewCommMeeting(e.target.value)}
+                              placeholder="e.g. Thla tin Thawhtan zan hmasa ber"
+                              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-gold"
                             />
                           </div>
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Inkhawm Hun / Meeting Time</label>
+
+                          <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200 flex items-center gap-3 cursor-pointer" onClick={() => setNewCommIncludeOB(!newCommIncludeOB)}>
                             <input 
-                              type="text" 
-                              value={committee.meetingTime || ""}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, meetingTime: e.target.value } : c);
-                                setCommittees(newList);
-                              }}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
+                              type="checkbox"
+                              checked={newCommIncludeOB}
+                              onChange={(e) => setNewCommIncludeOB(e.target.checked)}
+                              className="h-4 w-4 rounded accent-church-burgundy"
                             />
+                            <div className="text-xs">
+                              <span className="font-bold text-stone-800">Office Bearer (OB) pangngai 6 te telh nghal rawh</span>
+                              <p className="text-stone-500 mt-0.5">Chairman, Vice Chairman, Secretary, Asst. Secretary, Treasurer, Finance Secretary</p>
+                            </div>
                           </div>
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Office Bearers</label>
-                            <div className="grid sm:grid-cols-2 gap-4">
-                              {(committee.officeBearers || []).map((ob: any, obIdx: number) => {
-                                const isStructured = typeof ob === 'object' && ob !== null;
-                                const role = isStructured ? ob.role : ob.split(':')[0];
-                                const name = isStructured ? ob.name : ob.split(':')[1];
-                                const phone = isStructured ? ob.phone : "";
-                                
-                                return (
-                                  <div key={obIdx} className="p-3 bg-white border border-stone-200 rounded-xl space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <input 
-                                        type="text" 
-                                        value={role}
-                                        onChange={(e) => {
-                                          const newList = [...committee.officeBearers];
-                                          newList[obIdx] = { role: e.target.value, name, phone };
-                                          const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
-                                          setCommittees(newCommittees);
-                                        }}
-                                        className="text-xs font-bold text-church-burgundy uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-stone-400"
-                                        placeholder="Role"
-                                      />
-                                      <button 
-                                        onClick={() => {
-                                          const newList = committee.officeBearers.filter((_: any, i: number) => i !== obIdx);
-                                          const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
-                                          setCommittees(newCommittees);
-                                        }}
-                                        className="text-red-400 hover:text-red-600"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </button>
-                                    </div>
+
+                          <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-100">
+                            <button 
+                              type="button"
+                              onClick={() => setIsCreateCommitteeModalOpen(false)}
+                              className="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button 
+                              type="submit"
+                              disabled={isCreatingCommittee}
+                              className="flex items-center gap-2 px-6 py-2.5 bg-church-burgundy hover:bg-church-burgundy/90 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg transition-all disabled:opacity-50"
+                            >
+                              {isCreatingCommittee ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                              Siam & Open Page
+                            </button>
+                          </div>
+                        </form>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Committees List */}
+                <div className="grid gap-6">
+                  {committees
+                    .filter(c => 
+                      !committeeSearch || 
+                      (c.name || '').toLowerCase().includes(committeeSearch.toLowerCase()) || 
+                      (c.id || '').toLowerCase().includes(committeeSearch.toLowerCase())
+                    )
+                    .map((committee) => (
+                    <div key={committee.id} className="p-6 border border-stone-200 rounded-3xl bg-white shadow-sm space-y-5 hover:border-church-gold/40 transition-all">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-church-burgundy/10 text-church-burgundy flex items-center justify-center font-bold font-serif text-lg">
+                            {committee.name?.charAt(0) || 'C'}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-lg font-serif font-bold text-stone-900">
+                                {committee.name || committee.id}
+                              </h3>
+                              <span className="px-2 py-0.5 bg-stone-100 text-stone-600 rounded-md font-mono text-[11px]">
+                                /committee/{committee.id}
+                              </span>
+                            </div>
+                            <p className="text-xs text-stone-500 line-clamp-1">{committee.description || "No description"}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Link 
+                            to={`/committee/${committee.id}`}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-church-gold/10 hover:bg-church-gold/20 text-church-gold rounded-xl text-xs font-bold transition-all"
+                            title="Open Public Committee Page"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" /> Open Page & CSV
+                          </Link>
+                          <button 
+                            onClick={() => handleSaveCommittee(committee.id, committee)}
+                            disabled={isSaving}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                            title="Save Changes"
+                          >
+                            <Save className="h-3.5 w-3.5" /> Save
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteCommittee(committee.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            title="Delete this committee category"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Hming (Committee Name)</label>
+                          <input 
+                            type="text" 
+                            value={committee.name || ""}
+                            onChange={(e) => {
+                              const newList = committees.map(c => c.id === committee.id ? { ...c, name: e.target.value } : c);
+                              setCommittees(newList);
+                            }}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-gold"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Hrilhfiahna (Description)</label>
+                          <input 
+                            type="text" 
+                            value={committee.description || ""}
+                            onChange={(e) => {
+                              const newList = committees.map(c => c.id === committee.id ? { ...c, description: e.target.value } : c);
+                              setCommittees(newList);
+                            }}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-gold"
+                          />
+                        </div>
+                        <div className="md:col-span-3">
+                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Inkhawm Hun / Meeting Time</label>
+                          <input 
+                            type="text" 
+                            value={committee.meetingTime || ""}
+                            onChange={(e) => {
+                              const newList = committees.map(c => c.id === committee.id ? { ...c, meetingTime: e.target.value } : c);
+                              setCommittees(newList);
+                            }}
+                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:border-church-gold"
+                          />
+                        </div>
+
+                        {/* Office Bearers in Admin Panel */}
+                        <div className="md:col-span-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500">
+                              Office Bearers ({committee.officeBearers?.length || 0})
+                            </label>
+                            <button 
+                              onClick={() => {
+                                const newList = [...(committee.officeBearers || []), { role: "Role Thar", name: "", phone: "" }];
+                                const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                setCommittees(newCommittees);
+                              }}
+                              className="text-xs font-bold text-church-burgundy hover:text-church-gold transition-colors flex items-center gap-1"
+                            >
+                              <Plus className="h-3.5 w-3.5" /> OB Belhna
+                            </button>
+                          </div>
+
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {(committee.officeBearers || []).map((ob: any, obIdx: number) => {
+                              const isStructured = typeof ob === 'object' && ob !== null;
+                              const role = isStructured ? ob.role : ob.split(':')[0];
+                              const name = isStructured ? ob.name : ob.split(':')[1];
+                              const phone = isStructured ? (ob.phone || "") : "";
+                              
+                              return (
+                                <div key={obIdx} className="p-3 bg-stone-50 border border-stone-200 rounded-2xl space-y-2">
+                                  <div className="flex justify-between items-center">
                                     <input 
                                       type="text" 
-                                      value={name}
+                                      value={role}
                                       onChange={(e) => {
                                         const newList = [...committee.officeBearers];
-                                        newList[obIdx] = { role, name: e.target.value, phone };
+                                        newList[obIdx] = { role: e.target.value, name, phone };
                                         const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
                                         setCommittees(newCommittees);
                                       }}
-                                      placeholder="Hming"
-                                      className="w-full text-base border-none p-0 focus:ring-0 text-stone-900 font-medium placeholder:text-stone-400"
+                                      className="text-xs font-bold text-church-burgundy uppercase tracking-wider bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-stone-400"
+                                      placeholder="Role"
                                     />
+                                    <button 
+                                      onClick={() => {
+                                        const newList = committee.officeBearers.filter((_: any, i: number) => i !== obIdx);
+                                        const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                        setCommittees(newCommittees);
+                                      }}
+                                      className="text-red-400 hover:text-red-600 p-1"
+                                      title="Remove OB"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+                                  <input 
+                                    type="text" 
+                                    value={name}
+                                    onChange={(e) => {
+                                      const newList = [...committee.officeBearers];
+                                      newList[obIdx] = { role, name: e.target.value, phone };
+                                      const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
+                                      setCommittees(newCommittees);
+                                    }}
+                                    placeholder="Hming"
+                                    className="w-full text-sm bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-stone-900 font-medium placeholder:text-stone-400"
+                                  />
+                                  <div className="flex items-center gap-1.5">
+                                    <Phone className="h-3.5 w-3.5 text-stone-400 shrink-0" />
                                     <input 
                                       type="text" 
                                       value={phone}
@@ -458,80 +791,48 @@ const AdminPanel = () => {
                                         const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
                                         setCommittees(newCommittees);
                                       }}
-                                      placeholder="Phone"
-                                      className="w-full text-sm border-none p-0 focus:ring-0 text-stone-600 placeholder:text-stone-400"
+                                      placeholder="Phone number"
+                                      className="w-full text-xs bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-stone-700 placeholder:text-stone-400"
                                     />
                                   </div>
-                                );
-                              })}
-                              <button 
-                                onClick={() => {
-                                  const newList = [...(committee.officeBearers || []), { role: "New Role", name: "", phone: "" }];
-                                  const newCommittees = committees.map(c => c.id === committee.id ? { ...c, officeBearers: newList } : c);
-                                  setCommittees(newCommittees);
-                                }}
-                                className="border border-dashed border-stone-300 rounded-xl p-4 text-stone-400 text-xs flex items-center justify-center gap-2 hover:bg-stone-50 transition-all"
-                              >
-                                <Plus className="h-4 w-4" /> OB belhna
-                              </button>
-                            </div>
-                          </div>
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Member-te (Comma separated)</label>
-                            <textarea 
-                              value={committee.members?.join(', ') || ""}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, members: e.target.value.split(',').map(s => s.trim()) } : c);
-                                setCommittees(newList);
-                              }}
-                              rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
-                            />
-                          </div>
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Activities (Comma separated)</label>
-                            <textarea 
-                              value={committee.activities?.join(', ') || ""}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, activities: e.target.value.split(',').map(s => s.trim()) } : c);
-                                setCommittees(newList);
-                              }}
-                              rows={2}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
-                            />
-                          </div>
-                          <div className="md:col-span-3">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Reports / Minutes Summary</label>
-                            <textarea 
-                              value={committee.reports || ""}
-                              onChange={(e) => {
-                                const newList = committees.map(c => c.id === committee.id ? { ...c, reports: e.target.value } : c);
-                                setCommittees(newList);
-                              }}
-                              rows={3}
-                              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-church-gold transition-all text-base text-stone-900 placeholder:text-stone-400"
-                            />
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-                        <div className="flex gap-2 ml-4">
-                          <button 
-                            onClick={() => handleSaveCommittee(committee.id, committee)}
-                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                            title="Save"
+
+                        {/* Members Summary / Link */}
+                        <div className="md:col-span-3 bg-stone-50 p-4 rounded-2xl border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                              Committee Members ({Array.isArray(committee.members) ? committee.members.length : 0} members)
+                            </span>
+                            <p className="text-xs text-stone-500 mt-0.5">
+                              Committee member-te hi CSV/Excel hmangin awlsam takin a upload theih a, phone number nen call/WhatsApp theih a ni.
+                            </p>
+                          </div>
+                          <Link 
+                            to={`/committee/${committee.id}`}
+                            className="flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap"
                           >
-                            <Save className="h-5 w-5" />
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteCommittee(committee.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
+                            <FileSpreadsheet className="h-4 w-4 text-church-gold" /> Upload CSV / Manage Members
+                          </Link>
                         </div>
                       </div>
                     </div>
                   ))}
+
+                  {committees.length === 0 && (
+                    <div className="text-center py-12 border-2 border-dashed border-stone-200 rounded-3xl">
+                      <p className="text-stone-400 text-sm">Committee category engmah hmuh a ni lo.</p>
+                      <button 
+                        onClick={() => setIsCreateCommitteeModalOpen(true)}
+                        className="mt-3 text-church-burgundy font-bold text-xs uppercase tracking-wider hover:underline"
+                      >
+                        + Category Thar Belh Rawh
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

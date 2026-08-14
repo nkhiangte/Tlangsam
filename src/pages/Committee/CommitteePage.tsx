@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -24,12 +25,13 @@ import {
   Crown,
   UserCheck,
   ExternalLink,
-  Copy
+  Copy,
+  ArrowLeft
 } from 'lucide-react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../context/AuthContext';
 
@@ -52,9 +54,9 @@ interface NewsItem {
 }
 
 interface CommitteePageProps {
-  id: string;
-  defaultName: string;
-  defaultDescription: string;
+  id?: string;
+  defaultName?: string;
+  defaultDescription?: string;
 }
 
 export const DEFAULT_OB_ROLES = [
@@ -132,11 +134,22 @@ const normalizeMembers = (rawMembers: any): CommitteeMember[] => {
   }).filter(m => m.name.trim() !== '' || m.phone.trim() !== '');
 };
 
-const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultDescription }) => {
+const CommitteePage: React.FC<CommitteePageProps> = ({ id: propId, defaultName, defaultDescription }) => {
+  const { id: paramId } = useParams<{ id: string }>();
+  const id = propId || paramId || 'kohhran';
+  
+  const fallbackTitle = defaultName || (id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') + (id.toLowerCase().includes('committee') ? '' : ' Committee'));
+  const fallbackDescription = defaultDescription || `${fallbackTitle} rawngbawlna leh hmalakna hrang hrangte.`;
+
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAuth();
   
+  // Header editing state
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [editHeaderName, setEditHeaderName] = useState('');
+  const [editHeaderDesc, setEditHeaderDesc] = useState('');
+
   // Section editing states
   const [isEditingRoster, setIsEditingRoster] = useState(false);
   const [editOB, setEditOB] = useState<OfficeBearer[]>([]);
@@ -158,27 +171,32 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     const unsubscribe = onSnapshot(doc(db, 'committees', id), (snapshot) => {
       if (snapshot.exists()) {
         const d = snapshot.data();
         setData(d);
+        setEditHeaderName(d.name || fallbackTitle);
+        setEditHeaderDesc(d.description || fallbackDescription);
       } else {
         setData({
-          name: defaultName,
-          description: defaultDescription,
+          name: fallbackTitle,
+          description: fallbackDescription,
           meetingTime: "Committee thutkhawm hun leh hmun hrang hrangte.",
           members: [],
           officeBearers: DEFAULT_OB_ROLES.map(role => ({ role, name: '', phone: '' })),
           activities: [],
           reports: []
         });
+        setEditHeaderName(fallbackTitle);
+        setEditHeaderDesc(fallbackDescription);
       }
       setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, `committees/${id}`);
     });
     return unsubscribe;
-  }, [id, defaultName, defaultDescription]);
+  }, [id, fallbackTitle, fallbackDescription]);
 
   const startEditingRoster = () => {
     setEditOB(normalizeOfficeBearers(data?.officeBearers));
@@ -193,17 +211,33 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
     setImportStatus(null);
   };
 
+  const handleSaveHeader = async () => {
+    setIsSaving(true);
+    try {
+      await setDoc(doc(db, 'committees', id), {
+        name: editHeaderName.trim(),
+        description: editHeaderDesc.trim(),
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      setIsEditingHeader(false);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `committees/${id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSaveRoster = async () => {
     setIsSaving(true);
     try {
       // Clean up empty members
       const cleanMembers = editMembers.filter(m => m.name.trim() !== '' || m.phone.trim() !== '');
       
-      await updateDoc(doc(db, 'committees', id), {
+      await setDoc(doc(db, 'committees', id), {
         officeBearers: editOB,
         members: cleanMembers,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
       setIsEditingRoster(false);
       setImportStatus(null);
     } catch (error) {
@@ -216,10 +250,10 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
   const handleSaveGeneral = async (field: string, value: any) => {
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'committees', id), {
+      await setDoc(doc(db, 'committees', id), {
         [field]: value,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
       setEditingSection(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `committees/${id}`);
@@ -441,17 +475,83 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col lg:flex-row lg:items-end justify-between gap-6"
           >
-            <div>
+            <div className="flex-1 max-w-3xl">
               <div className="flex items-center gap-2 mb-3">
-                <div className="h-px w-8 bg-church-gold"></div>
-                <span className="text-church-gold font-medium uppercase tracking-widest text-xs">Committee & Member-te</span>
+                <Link to="/admin?tab=committees" className="inline-flex items-center gap-1.5 text-church-gold hover:text-white transition-colors text-xs font-medium uppercase tracking-widest">
+                  <ArrowLeft className="h-3.5 w-3.5" /> All Committees
+                </Link>
+                <div className="h-px w-6 bg-church-gold/50"></div>
+                <span className="text-church-gold/80 font-medium uppercase tracking-widest text-xs">Category</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-serif font-bold text-white mb-3">
-                {data?.name || defaultName}
-              </h1>
-              <p className="text-stone-300 max-w-2xl text-sm sm:text-base leading-relaxed">
-                {data?.description || defaultDescription}
-              </p>
+
+              {isEditingHeader ? (
+                <div className="space-y-4 bg-white/10 p-5 rounded-2xl border border-white/20 backdrop-blur-sm">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-church-gold mb-1">
+                      Committee Hming (Name)
+                    </label>
+                    <input 
+                      type="text" 
+                      value={editHeaderName}
+                      onChange={(e) => setEditHeaderName(e.target.value)}
+                      className="w-full bg-stone-900/90 border border-church-gold/40 rounded-xl px-4 py-2.5 text-white font-serif text-2xl focus:outline-none focus:border-church-gold"
+                      placeholder="Committee Hming"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-church-gold mb-1">
+                      Hrilhfiahna / Description
+                    </label>
+                    <textarea 
+                      value={editHeaderDesc}
+                      onChange={(e) => setEditHeaderDesc(e.target.value)}
+                      rows={2}
+                      className="w-full bg-stone-900/90 border border-church-gold/40 rounded-xl px-4 py-2.5 text-stone-200 text-sm focus:outline-none focus:border-church-gold"
+                      placeholder="Committee mawhphurhna leh hmalakna..."
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={handleSaveHeader}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition-all"
+                    >
+                      {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                      Save Info
+                    </button>
+                    <button 
+                      onClick={() => setIsEditingHeader(false)}
+                      className="flex items-center gap-1.5 px-3 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-semibold"
+                    >
+                      <X className="h-3.5 w-3.5" /> Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h1 className="text-3xl md:text-5xl font-serif font-bold text-white">
+                      {data?.name || fallbackTitle}
+                    </h1>
+                    {isAdmin && (
+                      <button 
+                        onClick={() => {
+                          setEditHeaderName(data?.name || fallbackTitle);
+                          setEditHeaderDesc(data?.description || fallbackDescription);
+                          setIsEditingHeader(true);
+                        }}
+                        className="p-1.5 text-stone-400 hover:text-church-gold hover:bg-white/10 rounded-lg transition-all"
+                        title="Edit Committee Name & Description"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-stone-300 max-w-2xl text-sm sm:text-base leading-relaxed">
+                    {data?.description || fallbackDescription}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Admin Quick Action Controls */}
@@ -499,6 +599,13 @@ const CommitteePage: React.FC<CommitteePageProps> = ({ id, defaultName, defaultD
                         <Download className="h-4 w-4" /> Template (.xlsx)
                       </button>
                     </div>
+                    <Link
+                      to="/admin?tab=committees"
+                      className="flex items-center gap-1.5 px-3 py-2.5 bg-stone-800/80 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-semibold border border-stone-700 transition-all"
+                      title="Manage all categories in Admin Panel"
+                    >
+                      <Shield className="h-4 w-4 text-church-gold" /> Admin Hub
+                    </Link>
                   </>
                 )}
               </div>

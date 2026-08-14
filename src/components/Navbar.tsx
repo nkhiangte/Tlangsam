@@ -15,9 +15,18 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db, storage, handleFirestoreError, OperationType } from '../firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import LoginModal from './LoginModal';
+
+const DEFAULT_COMMITTEES = [
+  { id: 'kohhran', name: 'Kohhran Committee', href: '/committee/kohhran' },
+  { id: 'sunday-school', name: 'Sunday School Committee', href: '/committee/sunday-school' },
+  { id: 'ramthar', name: 'Ramthar Committee', href: '/committee/ramthar' },
+  { id: 'bsi', name: 'BSI Committee', href: '/committee/bsi' },
+  { id: 'refreshment', name: 'Refreshment Committee', href: '/committee/refreshment' },
+  { id: 'light-sound', name: 'Light & Sound Committee', href: '/committee/light-sound' },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +40,7 @@ const Navbar = () => {
   const [uploading, setUploading] = useState(false);
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [dynamicCommittees, setDynamicCommittees] = useState<Array<{ name: string; href: string }>>([]);
   const { user, logout, isAdmin } = useAuth();
 
   const isHomePage = pathname === '/';
@@ -76,10 +86,39 @@ const Navbar = () => {
       }
     });
 
+    const unsubscribeCommittees = onSnapshot(collection(db, 'committees'), (snapshot) => {
+      const mergedMap = new Map<string, { name: string; href: string }>();
+      
+      // Default baseline
+      DEFAULT_COMMITTEES.forEach(c => {
+        mergedMap.set(c.id, { name: c.name, href: c.href });
+      });
+
+      // Overlay from Firestore
+      snapshot.docs.forEach(docSnap => {
+        const d = docSnap.data();
+        const id = docSnap.id;
+        const name = d.name && d.name.trim() !== '' 
+          ? d.name 
+          : (id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') + (id.toLowerCase().includes('committee') ? '' : ' Committee'));
+        
+        mergedMap.set(id, {
+          name,
+          href: `/committee/${id}`
+        });
+      });
+
+      setDynamicCommittees(Array.from(mergedMap.values()));
+    }, (error) => {
+      console.error("Error fetching committees for navbar:", error);
+      setDynamicCommittees(DEFAULT_COMMITTEES.map(c => ({ name: c.name, href: c.href })));
+    });
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       unsubscribeHomepage();
       unsubscribeBranding();
+      unsubscribeCommittees();
     };
   }, []);
 
@@ -155,14 +194,9 @@ const Navbar = () => {
     { 
       name: 'Committee', 
       href: '#',
-      dropdown: [
-        { name: 'Kohhran Committee', href: '/committee/kohhran' },
-        { name: 'Sunday School Committee', href: '/committee/sunday-school' },
-        { name: 'Ramthar Committee', href: '/committee/ramthar' },
-        { name: 'BSI Committee', href: '/committee/bsi' },
-        { name: 'Refreshment Committee', href: '/committee/refreshment' },
-        { name: 'Light & Sound Committee', href: '/committee/light-sound' },
-      ]
+      dropdown: dynamicCommittees.length > 0 
+        ? dynamicCommittees 
+        : DEFAULT_COMMITTEES.map(c => ({ name: c.name, href: c.href })),
     },
     { name: 'Sunday School', 
       href: '#',
@@ -331,6 +365,14 @@ const Navbar = () => {
                       {sub.name}
                     </Link>
                   ))}
+                  {link.name === 'Committee' && isAdmin && (
+                    <Link
+                      to="/admin?tab=committees"
+                      className="block px-3 py-1.5 text-[11px] text-church-burgundy hover:bg-church-burgundy/10 transition-colors font-black uppercase tracking-wider rounded-r-lg border-t border-stone-100 mt-1"
+                    >
+                      + Add / Manage Committees
+                    </Link>
+                  )}
                 </div>
               </div>
             ) : (
@@ -403,6 +445,15 @@ const Navbar = () => {
                       {sub.name}
                     </Link>
                   ))}
+                  {link.name === 'Committee' && isAdmin && (
+                    <Link
+                      to="/admin?tab=committees"
+                      onClick={() => setIsOpen(false)}
+                      className="text-church-burgundy font-bold py-2 px-4 border-l-2 border-church-burgundy bg-church-burgundy/5 transition-all text-xs uppercase tracking-wider"
+                    >
+                      + Add / Manage Committees
+                    </Link>
+                  )}
                 </div>
               ) : link.href.startsWith('/#') ? (
                 <a 
