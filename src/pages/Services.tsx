@@ -328,7 +328,7 @@ const Services = () => {
                     {service.fields && Object.keys(service.fields).filter(k => service.fields![k] && service.fields![k].trim() !== '').length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                         {Object.entries(service.fields)
-                          .filter(([_, value]) => value && value.trim() !== '')
+                          .filter(([_, value]) => value && String(value).trim() !== '')
                           .map(([label, value]) => (
                           <div 
                             key={label} 
